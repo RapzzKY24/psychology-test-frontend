@@ -1,3 +1,6 @@
+"use client";
+
+import Link from "next/link";
 import {
   Table,
   TableBody,
@@ -8,8 +11,9 @@ import {
 } from "@/components/ui/table";
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
+import type { QueryKey } from "@tanstack/react-query";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
-import type { QueryResultsItem } from "@/lib/api/types";
+import type { QueryResultsItem } from "@/lib/api/types/reviews";
 import { formatIdDate } from "@/lib/format/format-date";
 import { ResubmitButton } from "./resubmit-button";
 import { ResultStatusBadge } from "./result-status-badge";
@@ -17,10 +21,11 @@ import { ResultStatusBadge } from "./result-status-badge";
 interface ResultsTableProps {
   rows: QueryResultsItem[];
   meta: PaginationMeta;
+  listKey: QueryKey;
   status?: string;
 }
 
-export function ResultsTable({ rows, meta, status }: ResultsTableProps) {
+export function ResultsTable({ rows, meta, listKey, status }: ResultsTableProps) {
   if (rows.length === 0) {
     return (
       <TableEmpty
@@ -55,7 +60,7 @@ export function ResultsTable({ rows, meta, status }: ResultsTableProps) {
           </TableHeader>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.resultId}>
+              <TableRow key={row.id}>
                 <TableCell className="font-medium">{row.participantName}</TableCell>
                 <TableCell>{row.testName}</TableCell>
                 <TableCell>{row.sessionTitle}</TableCell>
@@ -70,13 +75,15 @@ export function ResultsTable({ rows, meta, status }: ResultsTableProps) {
                   <ResultStatusBadge status={row.status} />
                 </TableCell>
                 <TableCell>
-                  {row.status === "RETURNED" ? (
-                    <ResubmitButton resultId={row.resultId} />
-                  ) : (
-                    <span className="text-xs text-muted-foreground">
-                      {row.status === "PENDING_REVIEW" ? "menunggu psikolog" : "selesai"}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    <Link
+                      href={`/admin/hasil/${row.attemptId}`}
+                      className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
+                    >
+                      Detail
+                    </Link>
+                    {row.status === "RETURNED" && <ResubmitButton resultId={row.id} />}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

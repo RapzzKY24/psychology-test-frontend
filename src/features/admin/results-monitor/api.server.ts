@@ -1,5 +1,5 @@
 import { apiFetchServer } from "@/lib/api/server";
-import type { QueryResultsItem } from "@/lib/api/types";
+import type { AdminResultView, QueryResultsItem } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { ResultFilters } from "./api";
 
@@ -16,4 +16,9 @@ function buildQuery(filters: ResultFilters): string {
 
 export function fetchResultsServer(filters: ResultFilters = {}): Promise<ApiSuccess<QueryResultsItem[]>> {
   return apiFetchServer<QueryResultsItem[]>(`/admin/results${buildQuery(filters)}`);
+}
+
+/** Full admin view: system scores + corrections + interpretation. */
+export function fetchAdminResultServer(attemptId: string): Promise<ApiSuccess<AdminResultView>> {
+  return apiFetchServer<AdminResultView>(`/admin/attempts/${attemptId}/result`);
 }
