@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Pencil } from "lucide-react";
 import { formatIdr } from "@/lib/format/format-idr";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
-import type { AdminTest, TestStatus } from "@/lib/api/types";
+import type { AdminTest } from "@/lib/api/types";
 import { TestStatusBadge } from "./status-badge";
 
 interface TestsTableProps {
