@@ -14,10 +14,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { QueryKey } from "@tanstack/react-query";
-import type { Institution, SessionSummary } from "@/lib/api/types";
+import type { Institution } from "@/lib/api/types";
 import { useCreateSessionForm } from "../hooks/use-create-session-form";
 import { CreateSessionFields } from "./create-session-fields";
-import { CreateSessionSuccess } from "./create-session-success";
 
 interface CreateSessionDialogProps {
   /** List cache key — the mutation prepends the new session optimistically. */
@@ -30,10 +29,11 @@ interface CreateSessionDialogProps {
 
 export function CreateSessionDialog({ listKey, tests, institutions }: CreateSessionDialogProps) {
   const [open, setOpen] = useState(false);
-  const [created, setCreated] = useState<SessionSummary | null>(null);
 
-  const { form, mutation, submit } = useCreateSessionForm(listKey, (createdSession) => {
-    setCreated(createdSession);
+  const { form, mutation, submit } = useCreateSessionForm(listKey, () => {
+    // Close on success — the grayed new row (with its Salin Undangan button)
+    // is already visible in the table behind the dialog.
+    setOpen(false);
   });
 
   return (
@@ -41,7 +41,6 @@ export function CreateSessionDialog({ listKey, tests, institutions }: CreateSess
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (next) setCreated(null);
         if (!next) form.reset();
       }}
     >
@@ -58,31 +57,20 @@ export function CreateSessionDialog({ listKey, tests, institutions }: CreateSess
             Sesi group: bagikan tautan undangan, peserta masuk tanpa akun.
           </DialogDescription>
         </DialogHeader>
-
-        {created ? (
-          <CreateSessionSuccess
-            created={created}
-            onDone={() => {
-              setOpen(false);
-              form.reset();
-            }}
-          />
-        ) : (
-          <FormProvider {...form}>
-            <form onSubmit={submit} noValidate className="grid gap-4">
-              <CreateSessionFields
-                tests={tests}
-                institutions={institutions}
-                disabled={mutation.isPending}
-              />
-              <DialogFooter>
-                <Button type="submit" disabled={mutation.isPending}>
-                  {mutation.isPending ? "Menyimpan..." : "Buat Sesi"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </FormProvider>
-        )}
+        <FormProvider {...form}>
+          <form onSubmit={submit} noValidate className="grid gap-4">
+            <CreateSessionFields
+              tests={tests}
+              institutions={institutions}
+              disabled={mutation.isPending}
+            />
+            <DialogFooter>
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending ? "Menyimpan..." : "Buat Sesi"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );
