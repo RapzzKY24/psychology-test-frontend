@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import type { AdminResultView, QueryResultsItem } from "@/lib/api/types";
+import type { QueryResultsItem } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 
 export interface ResultFilters {
