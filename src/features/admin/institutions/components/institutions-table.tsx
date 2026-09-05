@@ -15,10 +15,9 @@ import { InstitutionFormDialog } from "./institution-form-dialog";
 interface InstitutionsTableProps {
   rows: Institution[];
   meta: PaginationMeta;
-  page: number;
 }
 
-export function InstitutionsTable({ rows, meta, page }: InstitutionsTableProps) {
+export function InstitutionsTable({ rows, meta }: InstitutionsTableProps) {
   if (rows.length === 0) {
     return (
       <TableEmpty

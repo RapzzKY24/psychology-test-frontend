@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,11 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { isApiError } from "@/lib/api/client";
-import { qk } from "@/lib/api/query-keys";
 import { USER_ROLES } from "@/lib/api/types";
-import type { AdminUser, UserRole } from "@/lib/api/types";
-import { updateUserRole } from "../api";
+import type { UserRole } from "@/lib/api/types";
+import type { AdminUser } from "@/lib/api/types";
+import { useChangeRole } from "../hooks/use-change-role";
 import { ROLE_LABEL } from "../schemas";
 
 interface ChangeRoleDialogProps {
@@ -37,33 +34,18 @@ interface ChangeRoleDialogProps {
 }
 
 export function ChangeRoleDialog({ user, disabled }: ChangeRoleDialogProps) {
-  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm<{ role: UserRole }>({
-    defaultValues: { role: user.role as UserRole },
+    defaultValues: { role: user.role },
   });
 
-  const mutation = useMutation({
-    mutationFn: async (values: { role: UserRole }) => {
-      const { data } = await updateUserRole(user.id, values.role);
-      return data;
-    },
-    meta: { silentError: true },
-    onSuccess: (updated) => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.users.all });
-      toast.success(`Role ${user.email} → ${ROLE_LABEL[updated.role]}.`);
-      setOpen(false);
-    },
-    onError: (error) => {
-      if (isApiError(error) && error.code === "cannot_change_own_role") {
-        setFormError("Anda tidak bisa mengubah role akun sendiri.");
-        return;
-      }
-      toast.error(error instanceof Error ? error.message : "Terjadi kesalahan — coba lagi.");
-    },
-  });
+  const mutation = useChangeRole(
+    user,
+    (message) => setFormError(message),
+    () => setOpen(false),
+  );
 
   if (disabled) {
     return (
@@ -80,7 +62,7 @@ export function ChangeRoleDialog({ user, disabled }: ChangeRoleDialogProps) {
       onOpenChange={(next) => {
         setOpen(next);
         setFormError(null);
-        if (next) form.reset({ role: user.role as UserRole });
+        if (next) form.reset({ role: user.role });
       }}
     >
       <DialogTrigger asChild>
@@ -97,10 +79,7 @@ export function ChangeRoleDialog({ user, disabled }: ChangeRoleDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <form
-          onSubmit={form.handleSubmit((values) => {
-            setFormError(null);
-            return mutation.mutateAsync(values);
-          })}
+          onSubmit={form.handleSubmit((values) => mutation.mutateAsync(values))}
           noValidate
           className="grid gap-4"
         >

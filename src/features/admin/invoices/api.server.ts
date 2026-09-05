@@ -1,5 +1,5 @@
 import { apiFetchServer } from "@/lib/api/server";
-import type { Invoice, InvoiceStatus } from "@/lib/api/types";
+import type { Invoice } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { InvoiceFilters } from "./api";
 

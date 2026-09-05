@@ -1,5 +1,5 @@
 import { apiFetchServer } from "@/lib/api/server";
-import type { AdminUser, UserRole } from "@/lib/api/types";
+import type { AdminUser } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { AdminUserFilters } from "./api";
 

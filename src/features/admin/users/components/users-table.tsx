@@ -12,10 +12,9 @@ interface UsersTableProps {
   meta: PaginationMeta;
   currentUserId: string;
   role?: string;
-  page: number;
 }
 
-export function UsersTable({ rows, meta, currentUserId, role, page }: UsersTableProps) {
+export function UsersTable({ rows, meta, currentUserId, role }: UsersTableProps) {
   if (rows.length === 0) {
     return <TableEmpty title="Belum ada pengguna" filtered={Boolean(role)} />;
   }
@@ -46,7 +45,7 @@ export function UsersTable({ rows, meta, currentUserId, role, page }: UsersTable
                   <p className="font-medium">{row.name}</p>
                   <p className="text-xs text-muted-foreground">{row.email}</p>
                 </TableCell>
-                <TableCell>{ROLE_LABEL[row.role as keyof typeof ROLE_LABEL]}</TableCell>
+                <TableCell>{ROLE_LABEL[row.role]}</TableCell>
                 <TableCell className="tabular-nums">{formatIdDate(row.createdAt)}</TableCell>
                 <TableCell>
                   <ChangeRoleDialog user={row} disabled={row.id === currentUserId} />

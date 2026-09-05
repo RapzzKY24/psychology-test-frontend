@@ -1,9 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,14 +15,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { qk } from "@/lib/api/query-keys";
+import { FORM_INVALID_TOAST } from "@/features/admin/copy";
 import type { Institution } from "@/lib/api/types";
-import { createInstitution, updateInstitution } from "../api";
+import { useInstitutionForm } from "../hooks/use-institution-form";
 import { InstitutionSchema } from "../schemas";
 import type { InstitutionInput } from "../schemas";
+import { InstitutionFormFields } from "./institution-form-fields";
 
 interface InstitutionFormDialogProps {
   mode: "create" | "edit";
@@ -31,8 +28,8 @@ interface InstitutionFormDialogProps {
 }
 
 export function InstitutionFormDialog({ mode, institution }: InstitutionFormDialogProps) {
-  const queryClient = useQueryClient();
   const isEdit = mode === "edit";
+  const [open, setOpen] = useState(false);
 
   const form = useForm<InstitutionInput>({
     resolver: zodResolver(InstitutionSchema),
@@ -46,41 +43,25 @@ export function InstitutionFormDialog({ mode, institution }: InstitutionFormDial
   });
 
   useEffect(() => {
-    if (isEdit && institution) {
+    if (open) {
       form.reset({
-        name: institution.name,
-        contactName: institution.contactName,
-        contactEmail: institution.contactEmail,
-        phone: institution.phone ?? "",
-        notes: institution.notes ?? "",
+        name: institution?.name ?? "",
+        contactName: institution?.contactName ?? "",
+        contactEmail: institution?.contactEmail ?? "",
+        phone: institution?.phone ?? "",
+        notes: institution?.notes ?? "",
       });
     }
-  }, [institution, isEdit, form]);
+  }, [open, institution, form]);
 
-  const mutation = useMutation({
-    mutationFn: async (values: InstitutionInput) => {
-      const payload = {
-        ...values,
-        phone: values.phone || undefined,
-        notes: values.notes || undefined,
-      };
-      const { data } = isEdit && institution
-        ? await updateInstitution(institution.id, payload)
-        : await createInstitution(payload);
-      return data;
-    },
-    meta: { silentError: true },
-    onSuccess: (saved) => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.institutions.all });
-      toast.success(isEdit ? `Institusi ${saved.name} diperbarui.` : `Institusi ${saved.name} dibuat.`);
-    },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Terjadi kesalahan — coba lagi.");
-    },
+  const mutation = useInstitutionForm({
+    mode,
+    institution,
+    onSaved: () => setOpen(false),
   });
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {isEdit ? (
           <Button
@@ -105,81 +86,27 @@ export function InstitutionFormDialog({ mode, institution }: InstitutionFormDial
             Institusi adalah klien B2B — pemilik sesi group dan invoice.
           </DialogDescription>
         </DialogHeader>
-        <form
-          onSubmit={form.handleSubmit(
-            (values) => mutation.mutateAsync(values),
-            () => toast.error("Periksa kembali field yang bertanda merah."),
-          )}
-          noValidate
-          className="grid gap-4"
-        >
-          <Controller
-            name="name"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="inst-name">Nama institusi</FieldLabel>
-                <Input {...field} id="inst-name" placeholder="PT Maju Jaya" aria-invalid={fieldState.invalid} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
+        <FormProvider {...form}>
+          <form
+            onSubmit={form.handleSubmit(
+              (values) => mutation.mutateAsync(values),
+              () => toast.error(FORM_INVALID_TOAST),
             )}
-          />
-          <Controller
-            name="contactName"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="inst-contact">Nama kontak</FieldLabel>
-                <Input {...field} id="inst-contact" placeholder="Budi HRD" aria-invalid={fieldState.invalid} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-          <Controller
-            name="contactEmail"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="inst-email">Email kontak</FieldLabel>
-                <Input
-                  {...field}
-                  id="inst-email"
-                  type="email"
-                  placeholder="hr@ptmajujaya.co.id"
-                  aria-invalid={fieldState.invalid}
-                />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-          <Controller
-            name="phone"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="inst-phone">Telepon (opsional)</FieldLabel>
-                <Input {...field} id="inst-phone" placeholder="0812…" aria-invalid={fieldState.invalid} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-          <Controller
-            name="notes"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="inst-notes">Catatan (opsional)</FieldLabel>
-                <Textarea {...field} id="inst-notes" rows={3} aria-invalid={fieldState.invalid} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-          <DialogFooter>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Buat Institusi"}
-            </Button>
-          </DialogFooter>
-        </form>
+            noValidate
+            className="grid gap-4"
+          >
+            <InstitutionFormFields disabled={mutation.isPending} />
+            <DialogFooter>
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending
+                  ? "Menyimpan..."
+                  : isEdit
+                    ? "Simpan Perubahan"
+                    : "Buat Institusi"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

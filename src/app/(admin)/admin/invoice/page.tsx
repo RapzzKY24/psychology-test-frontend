@@ -17,6 +17,8 @@ export default async function InvoicePage({ searchParams }: PageProps<"/admin/in
     ? (sp.status as InvoiceStatus)
     : undefined;
 
+  // MVP cap (accepted): institutions realistically stay under 100; beyond that
+  // names fall back to "—" and the create-invoice select loses options.
   const [invoicePage, institutionPage] = await Promise.all([
     fetchInvoicesServer({ page, status }),
     fetchInstitutionsServer({ page: 1, limit: 100 }),

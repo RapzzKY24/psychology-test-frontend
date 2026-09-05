@@ -3,7 +3,7 @@
  * Keep in sync with the schema — a mismatch here is a contract bug.
  */
 
-export const USER_ROLES = ["PARTICIPANT", "ADMIN", "PSYCHOLOGIST"] as const;
+export const USER_ROLES = ["ADMIN", "PSYCHOLOGIST", "PARTICIPANT"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
 export const TEST_CATEGORIES = [

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
-import { TablePagination } from "@/components/admin/table-pagination";
 import { CreateUserButton } from "@/features/admin/users/components/create-user-dialog";
 import { UserFilters } from "@/features/admin/users/components/user-filters";
 import { UsersTable } from "@/features/admin/users/components/users-table";
@@ -38,7 +37,6 @@ export default async function UsersPage({ searchParams }: PageProps<"/admin/user
         meta={tableMeta}
         currentUserId={session?.user.id ?? ""}
         role={role}
-        page={page}
       />
     </main>
   );

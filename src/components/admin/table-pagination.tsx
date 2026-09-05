@@ -24,7 +24,7 @@ export function TablePagination({ meta, pageHref }: TablePaginationProps) {
         )}
         {meta.page < meta.totalPages && (
           <Link
-            href={pageQueryNextSafe(meta.page, meta.totalPages, pageHref)}
+            href={pageHref(meta.page + 1)}
             className="rounded-md border px-3 py-1.5 hover:bg-muted"
           >
             Berikutnya
@@ -33,12 +33,4 @@ export function TablePagination({ meta, pageHref }: TablePaginationProps) {
       </div>
     </div>
   );
-}
-
-function pageQueryNextSafe(
-  page: number,
-  totalPages: number,
-  pageHref: (page: number) => string,
-): string {
-  return pageHref(Math.min(page + 1, totalPages));
 }

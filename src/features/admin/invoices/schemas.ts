@@ -17,7 +17,7 @@ export type CreateInvoiceInput = z.infer<typeof CreateInvoiceSchema>;
 
 export const UpdateStatusSchema = z.object({
   status: z.enum(INVOICE_STATUSES),
-  notes: z.string().trim().max(2000).optional(),
+  notes: z.string().trim().max(2000),
 });
 
 export type UpdateStatusInput = z.infer<typeof UpdateStatusSchema>;

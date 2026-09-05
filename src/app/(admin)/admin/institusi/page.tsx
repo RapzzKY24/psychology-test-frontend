@@ -22,7 +22,7 @@ export default async function InstitusiPage({ searchParams }: PageProps<"/admin/
         />
         <InstitutionFormDialog mode="create" />
       </div>
-      <InstitutionsTable rows={data} meta={tableMeta} page={page} />
+      <InstitutionsTable rows={data} meta={tableMeta} />
     </main>
   );
 }

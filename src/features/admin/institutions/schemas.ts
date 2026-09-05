@@ -4,7 +4,7 @@ import { z } from "zod";
 export const InstitutionSchema = z.object({
   name: z.string().trim().min(1, "Nama institusi wajib diisi.").max(200),
   contactName: z.string().trim().min(1, "Nama kontak wajib diisi.").max(200),
-  contactEmail: z.email("Format email tidak valid."),
+  contactEmail: z.email("Format email tidak valid.").max(200),
   phone: z
     .string()
     .trim()

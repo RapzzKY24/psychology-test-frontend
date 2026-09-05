@@ -7,6 +7,9 @@
 
 import type { ApiSuccess, PaginationMeta } from "./types/pagination";
 
+/** Shared fallback copy — reuse instead of re-typing it per feature. */
+export const GENERIC_ERROR_MESSAGE = "Terjadi kesalahan — coba lagi.";
+
 /** Known catalog codes (api-contract §7 + verified backend usages). */
 export const KNOWN_ERROR_CODES = [
   // Auth
@@ -107,7 +110,7 @@ export function errorMessageFor(code: string, statusCode: number): string {
   if ((KNOWN_ERROR_CODES as readonly string[]).includes(code)) {
     return ERROR_MESSAGES[code as ErrorCode];
   }
-  return STATUS_FALLBACK[statusCode] ?? "Terjadi kesalahan — coba lagi.";
+  return STATUS_FALLBACK[statusCode] ?? GENERIC_ERROR_MESSAGE;
 }
 
 export class ApiError extends Error {
