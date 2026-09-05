@@ -19,6 +19,18 @@ export interface AdminTest extends PublicTest {
   updatedAt?: string;
 }
 
+/** Builder payload (`GET /api/v1/admin/tests/:id` — merged 2026-09-05, PR #6). */
+export interface AdminTestItem {
+  id: string;
+  order: number;
+  content: DiscItemContent;
+}
+
+export interface AdminTestDetail extends AdminTest {
+  items: AdminTestItem[];
+  interpretations: Interpretation[];
+}
+
 /** Body of `POST /api/v1/admin/tests` (CreateTestSchema, verified). */
 export interface CreateTestInput {
   name: string;
@@ -32,24 +44,17 @@ export interface CreateTestInput {
 
 export type UpdateTestInput = Partial<CreateTestInput>;
 
+export type DiscMapping = "D" | "I" | "S" | "C" | "*";
+
 /**
  * DISC forced-choice item content (DiscItemContentSchema in
  * src/scorers/schemas/forced-choice-disc.ts, verified). `*` marks a neutral word.
+ * Arrays are length-4 at runtime — enforced by Zod on both sides.
  */
 export interface DiscItemContent {
-  words: [string, string, string, string];
-  mostMapping: [
-    "D" | "I" | "S" | "C" | "*",
-    "D" | "I" | "S" | "C" | "*",
-    "D" | "I" | "S" | "C" | "*",
-    "D" | "I" | "S" | "C" | "*",
-  ];
-  leastMapping: [
-    "D" | "I" | "S" | "C" | "*",
-    "D" | "I" | "S" | "C" | "*",
-    "D" | "I" | "S" | "C" | "*",
-    "D" | "I" | "S" | "C" | "*",
-  ];
+  words: string[];
+  mostMapping: DiscMapping[];
+  leastMapping: DiscMapping[];
 }
 
 /** Body of `PUT /api/v1/admin/tests/:id/items` (PutItemsSchema — content validated per scorerType in the service). */
