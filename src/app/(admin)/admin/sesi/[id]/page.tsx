@@ -4,8 +4,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { CopyInviteButton } from "@/features/admin/sessions/components/copy-invite-button";
 import { CloseSessionButton } from "@/features/admin/sessions/components/close-session-button";
-import { SessionAttemptsTable } from "@/features/admin/sessions/components/session-attempts-table";
-import { SessionParticipantsTable } from "@/features/admin/sessions/components/session-participants-table";
+import { SessionStats } from "@/features/admin/sessions/components/session-stats";
 import { fetchSessionDetailServer } from "@/features/admin/sessions/api.server";
 import { qk } from "@/lib/api/query-keys";
 import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
@@ -26,22 +25,28 @@ export default async function SessionDetailPage({ params }: PageProps<"/admin/se
     throw error;
   }
 
-  const listKey = qk.admin.sessions.all;
-
   return (
     <main className="flex-1 space-y-6 p-6">
       <PageHeader
         title={detail.session.title}
-        description={`Status: ${SESSION_STATUS_LABEL[detail.session.status]} · slot ${detail.session.slotLimit} · kedaluwarsa ${formatIdDate(detail.session.expiresAt)}`}
+        description={`Status: ${SESSION_STATUS_LABEL[detail.session.status]} · kedaluwarsa ${formatIdDate(detail.session.expiresAt)}`}
       />
 
       <div className="flex flex-wrap items-center gap-3">
         <CopyInviteButton token={detail.session.token} label="Salin Tautan Undangan" />
-        {detail.session.status === "ACTIVE" && <CloseSessionButton sessionId={detail.session.id} listKey={listKey} />}
+        {detail.session.status === "ACTIVE" && (
+          <CloseSessionButton sessionId={detail.session.id} listKey={qk.admin.sessions.all} />
+        )}
         <Link href="/admin/sesi" className="text-sm text-muted-foreground hover:underline">
           ← Kembali ke daftar sesi
         </Link>
       </div>
+
+      <SessionStats
+        participants={detail.participants}
+        slotLimit={detail.session.slotLimit}
+        attempts={detail.attempts}
+      />
 
       <section className="space-y-2">
         <h2 className="text-base font-semibold">Tes dalam sesi (berurutan)</h2>
@@ -60,25 +65,9 @@ export default async function SessionDetailPage({ params }: PageProps<"/admin/se
         </ol>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold">
-          Peserta{" "}
-          <span className="text-sm text-muted-foreground tabular-nums">
-            ({detail.participants.length})
-          </span>
-        </h2>
-        <SessionParticipantsTable participants={detail.participants} />
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold">
-          Attempt{" "}
-          <span className="text-sm text-muted-foreground tabular-nums">
-            ({detail.attempts.length})
-          </span>
-        </h2>
-        <SessionAttemptsTable attempts={detail.attempts} tests={detail.tests} />
-      </section>
+      <p className="text-xs text-muted-foreground">
+        Daftar nama peserta per sesi menyusul — saat ini tersedia rekap jumlah peserta dan attempt.
+      </p>
     </main>
   );
 }

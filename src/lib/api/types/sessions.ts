@@ -26,26 +26,23 @@ export interface SessionSummary {
   createdAt?: string;
 }
 
-/** `GET /api/v1/admin/sessions/:id` (SessionDetail from sessions.repository.ts, verified). */
+/**
+ * `GET /api/v1/admin/sessions/:id` — verified against
+ * sessions.prisma-repository.findDetailById (2026-09-06): participants is a
+ * COUNT and attempts is a summary object, NOT arrays.
+ */
+export interface SessionAttemptsSummary {
+  total: number;
+  inProgress: number;
+  completed: number;
+}
+
 export interface SessionDetail {
+  /** Full TestSession row (admin-only endpoint; pinHash present — never rendered). */
   session: SessionSummary;
   tests: Array<{ id: string; testId: string; testName: string; order: number }>;
-  participants: Array<{
-    id: string;
-    name: string;
-    email: string | null;
-    candidateNumber: string | null;
-    joinedAt: string;
-  }>;
-  attempts: Array<{
-    id: string;
-    testId: string;
-    participantId: string | null;
-    userId: string | null;
-    status: string;
-    startedAt: string | null;
-    completedAt: string | null;
-  }>;
+  participants: number;
+  attempts: SessionAttemptsSummary;
 }
 
 /** Body of `POST /api/v1/public/sessions/:token/join` (JoinSessionSchema, verified). */
