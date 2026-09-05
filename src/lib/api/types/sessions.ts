@@ -28,8 +28,8 @@ export interface SessionSummary {
 
 /**
  * `GET /api/v1/admin/sessions/:id` — verified against
- * sessions.prisma-repository.findDetailById (2026-09-06): participants is a
- * COUNT and attempts is a summary object, NOT arrays.
+ * sessions.prisma-repository.findDetailById (2026-09-06, updated same day:
+ * participants now returns the full rows; attempts is a summary object).
  */
 export interface SessionAttemptsSummary {
   total: number;
@@ -37,11 +37,19 @@ export interface SessionAttemptsSummary {
   completed: number;
 }
 
+export interface SessionParticipantRow {
+  id: string;
+  name: string;
+  email: string | null;
+  candidateNumber: string | null;
+  joinedAt: string;
+}
+
 export interface SessionDetail {
   /** Full TestSession row (admin-only endpoint; pinHash present — never rendered). */
   session: SessionSummary;
   tests: Array<{ id: string; testId: string; testName: string; order: number }>;
-  participants: number;
+  participants: SessionParticipantRow[];
   attempts: SessionAttemptsSummary;
 }
 

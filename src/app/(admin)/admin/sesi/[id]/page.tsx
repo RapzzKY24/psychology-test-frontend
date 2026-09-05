@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { CopyInviteButton } from "@/features/admin/sessions/components/copy-invite-button";
 import { CloseSessionButton } from "@/features/admin/sessions/components/close-session-button";
 import { SessionStats } from "@/features/admin/sessions/components/session-stats";
+import { SessionParticipantsTable } from "@/features/admin/sessions/components/session-participants-table";
 import { fetchSessionDetailServer } from "@/features/admin/sessions/api.server";
 import { qk } from "@/lib/api/query-keys";
 import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
@@ -43,7 +44,7 @@ export default async function SessionDetailPage({ params }: PageProps<"/admin/se
       </div>
 
       <SessionStats
-        participants={detail.participants}
+        participants={detail.participants.length}
         slotLimit={detail.session.slotLimit}
         attempts={detail.attempts}
       />
@@ -65,9 +66,15 @@ export default async function SessionDetailPage({ params }: PageProps<"/admin/se
         </ol>
       </section>
 
-      <p className="text-xs text-muted-foreground">
-        Daftar nama peserta per sesi menyusul — saat ini tersedia rekap jumlah peserta dan attempt.
-      </p>
+      <section className="space-y-2">
+        <h2 className="text-base font-semibold">
+          Peserta{" "}
+          <span className="text-sm text-muted-foreground tabular-nums">
+            ({detail.participants.length})
+          </span>
+        </h2>
+        <SessionParticipantsTable participants={detail.participants} />
+      </section>
     </main>
   );
 }
