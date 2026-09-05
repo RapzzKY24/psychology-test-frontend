@@ -10,11 +10,10 @@ import { z } from "zod";
 import { isApiError } from "@/lib/api/client";
 import { qk } from "@/lib/api/query-keys";
 import type { AdminTestDetail } from "@/lib/api/types";
-import { archiveTest, publishTest, putInterpretations, putTestItems, updateTest } from "../api";
-import { DiscItemContentSchema, TestSettingsSchema } from "../schemas";
+import { archiveTest, publishTest, putInterpretations, putTestItems } from "../api";
+import { DiscItemContentSchema } from "../schemas";
 
 const BuilderFormSchema = z.object({
-  settings: TestSettingsSchema,
   items: z.array(z.object({ content: DiscItemContentSchema })),
   interpretations: z.array(
     z.object({ patternCode: z.string(), title: z.string(), body: z.string() }),
@@ -22,18 +21,10 @@ const BuilderFormSchema = z.object({
 });
 
 export type BuilderFormValues = z.infer<typeof BuilderFormSchema>;
-export type BuilderTab = "pengaturan" | "soal" | "interpretasi";
+export type BuilderTab = "soal" | "interpretasi";
 
 function toFormValues(detail: AdminTestDetail): BuilderFormValues {
   return {
-    settings: {
-      name: detail.name,
-      slug: detail.slug,
-      description: detail.description,
-      category: detail.category,
-      price: detail.price,
-      estimatedDurationMin: detail.estimatedDurationMin,
-    },
     items: detail.items.map((item) => ({ content: item.content })),
     interpretations: detail.interpretations.map((row) => ({
       patternCode: row.patternCode,
@@ -44,14 +35,15 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
 }
 
 /**
- * The studio's single form holds all three draft slices (settings, items,
- * interpretations). Saves are replace-all on the backend, so Simpan sends the
- * dirty slices' full state; publish saves first and surfaces 422 coverage gaps.
+ * The studio's draft form holds the two editor slices (items, interpretations).
+ * Settings live in a separate modal with its own PATCH (owner-requested UX).
+ * Saves are replace-all on the backend; publish saves first and surfaces 422
+ * coverage gaps.
  */
 export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<BuilderTab>("pengaturan");
+  const [tab, setTab] = useState<BuilderTab>("soal");
   const [activeItem, setActiveItem] = useState(0);
   const [activePattern, setActivePattern] = useState<string>("1");
   const [missingCodes, setMissingCodes] = useState<string[]>([]);
@@ -71,15 +63,15 @@ export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
   });
 
   const { dirtyFields } = form.formState;
-  const dirtySlices = useMemo(() => {
-    const settings = Object.keys(dirtyFields.settings ?? {}).length > 0;
-    const items = Array.isArray(dirtyFields.items) && dirtyFields.items.length > 0;
-    const interpretations =
-      Array.isArray(dirtyFields.interpretations) && dirtyFields.interpretations.length > 0;
-    return { settings, items, interpretations };
-  }, [dirtyFields]);
-  const dirtyCount =
-    Number(dirtySlices.settings) + Number(dirtySlices.items) + Number(dirtySlices.interpretations);
+  const dirtySlices = useMemo(
+    () => ({
+      items: Array.isArray(dirtyFields.items) && dirtyFields.items.length > 0,
+      interpretations:
+        Array.isArray(dirtyFields.interpretations) && dirtyFields.interpretations.length > 0,
+    }),
+    [dirtyFields],
+  );
+  const dirtyCount = Number(dirtySlices.items) + Number(dirtySlices.interpretations);
 
   // Warn before closing the tab with unsaved changes (App Router has no
   // in-app navigation blocker — the Simpan ●N badge covers in-app awareness).
@@ -98,7 +90,6 @@ export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
 
   const persistSlices = useCallback(async () => {
     const values = form.getValues();
-    await updateTest(testId, values.settings);
     await putTestItems(
       testId,
       values.items.map((item) => ({ content: item.content })),

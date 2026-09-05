@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { formatIdr } from "@/lib/format/format-idr";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
 import type { AdminTest, TestStatus } from "@/lib/api/types";
@@ -53,7 +53,7 @@ export function TestsTable({ rows, meta, status, category }: TestsTableProps) {
               <th className="px-4 py-3 font-medium">Harga</th>
               <th className="px-4 py-3 font-medium">Durasi</th>
               <th className="px-4 py-3 font-medium">Status</th>
-              <th className="w-10 px-4 py-3" aria-hidden />
+              <th className="w-16 px-4 py-3 font-medium">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -71,8 +71,14 @@ export function TestsTable({ rows, meta, status, category }: TestsTableProps) {
                 <td className="px-4 py-3">
                   <TestStatusBadge status={row.status} />
                 </td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  <ChevronRight className="size-4" aria-hidden />
+                <td className="px-4 py-3">
+                  <Link
+                    href={`/admin/tes/${row.id}`}
+                    aria-label={`Edit tes ${row.name}`}
+                    className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <Pencil className="size-4" aria-hidden />
+                  </Link>
                 </td>
               </tr>
             ))}

@@ -1,15 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { BuilderHeader } from "./builder-header";
 import { ItemsTab } from "./items-tab";
 import { InterpretationsTab } from "./interpretations-tab";
-import { SettingsTab } from "./settings-tab";
 import { useBuilderForm } from "../hooks/use-builder-form";
 import type { AdminTestDetail } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { key: "pengaturan", label: "Pengaturan" },
   { key: "soal", label: "Soal" },
   { key: "interpretasi", label: "Interpretasi" },
 ] as const;
@@ -22,10 +21,21 @@ export function TestBuilderStudio({
   initialData: AdminTestDetail;
 }) {
   const builder = useBuilderForm(testId, initialData);
+  // Header name + modal defaults refresh when settings are saved via the modal.
+  const [displayName, setDisplayName] = useState(initialData.name);
+  const [settingsSnapshot, setSettingsSnapshot] = useState(initialData);
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      <BuilderHeader name={initialData.name} status={initialData.status} builder={builder} />
+      <BuilderHeader
+        detail={settingsSnapshot}
+        displayName={displayName}
+        builder={builder}
+        onSettingsSaved={(updated) => {
+          setDisplayName(updated.name);
+          setSettingsSnapshot((prev) => ({ ...prev, ...updated }));
+        }}
+      />
 
       {builder.locked && (
         <div role="alert" className="border-b bg-chart-3/15 px-6 py-2.5 text-sm text-foreground">
@@ -64,7 +74,6 @@ export function TestBuilderStudio({
         ))}
       </div>
 
-      {builder.tab === "pengaturan" && <SettingsTab builder={builder} locked={builder.locked} />}
       {builder.tab === "soal" && <ItemsTab builder={builder} locked={builder.locked} />}
       {builder.tab === "interpretasi" && (
         <InterpretationsTab builder={builder} locked={builder.locked} />
