@@ -9,6 +9,7 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
+import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AdminModule {
@@ -31,12 +32,10 @@ const MODULES: AdminModule[] = [
 export default function AdminHomePage() {
   return (
     <main className="flex-1 space-y-6 p-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Ringkasan</h1>
-        <p className="text-sm text-muted-foreground">
-          Pusat kendali platform: kelola tes, sesi, pembayaran, dan hasil.
-        </p>
-      </div>
+      <PageHeader
+        title="Ringkasan"
+        description="Pusat kendali platform: kelola tes, sesi, pembayaran, dan hasil."
+      />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {MODULES.map((mod) => {
           const Icon = mod.icon;

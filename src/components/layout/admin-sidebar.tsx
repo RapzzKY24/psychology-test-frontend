@@ -56,7 +56,10 @@ function BrandMark() {
         <Brain className="size-5" aria-hidden />
       </span>
       <div>
-        <p className="text-sm font-semibold leading-tight">Psikotes</p>
+        <p className="flex items-center gap-1.5 text-sm font-semibold leading-tight">
+          Psikotes
+          <span aria-hidden className="size-1.5 rounded-full bg-chart-3" />
+        </p>
         <p className="text-xs text-muted-foreground leading-tight">Konsol Admin</p>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface SectionPlaceholderProps {
@@ -8,10 +9,7 @@ interface SectionPlaceholderProps {
 export function SectionPlaceholder({ title, description }: SectionPlaceholderProps) {
   return (
     <main className="flex-1 space-y-6 p-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
+      <PageHeader title={title} description={description} />
       <Card className="max-w-lg">
         <CardHeader>
           <CardTitle>Segera hadir</CardTitle>
