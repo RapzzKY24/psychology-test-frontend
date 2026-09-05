@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
+import { isApiError } from "@/lib/api/client";
 import { qk } from "@/lib/api/query-keys";
 import type { SessionSummary } from "@/lib/api/types";
 import { closeSession, createSession } from "../api";
@@ -28,8 +29,13 @@ export function useCreateSession(onCreated: (created: SessionSummary) => void) {
       toast.success("Sesi dibuat — bagikan tautan undangannya.");
       onCreated(created);
     },
-    onError: (error) =>
-      toast.error(error instanceof Error ? error.message : GENERIC_ERROR_MESSAGE),
+    onError: (error) => {
+      if (isApiError(error)) {
+        toast.error(error.message);
+        return;
+      }
+      toast.error(GENERIC_ERROR_MESSAGE);
+    },
   });
 }
 
@@ -47,7 +53,12 @@ export function useCloseSession(onClosed: () => void) {
       toast.success("Sesi ditutup.");
       onClosed();
     },
-    onError: (error) =>
-      toast.error(error instanceof Error ? error.message : GENERIC_ERROR_MESSAGE),
+    onError: (error) => {
+      if (isApiError(error)) {
+        toast.error(error.message);
+        return;
+      }
+      toast.error(GENERIC_ERROR_MESSAGE);
+    },
   });
 }

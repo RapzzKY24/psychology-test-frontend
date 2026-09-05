@@ -37,7 +37,7 @@ export default async function SesiPage({ searchParams }: PageProps<"/admin/sesi"
           institutions={institutions.data}
         />
       </div>
-      <SessionsTable rows={sessionPage.data} meta={tableMeta} page={page} />
+      <SessionsTable rows={sessionPage.data} meta={tableMeta} />
     </main>
   );
 }

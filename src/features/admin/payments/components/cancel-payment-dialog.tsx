@@ -3,8 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,16 +16,12 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
-import { isApiError } from "@/lib/api/client";
-import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
-import { qk } from "@/lib/api/query-keys";
 import type { AdminPaymentListItem } from "@/lib/api/types";
-import { cancelPayment } from "../api";
+import { useCancelPayment } from "../hooks/use-cancel-payment";
 import { CancelPaymentSchema } from "../schemas";
 import type { CancelPaymentInput } from "../schemas";
 
 export function CancelPaymentDialog({ payment }: { payment: AdminPaymentListItem }) {
-  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -36,24 +30,9 @@ export function CancelPaymentDialog({ payment }: { payment: AdminPaymentListItem
     defaultValues: { reason: "" },
   });
 
-  const mutation = useMutation({
-    mutationFn: async (values: CancelPaymentInput) => {
-      const { data } = await cancelPayment(payment.orderId, values.reason);
-      return data;
-    },
-    meta: { silentError: true },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.payments.all });
-      toast.success(`Pesanan dibatalkan.`);
-      setOpen(false);
-    },
-    onError: (error) => {
-      setFormError(
-        isApiError(error)
-          ? error.message
-          : GENERIC_ERROR_MESSAGE,
-      );
-    },
+  const mutation = useCancelPayment(payment, {
+    onSaved: () => setOpen(false),
+    onFailed: (message) => setFormError(message),
   });
 
   return (

@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
+import { parseErrorResponse } from "@/lib/api/error";
 import type { AdminPaymentListItem } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 
@@ -58,10 +58,9 @@ export async function uploadQrisImage(file: File): Promise<{ qrisImageUrl: strin
     payload = text;
   }
   if (!response.ok) {
-    const body2 = (payload ?? {}) as { message?: string };
-    throw new Error(body2.message ?? GENERIC_ERROR_MESSAGE);
+    throw parseErrorResponse(response.status, payload);
   }
   const data = (payload as { data?: { qrisImageUrl?: string } })?.data;
-  if (!data?.qrisImageUrl) throw new Error(GENERIC_ERROR_MESSAGE);
+  if (!data?.qrisImageUrl) throw parseErrorResponse(response.status, null);
   return { qrisImageUrl: data.qrisImageUrl };
 }

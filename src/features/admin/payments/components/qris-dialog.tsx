@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ImageIcon, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,26 +13,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
-import { uploadQrisImage } from "../api";
+import { useQrisUpload } from "../hooks/use-qris-upload";
 
 export function QrisDialog() {
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const mutation = useMutation({
-    mutationFn: async () => {
-      if (!file) throw new Error(GENERIC_ERROR_MESSAGE);
-      return uploadQrisImage(file);
-    },
-    meta: { silentError: true },
-    onSuccess: () => {
-      toast.success("QRIS merchant terunggah.");
-      setOpen(false);
-      setFile(null);
-    },
-    onError: (error) => toast.error(error instanceof Error ? error.message : GENERIC_ERROR_MESSAGE),
+  const mutation = useQrisUpload(() => {
+    setOpen(false);
+    setFile(null);
   });
 
   const pick = (selected: File | null) => {
@@ -86,7 +75,7 @@ export function QrisDialog() {
           {file ? file.name : "Pilih gambar QRIS (png/jpg ≤2MB)"}
         </button>
         <DialogFooter>
-          <Button onClick={() => mutation.mutate()} disabled={!file || mutation.isPending}>
+          <Button onClick={() => mutation.mutate(file!)} disabled={!file || mutation.isPending}>
             {mutation.isPending ? "Mengunggah..." : "Unggah"}
           </Button>
         </DialogFooter>

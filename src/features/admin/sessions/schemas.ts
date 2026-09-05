@@ -1,14 +1,19 @@
 import { z } from "zod";
 
 /**
- * Mirrors the backend CreateSessionSchema (strict): testIds unique uuids,
- * slotLimit 1–1000, expiresAt must be future, optional PIN 4–8 chars.
- * expiresAt arrives as a datetime-local string and is sent as ISO.
+ * Mirrors the backend CreateSessionSchema (strict): testIds uuids unique
+ * (refine), slotLimit 1–1000, expiresAt must be future, optional PIN 4–8
+ * digits. expiresAt arrives as a datetime-local string, sent as ISO.
  */
 export const CreateSessionSchema = z.object({
   title: z.string().trim().min(1, "Judul wajib diisi.").max(200),
   institutionId: z.string().uuid().optional().or(z.literal("")),
-  testIds: z.array(z.string().uuid()).min(1, "Pilih minimal satu tes."),
+  testIds: z
+    .array(z.string().uuid())
+    .min(1, "Pilih minimal satu tes.")
+    .refine((ids) => new Set(ids).size === ids.length, {
+      message: "Tes tidak boleh duplikat.",
+    }),
   slotLimit: z.number().int().min(1, "Slot minimal 1.").max(1000, "Slot maksimal 1000."),
   expiresAt: z
     .string()
@@ -24,8 +29,3 @@ export const CreateSessionSchema = z.object({
 });
 
 export type CreateSessionInput = z.infer<typeof CreateSessionSchema>;
-
-export const SESSION_STATUS_LABEL = {
-  ACTIVE: "Aktif",
-  CLOSED: "Ditutup",
-} as const;

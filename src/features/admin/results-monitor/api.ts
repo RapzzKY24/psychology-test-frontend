@@ -21,10 +21,6 @@ export function fetchResults(filters: ResultFilters = {}): Promise<ApiSuccess<Qu
   return apiFetch<QueryResultsItem[]>(`/admin/results${buildQuery(filters)}`);
 }
 
-export function fetchAdminResult(id: string): Promise<ApiSuccess<AdminResultView>> {
-  return apiFetch<AdminResultView>(`/admin/attempts/${id}/result`);
-}
-
 export function resubmitResult(resultId: string): Promise<ApiSuccess<unknown>> {
   return apiFetch(`/admin/results/${resultId}/resubmit`, { method: "POST" });
 }

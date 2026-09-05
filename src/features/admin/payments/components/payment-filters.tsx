@@ -4,13 +4,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { PAYMENT_STATUS_LABEL } from "../constants";
 
 const STATUSES = [
   { value: "", label: "Semua" },
-  { value: "PENDING", label: "PENDING" },
-  { value: "PAID", label: "PAID" },
-  { value: "EXPIRED", label: "EXPIRED" },
-  { value: "CANCELLED", label: "CANCELLED" },
+  { value: "PENDING", label: PAYMENT_STATUS_LABEL.PENDING },
+  { value: "PAID", label: PAYMENT_STATUS_LABEL.PAID },
+  { value: "EXPIRED", label: PAYMENT_STATUS_LABEL.EXPIRED },
+  { value: "CANCELLED", label: PAYMENT_STATUS_LABEL.CANCELLED },
 ] as const;
 
 export function PaymentFilters({ status, amount }: { status?: string; amount?: string }) {

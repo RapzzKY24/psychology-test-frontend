@@ -22,10 +22,9 @@ interface PaymentsTableProps {
   meta: PaginationMeta;
   status?: string;
   amount?: string;
-  page: number;
 }
 
-export function PaymentsTable({ rows, meta, status, amount, page }: PaymentsTableProps) {
+export function PaymentsTable({ rows, meta, status, amount }: PaymentsTableProps) {
   if (rows.length === 0) {
     return (
       <TableEmpty

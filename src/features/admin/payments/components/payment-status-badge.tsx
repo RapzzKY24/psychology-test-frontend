@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import type { AdminPaymentListItem } from "@/lib/api/types";
+import { PAYMENT_STATUS_LABEL } from "../constants";
 
 const STYLE: Record<AdminPaymentListItem["status"], string> = {
   // Gold accent = needs admin attention (the reconciliation queue).
@@ -12,7 +13,7 @@ const STYLE: Record<AdminPaymentListItem["status"], string> = {
 export function PaymentStatusBadge({ status }: { status: AdminPaymentListItem["status"] }) {
   return (
     <Badge variant="outline" className={STYLE[status]}>
-      {status}
+      {PAYMENT_STATUS_LABEL[status]}
     </Badge>
   );
 }

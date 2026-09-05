@@ -3,12 +3,13 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { RESULT_STATUS_LABEL } from "../constants";
 
 const STATUSES = [
   { value: "", label: "Semua" },
-  { value: "PENDING_REVIEW", label: "MENUNGGU REVIEW" },
-  { value: "APPROVED", label: "APPROVED" },
-  { value: "RETURNED", label: "RETURNED" },
+  { value: "PENDING_REVIEW", label: RESULT_STATUS_LABEL.PENDING_REVIEW },
+  { value: "APPROVED", label: RESULT_STATUS_LABEL.APPROVED },
+  { value: "RETURNED", label: RESULT_STATUS_LABEL.RETURNED },
 ] as const;
 
 export function ResultFilters({ status }: { status?: string }) {

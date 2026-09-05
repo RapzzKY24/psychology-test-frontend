@@ -47,7 +47,6 @@ export default async function PembayaranPage({ searchParams }: PageProps<"/admin
         meta={tableMeta}
         status={status}
         amount={amount}
-        page={page}
       />
     </main>
   );

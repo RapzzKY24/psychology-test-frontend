@@ -7,15 +7,14 @@ import type { PaginationMeta } from "@/lib/api/types/pagination";
 import type { SessionSummary } from "@/lib/api/types";
 import { formatIdDate } from "@/lib/format/format-date";
 import { CopyInviteButton } from "./copy-invite-button";
-import { SESSION_STATUS_LABEL } from "../schemas";
+import { SESSION_STATUS_LABEL } from "../constants";
 
 interface SessionsTableProps {
   rows: SessionSummary[];
   meta: PaginationMeta;
-  page: number;
 }
 
-export function SessionsTable({ rows, meta, page }: SessionsTableProps) {
+export function SessionsTable({ rows, meta }: SessionsTableProps) {
   if (rows.length === 0) {
     return (
       <TableEmpty
