@@ -76,7 +76,7 @@ export function DiscItemView({
       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
         Soal {order}
       </p>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {words.map((word, idx) => (
           <div
             key={idx}

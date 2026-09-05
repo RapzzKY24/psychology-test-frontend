@@ -70,7 +70,7 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
   const answered = attempt.items.map((it) => isAnswered(answers.answers[it.id]));
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10 lg:flex-row-reverse lg:items-start">
+    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-6 py-10 lg:flex-row-reverse lg:items-start">
       <aside
         className="flex flex-col gap-4 rounded-xl border bg-card p-4 lg:sticky lg:top-6 lg:w-64"
         aria-label="Navigasi soal dan waktu"
@@ -98,7 +98,7 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
         </div>
       </aside>
 
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+      <div className="flex w-full flex-col gap-6">
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <p className="font-medium">{attempt.testName}</p>
