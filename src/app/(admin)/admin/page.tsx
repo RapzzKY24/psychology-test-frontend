@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import type { LucideIcon } from "lucide-react";
 import {
   Building2,
@@ -28,6 +29,8 @@ const MODULES: AdminModule[] = [
   { href: "/admin/invoice", title: "Invoice", description: "Tagihan B2B: nomor, status, jatuh tempo.", icon: ReceiptText },
   { href: "/admin/hasil", title: "Hasil", description: "Monitor hasil peserta dan resubmit hasil returned.", icon: ChartColumn },
 ];
+
+export const metadata: Metadata = { title: "Ringkasan" };
 
 export default function AdminHomePage() {
   return (

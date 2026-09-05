@@ -16,7 +16,7 @@ const appMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: {
     default: "Psikotes — Platform Tes Psikologi",
-    template: "%s — Psikotes",
+    template: "%s | Psikotes",
   },
   description:
     "Platform tes psikologi: katalog tes, pengerjaan online, verifikasi psikolog, dan laporan resmi.",

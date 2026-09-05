@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SectionPlaceholder } from "@/components/layout/section-placeholder";
 
-export const metadata: Metadata = { title: "Tes" };
+export const metadata: Metadata = { title: "Manajemen Tes" };
 
 export default function TesPage() {
   return (

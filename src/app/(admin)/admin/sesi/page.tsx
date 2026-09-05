@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SectionPlaceholder } from "@/components/layout/section-placeholder";
 
-export const metadata: Metadata = { title: "Sesi" };
+export const metadata: Metadata = { title: "Sesi Ujian" };
 
 export default function SesiPage() {
   return (
