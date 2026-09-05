@@ -14,7 +14,7 @@ export default function LandingPage() {
       </p>
       <div className="flex gap-3">
         <Button asChild>
-          <Link href="/katalog">Lihat Katalog Tes</Link>
+          <Link href="/daftar">Mulai Sekarang</Link>
         </Button>
         <Button asChild variant="outline">
           <Link href="/masuk">Masuk</Link>

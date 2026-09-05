@@ -3,9 +3,6 @@
  * Granularity mirrors cache invalidation needs per feature.
  */
 export const qk = {
-  auth: {
-    session: ["auth", "session"] as const,
-  },
   tests: {
     all: ["tests"] as const,
     list: (filters?: { page?: number; category?: string }) =>
