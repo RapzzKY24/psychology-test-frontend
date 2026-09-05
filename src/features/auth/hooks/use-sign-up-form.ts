@@ -24,8 +24,8 @@ export function useSignUpForm(next?: string | null) {
       { name: values.name, email: values.email, password: values.password },
       {
         onError: (ctx) => {
-          const code = ctx.error?.code;
-          if (code === "USER_ALREADY_EXISTS" || code === "INVALID_EMAIL") {
+          const code = ctx.error?.code ?? "";
+          if (code.startsWith("USER_ALREADY_EXISTS") || code === "INVALID_EMAIL") {
             form.setError("email", { message: betterAuthErrorMessage(ctx.error) });
             return;
           }

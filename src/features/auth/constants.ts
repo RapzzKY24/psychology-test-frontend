@@ -13,6 +13,8 @@ export const SIGNUP_FALLBACK_HOME = "/dashboard";
  */
 export const BETTER_AUTH_ERROR_MESSAGES: Record<string, string> = {
   INVALID_EMAIL_OR_PASSWORD: "Email atau kata sandi salah.",
+  // Verified live 2026-09-05: better-auth 1.7 emits the long variant.
+  USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "Email sudah terdaftar — silakan masuk.",
   USER_ALREADY_EXISTS: "Email sudah terdaftar — silakan masuk.",
   USER_NOT_FOUND: "Akun tidak ditemukan.",
   INVALID_EMAIL: "Format email tidak valid.",
@@ -24,11 +26,22 @@ export const BETTER_AUTH_ERROR_MESSAGES: Record<string, string> = {
 
 const GENERIC_AUTH_ERROR = "Terjadi kesalahan — coba lagi.";
 
-/** Accepts the raw better-auth error (BetterFetchError) — narrowed internally. */
+/**
+ * Accepts the raw better-auth error (BetterFetchError) — narrowed internally.
+ * Verified live 2026-09-05: the rate limiter answers 429 with NO `code` field,
+ * so status is checked explicitly (the only status-based mapping — a wrong-
+ * password 401 must still read "Email atau kata sandi salah.", never a
+ * status-derived copy).
+ */
 export function betterAuthErrorMessage(error?: unknown): string {
-  const code = (error as { code?: unknown } | null | undefined)?.code;
-  if (typeof code !== "string") return GENERIC_AUTH_ERROR;
-  return BETTER_AUTH_ERROR_MESSAGES[code] ?? GENERIC_AUTH_ERROR;
+  const candidate = error as { code?: unknown; status?: unknown } | null | undefined;
+  const code = candidate?.code;
+  if (typeof code === "string") {
+    const mapped = BETTER_AUTH_ERROR_MESSAGES[code];
+    if (mapped) return mapped;
+  }
+  if (candidate?.status === 429) return BETTER_AUTH_ERROR_MESSAGES.RATE_LIMITED;
+  return GENERIC_AUTH_ERROR;
 }
 
 export type { UserRole };

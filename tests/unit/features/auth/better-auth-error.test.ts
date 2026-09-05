@@ -21,10 +21,25 @@ describe("betterAuthErrorMessage", () => {
     );
   });
 
-  it("never leaks raw messages and never uses status fallbacks", () => {
+  it("never leaks raw messages and never uses generic status fallbacks", () => {
     expect(betterAuthErrorMessage({ code: "SOMETHING_NEW" })).toBe("Terjadi kesalahan — coba lagi.");
     expect(betterAuthErrorMessage(undefined)).toBe("Terjadi kesalahan — coba lagi.");
     expect(betterAuthErrorMessage(null)).toBe("Terjadi kesalahan — coba lagi.");
     expect(betterAuthErrorMessage({})).toBe("Terjadi kesalahan — coba lagi.");
+    expect(betterAuthErrorMessage({ code: "X", status: 401 })).toBe(
+      "Terjadi kesalahan — coba lagi.",
+    );
+  });
+
+  it("maps the code-less 429 rate-limit response by status (verified live)", () => {
+    expect(betterAuthErrorMessage({ status: 429 })).toBe(
+      "Terlalu banyak percobaan — tunggu sebentar.",
+    );
+  });
+
+  it("maps the long duplicate-email code emitted by better-auth 1.7", () => {
+    expect(betterAuthErrorMessage({ code: "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL" })).toBe(
+      "Email sudah terdaftar — silakan masuk.",
+    );
   });
 });
