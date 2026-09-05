@@ -10,8 +10,7 @@ import type { BetterAuthSession } from "./types/auth";
  * Response caching is the caller's concern (`cache()` / `revalidate`).
  */
 
-const API_INTERNAL_URL =
-  process.env.API_INTERNAL_URL ?? "http://localhost:4000";
+const API_INTERNAL_URL = process.env.API_INTERNAL_URL ?? "http://localhost:4000";
 
 export interface ServerFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";

@@ -5,6 +5,8 @@
  * copy — raw messages are never shown when a known code exists.
  */
 
+import type { ApiSuccess, PaginationMeta } from "./types/pagination";
+
 /** Known catalog codes (api-contract §7 + verified backend usages). */
 export const KNOWN_ERROR_CODES = [
   // Auth
@@ -100,7 +102,7 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/** Maps an error envelope to the best Indonesian copy (catalog → status → raw). */
+/** Maps an error body into the best Indonesian copy (catalog → status → raw). */
 export function errorMessageFor(code: string, statusCode: number): string {
   if ((KNOWN_ERROR_CODES as readonly string[]).includes(code)) {
     return ERROR_MESSAGES[code as ErrorCode];
@@ -156,14 +158,8 @@ export function parseErrorResponse(status: number, body: unknown): ApiError {
   return new ApiError(status, "unknown_error");
 }
 
-/** Success envelope shape guard (api-contract §2). */
-export interface Unwrapped<T> {
-  data: T;
-  meta?: { page: number; limit: number; total: number; totalPages: number };
-  message?: string;
-}
-
-export function unwrapEnvelope<T>(body: unknown): Unwrapped<T> {
+/** Success envelope shape guard (api-contract §2). Reuses the shared contract type. */
+export function unwrapEnvelope<T>(body: unknown): ApiSuccess<T> {
   if (isRecord(body) && "data" in body) {
     const meta =
       isRecord(body.meta) &&
@@ -171,7 +167,7 @@ export function unwrapEnvelope<T>(body: unknown): Unwrapped<T> {
       typeof body.meta.limit === "number" &&
       typeof body.meta.total === "number" &&
       typeof body.meta.totalPages === "number"
-        ? (body.meta as Unwrapped<T>["meta"])
+        ? (body.meta as unknown as PaginationMeta)
         : undefined;
     return {
       data: body.data as T,

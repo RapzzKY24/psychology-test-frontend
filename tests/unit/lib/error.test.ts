@@ -25,9 +25,7 @@ describe("errorMessageFor", () => {
 
   it("falls back by status for unknown codes (404s use human messages)", () => {
     expect(errorMessageFor("Test not found", 404)).toBe("Data tidak ditemukan.");
-    expect(errorMessageFor("slug already exists", 409)).toBe(
-      "Konflik dengan data yang sudah ada.",
-    );
+    expect(errorMessageFor("slug already exists", 409)).toBe("Konflik dengan data yang sudah ada.");
   });
 
   it("has a last-resort fallback", () => {
@@ -45,9 +43,7 @@ describe("ApiError", () => {
   });
 
   it("flags validation and auth errors", () => {
-    expect(new ApiError(422, "validation_failed", ["price must be >= 0"]).isValidation).toBe(
-      true,
-    );
+    expect(new ApiError(422, "validation_failed", ["price must be >= 0"]).isValidation).toBe(true);
     expect(new ApiError(401, "unauthorized").isUnauthorized).toBe(true);
     expect(new ApiError(403, "forbidden").isForbidden).toBe(true);
     expect(new ApiError(403, "result_not_released").isResultNotReleased).toBe(true);

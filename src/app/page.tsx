@@ -9,8 +9,8 @@ export default function LandingPage() {
     <main className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-24 text-center">
       <h1 className="text-4xl font-semibold tracking-tight">Platform Tes Psikologi</h1>
       <p className="max-w-md text-muted-foreground">
-        Katalog tes, pengerjaan online, verifikasi oleh psikolog, dan laporan resmi
-        yang dapat diverifikasi.
+        Katalog tes, pengerjaan online, verifikasi oleh psikolog, dan laporan resmi yang dapat
+        diverifikasi.
       </p>
       <div className="flex gap-3">
         <Button asChild>

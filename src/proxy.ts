@@ -6,10 +6,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * via getServerSession (docs/frontend/00-architecture.md §3).
  */
 
-const SESSION_COOKIES = [
-  "better-auth.session_token",
-  "__Secure-better-auth.session_token",
-];
+const SESSION_COOKIES = ["better-auth.session_token", "__Secure-better-auth.session_token"];
 
 function hasSessionCookie(request: NextRequest): boolean {
   return SESSION_COOKIES.some((name) => request.cookies.has(name));

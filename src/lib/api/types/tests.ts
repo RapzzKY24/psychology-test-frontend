@@ -38,8 +38,18 @@ export type UpdateTestInput = Partial<CreateTestInput>;
  */
 export interface DiscItemContent {
   words: [string, string, string, string];
-  mostMapping: ["D" | "I" | "S" | "C" | "*", "D" | "I" | "S" | "C" | "*", "D" | "I" | "S" | "C" | "*", "D" | "I" | "S" | "C" | "*"];
-  leastMapping: ["D" | "I" | "S" | "C" | "*", "D" | "I" | "S" | "C" | "*", "D" | "I" | "S" | "C" | "*", "D" | "I" | "S" | "C" | "*"];
+  mostMapping: [
+    "D" | "I" | "S" | "C" | "*",
+    "D" | "I" | "S" | "C" | "*",
+    "D" | "I" | "S" | "C" | "*",
+    "D" | "I" | "S" | "C" | "*",
+  ];
+  leastMapping: [
+    "D" | "I" | "S" | "C" | "*",
+    "D" | "I" | "S" | "C" | "*",
+    "D" | "I" | "S" | "C" | "*",
+    "D" | "I" | "S" | "C" | "*",
+  ];
 }
 
 /** Body of `PUT /api/v1/admin/tests/:id/items` (PutItemsSchema — content validated per scorerType in the service). */

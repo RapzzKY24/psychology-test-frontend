@@ -15,8 +15,6 @@ export interface ApiFetchOptions {
   /** Guest session token (ADR-005) — sent as `x-participant-token`. */
   participantToken?: string;
   signal?: AbortSignal;
-  /** Skip envelope unwrap + error parsing (binary endpoints: PDF, QRIS image). */
-  raw?: boolean;
 }
 
 async function parseBody(response: Response): Promise<unknown> {
@@ -29,29 +27,39 @@ async function parseBody(response: Response): Promise<unknown> {
   }
 }
 
-export async function apiFetch<T>(
-  path: string,
-  { method = "GET", body, participantToken, signal, raw = false }: ApiFetchOptions = {},
-): Promise<ApiSuccess<T> | Response> {
+async function doFetch(path: string, opts: ApiFetchOptions): Promise<Response> {
   const headers: Record<string, string> = {};
-  if (body !== undefined) headers["Content-Type"] = "application/json";
-  if (participantToken) headers["x-participant-token"] = participantToken;
+  if (opts.body !== undefined) headers["Content-Type"] = "application/json";
+  if (opts.participantToken) headers["x-participant-token"] = opts.participantToken;
 
-  const response = await fetch(`${BASE_PATH}${path}`, {
-    method,
+  return fetch(`${BASE_PATH}${path}`, {
+    method: opts.method ?? "GET",
     headers,
     credentials: "include",
-    body: body === undefined ? undefined : JSON.stringify(body),
-    signal,
+    body: opts.body === undefined ? undefined : JSON.stringify(opts.body),
+    signal: opts.signal,
   });
+}
 
-  if (raw) return response;
-
+/** JSON endpoint → unwraps the envelope; non-2xx throws ApiError. */
+export async function apiFetch<T>(
+  path: string,
+  opts: ApiFetchOptions = {},
+): Promise<ApiSuccess<T>> {
+  const response = await doFetch(path, opts);
   const payload = await parseBody(response);
   if (!response.ok) {
     throw parseErrorResponse(response.status, payload);
   }
   return unwrapEnvelope<T>(payload);
+}
+
+/**
+ * Binary / non-enveloped endpoints (PDF streams, QRIS image, Better Auth
+ * routes) — returns the raw Response for the caller to handle.
+ */
+export async function apiFetchRaw(path: string, opts: ApiFetchOptions = {}): Promise<Response> {
+  return doFetch(path, opts);
 }
 
 export function isApiError(error: unknown): error is ApiError {
