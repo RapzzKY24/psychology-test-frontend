@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -27,15 +28,22 @@ interface CreateInvoiceButtonProps {
 }
 
 export function CreateInvoiceButton({ institutions }: CreateInvoiceButtonProps) {
+  const [open, setOpen] = useState(false);
   const form = useForm<CreateInvoiceInput>({
     resolver: zodResolver(CreateInvoiceSchema),
     defaultValues: { institutionId: "", amount: 0, dueDate: "", notes: "" },
   });
 
-  const mutation = useCreateInvoice(() => form.reset());
+  const mutation = useCreateInvoice(() => {
+    setOpen(false);
+    form.reset();
+  });
 
   return (
-    <Dialog onOpenChange={(next) => !next && form.reset()}>
+    <Dialog open={open} onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) form.reset();
+      }}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="size-4" aria-hidden />

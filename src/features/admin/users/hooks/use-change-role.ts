@@ -2,8 +2,8 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import { isApiError } from "@/lib/api/client";
+import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import { qk } from "@/lib/api/query-keys";
 import type { AdminUser, UserRole } from "@/lib/api/types";
 import { updateUserRole } from "../api";
@@ -32,7 +32,7 @@ export function useChangeRole(
         onOwnRoleBlocked("Anda tidak bisa mengubah role akun sendiri.");
         return;
       }
-      toast.error(error instanceof Error ? error.message : GENERIC_ERROR_MESSAGE);
+      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
     },
   });
 }

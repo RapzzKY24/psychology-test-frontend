@@ -27,11 +27,12 @@ import { INVOICE_STATUSES } from "@/lib/api/types";
 import type { Invoice } from "@/lib/api/types";
 import { useInvoiceStatus } from "../hooks/use-invoice-status";
 import { INVOICE_STATUS_LABEL, UpdateStatusSchema } from "../schemas";
+import type { UpdateStatusInput } from "../schemas";
 
 export function InvoiceStatusDialog({ invoice }: { invoice: Invoice }) {
   const [open, setOpen] = useState(false);
 
-  const form = useForm<{ status: Invoice["status"]; notes: string }>({
+  const form = useForm<UpdateStatusInput>({
     resolver: zodResolver(UpdateStatusSchema),
     defaultValues: { status: invoice.status, notes: "" },
   });

@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
+import { isApiError } from "@/lib/api/client";
 import { qk } from "@/lib/api/query-keys";
 import type { Invoice } from "@/lib/api/types";
 import { createInvoice } from "../api";
@@ -29,6 +30,6 @@ export function useCreateInvoice(onSaved: (created: Invoice) => void) {
       onSaved(created);
     },
     onError: (error) =>
-      toast.error(error instanceof Error ? error.message : GENERIC_ERROR_MESSAGE),
+      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE),
   });
 }
