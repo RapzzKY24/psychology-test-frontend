@@ -1,14 +1,27 @@
 "use client";
 
+import { toast } from "sonner";
 import { Check } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { formatIdr } from "@/lib/format/format-idr";
+import type { QueryKey } from "@tanstack/react-query";
 import type { AdminPaymentListItem } from "@/lib/api/types";
 import { useVerifyPayment } from "../hooks/use-verify-payment";
 
-export function VerifyPaymentButton({ payment }: { payment: AdminPaymentListItem }) {
-  const mutation = useVerifyPayment(payment, () => {});
+export function VerifyPaymentButton({
+  listKey,
+  payment,
+}: {
+  listKey: QueryKey;
+  payment: AdminPaymentListItem;
+}) {
+  const mutation = useVerifyPayment(
+    listKey,
+    payment,
+    () => {},
+    (message) => toast.error(message),
+  );
 
   return (
     <AlertDialog>

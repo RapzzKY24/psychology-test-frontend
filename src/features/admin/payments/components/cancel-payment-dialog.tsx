@@ -16,12 +16,19 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
+import type { QueryKey } from "@tanstack/react-query";
 import type { AdminPaymentListItem } from "@/lib/api/types";
 import { useCancelPayment } from "../hooks/use-cancel-payment";
 import { CancelPaymentSchema } from "../schemas";
 import type { CancelPaymentInput } from "../schemas";
 
-export function CancelPaymentDialog({ payment }: { payment: AdminPaymentListItem }) {
+export function CancelPaymentDialog({
+  listKey,
+  payment,
+}: {
+  listKey: QueryKey;
+  payment: AdminPaymentListItem;
+}) {
   const [open, setOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -30,9 +37,9 @@ export function CancelPaymentDialog({ payment }: { payment: AdminPaymentListItem
     defaultValues: { reason: "" },
   });
 
-  const mutation = useCancelPayment(payment, {
+  const mutation = useCancelPayment(listKey, payment, {
     onSaved: () => setOpen(false),
-    onFailed: (message) => setFormError(message),
+    onFailed: (message: string) => setFormError(message),
   });
 
   return (

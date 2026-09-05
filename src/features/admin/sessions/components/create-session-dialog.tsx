@@ -13,23 +13,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import type { QueryKey } from "@tanstack/react-query";
 import type { Institution, SessionSummary } from "@/lib/api/types";
 import { useCreateSessionForm } from "../hooks/use-create-session-form";
 import { CreateSessionFields } from "./create-session-fields";
 import { CreateSessionSuccess } from "./create-session-success";
 
 interface CreateSessionDialogProps {
+  /** List cache key — the mutation prepends the new session optimistically. */
+  listKey: QueryKey;
   /** PUBLISHED tests for the multiselect (fetched server-side). */
   tests: Array<{ id: string; name: string }>;
   /** Institutions for the optional Select (fetched server-side, RSC props). */
   institutions: Institution[];
 }
 
-export function CreateSessionDialog({ tests, institutions }: CreateSessionDialogProps) {
+export function CreateSessionDialog({ listKey, tests, institutions }: CreateSessionDialogProps) {
   const [open, setOpen] = useState(false);
   const [created, setCreated] = useState<SessionSummary | null>(null);
 
-  const { form, mutation, submit } = useCreateSessionForm((createdSession) => {
+  const { form, mutation, submit } = useCreateSessionForm(listKey, (createdSession) => {
     setCreated(createdSession);
   });
 

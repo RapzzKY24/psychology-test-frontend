@@ -4,13 +4,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
+import type { OptimisticRow } from "@/features/admin/hooks/use-optimistic-list";
 import type { SessionSummary } from "@/lib/api/types";
+import { SavingChip } from "@/components/admin/saving-chip";
+import { cn } from "@/lib/utils";
 import { formatIdDate } from "@/lib/format/format-date";
 import { CopyInviteButton } from "./copy-invite-button";
 import { SESSION_STATUS_LABEL } from "../constants";
 
 interface SessionsTableProps {
-  rows: SessionSummary[];
+  rows: OptimisticRow<SessionSummary>[];
   meta: PaginationMeta;
 }
 
@@ -41,7 +44,7 @@ export function SessionsTable({ rows, meta }: SessionsTableProps) {
           </TableHeader>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.id} className={cn(row._optimistic && "opacity-60")}>
                 <TableCell>
                   <Link href={`/admin/sesi/${row.id}`} className="font-medium hover:underline">
                     {row.title}
@@ -65,15 +68,19 @@ export function SessionsTable({ rows, meta }: SessionsTableProps) {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <CopyInviteButton token={row.token} />
-                    <Link
-                      href={`/admin/sesi/${row.id}`}
-                      className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
-                    >
-                      Detail
-                    </Link>
-                  </div>
+                  {row._optimistic ? (
+                    <SavingChip />
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <CopyInviteButton token={row.token} />
+                      <Link
+                        href={`/admin/sesi/${row.id}`}
+                        className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
+                      >
+                        Detail
+                      </Link>
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

@@ -1,15 +1,21 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { QueryKey } from "@tanstack/react-query";
+import { asOptimistic, useOptimisticList } from "@/features/admin/hooks/use-optimistic-list";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
-import { qk } from "@/lib/api/query-keys";
 import type { AdminPaymentListItem } from "@/lib/api/types";
 import { verifyPayment } from "../api";
 
-export function useVerifyPayment(payment: AdminPaymentListItem, onVerified: () => void) {
-  const queryClient = useQueryClient();
+export function useVerifyPayment(
+  listKey: QueryKey,
+  payment: AdminPaymentListItem,
+  onVerified: () => void,
+  onFailed: (message: string) => void,
+) {
+  const list = useOptimisticList<AdminPaymentListItem>(listKey);
 
   return useMutation({
     mutationFn: async () => {
@@ -17,8 +23,22 @@ export function useVerifyPayment(payment: AdminPaymentListItem, onVerified: () =
       return data;
     },
     meta: { silentError: true },
+    onMutate: async () => {
+      const rollback = list.begin();
+      list.patch((rows) =>
+        rows.map((row) =>
+          row.orderId === payment.orderId
+            ? asOptimistic({ ...row, status: "PAID" })
+            : row,
+        ),
+      );
+      return { rollback };
+    },
+    onError: (error, _values, context) => {
+      context?.rollback();
+      onFailed(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
+    },
     onSuccess: (result) => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.payments.all });
       toast.success(
         result.wasLate
           ? "Terverifikasi (terlambat) — sesi & attempt dibuat."
@@ -26,12 +46,6 @@ export function useVerifyPayment(payment: AdminPaymentListItem, onVerified: () =
       );
       onVerified();
     },
-    onError: (error) => {
-      if (isApiError(error)) {
-        toast.error(error.message);
-        return;
-      }
-      toast.error(GENERIC_ERROR_MESSAGE);
-    },
+    onSettled: () => list.refetch(),
   });
 }

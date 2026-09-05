@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { PaymentFilters } from "@/features/admin/payments/components/payment-filters";
-import { PaymentsTable } from "@/features/admin/payments/components/payments-table";
+import { PaymentsIsland } from "@/features/admin/payments/components/payments-island";
 import { QrisDialog } from "@/features/admin/payments/components/qris-dialog";
 import { fetchPaymentsServer } from "@/features/admin/payments/api.server";
+import { qk } from "@/lib/api/query-keys";
 import type { AdminPaymentListItem } from "@/lib/api/types";
 
 export const metadata: Metadata = { title: "Verifikasi Pembayaran" };
@@ -25,6 +26,7 @@ export default async function PembayaranPage({ searchParams }: PageProps<"/admin
   const amountRaw = Array.isArray(sp.amount) ? sp.amount[0] : sp.amount;
   const amount = amountRaw && /^\d+$/.test(amountRaw) ? amountRaw : undefined;
 
+  const listKey = qk.admin.payments.all;
   const { data, meta } = await fetchPaymentsServer({
     page,
     status,
@@ -42,9 +44,10 @@ export default async function PembayaranPage({ searchParams }: PageProps<"/admin
         <QrisDialog />
       </div>
       <PaymentFilters status={status} amount={amount} />
-      <PaymentsTable
-        rows={data}
-        meta={tableMeta}
+      <PaymentsIsland
+        listKey={listKey}
+        initial={{ data }}
+        page={page}
         status={status}
         amount={amount}
       />

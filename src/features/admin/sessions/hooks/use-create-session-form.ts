@@ -6,12 +6,16 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FORM_INVALID_TOAST } from "@/features/admin/copy";
 import type { SessionSummary } from "@/lib/api/types";
+import type { QueryKey } from "@tanstack/react-query";
 import { useCreateSession } from "./use-session-mutations";
 import { CreateSessionSchema } from "../schemas";
 import type { CreateSessionInput } from "../schemas";
 
 /** Form logic for the create-session dialog (§6.3 — logic in the hook). */
-export function useCreateSessionForm(onCreated: (created: SessionSummary) => void) {
+export function useCreateSessionForm(
+  listKey: QueryKey,
+  onCreated: (created: SessionSummary) => void,
+) {
   const form = useForm<CreateSessionInput>({
     resolver: zodResolver(CreateSessionSchema),
     defaultValues: {
@@ -24,7 +28,7 @@ export function useCreateSessionForm(onCreated: (created: SessionSummary) => voi
     },
   });
 
-  const mutation = useCreateSession(onCreated);
+  const mutation = useCreateSession(listKey, onCreated);
 
   const toggleTest = useCallback(
     (id: string, checked: boolean) => {

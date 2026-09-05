@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { CreateInvoiceButton } from "@/features/admin/invoices/components/create-invoice-dialog";
 import { InvoiceFilters } from "@/features/admin/invoices/components/invoice-filters";
+import { InvoicesIsland } from "@/features/admin/invoices/components/invoices-island";
 import { InvoicesTable } from "@/features/admin/invoices/components/invoices-table";
 import { fetchInvoicesServer } from "@/features/admin/invoices/api.server";
+import { qk } from "@/lib/api/query-keys";
 import { fetchInstitutionsServer } from "@/features/admin/institutions/api.server";
 import { INVOICE_STATUSES } from "@/lib/api/types";
 import type { InvoiceStatus } from "@/lib/api/types";
@@ -27,6 +29,7 @@ export default async function InvoicePage({ searchParams }: PageProps<"/admin/in
   const institutionMap = Object.fromEntries(
     institutionPage.data.map((institution) => [institution.id, institution.name]),
   );
+  const listKey = qk.admin.invoices.list({ page, status });
   const tableMeta = invoicePage.meta ?? {
     page,
     limit: 10,
@@ -41,14 +44,15 @@ export default async function InvoicePage({ searchParams }: PageProps<"/admin/in
           title="Invoice B2B"
           description="Tagihan institusi dengan nomor otomatis INV-YYYY-NNNN."
         />
-        <CreateInvoiceButton institutions={institutionPage.data} />
+        <CreateInvoiceButton institutions={institutionPage.data} listKey={listKey} />
       </div>
       <InvoiceFilters status={status} />
-      <InvoicesTable
-        rows={invoicePage.data}
-        meta={tableMeta}
-        institutionMap={institutionMap}
+      <InvoicesIsland
+        listKey={listKey}
+        initial={{ data: invoicePage.data, meta: tableMeta }}
+        page={page}
         status={status}
+        institutionMap={institutionMap}
       />
     </main>
   );

@@ -13,6 +13,8 @@ export interface CreateSessionInput {
 
 /** Session row — `token` is the invite-link token (`/join/<token>`). */
 export interface SessionSummary {
+  /** FE-only: set while an optimistic mutation is in flight (rendered grayed). */
+  _optimistic?: boolean;
   id: string;
   title: string;
   kind: SessionKind;

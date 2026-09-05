@@ -24,16 +24,19 @@ import {
 import { USER_ROLES } from "@/lib/api/types";
 import type { UserRole } from "@/lib/api/types";
 import type { AdminUser } from "@/lib/api/types";
+import type { QueryKey } from "@tanstack/react-query";
 import { useChangeRole } from "../hooks/use-change-role";
 import { ROLE_LABEL } from "../schemas";
 
 interface ChangeRoleDialogProps {
+  /** List cache key — the mutation updates the table optimistically. */
+  listKey: QueryKey;
   user: AdminUser;
   /** Role changes on the account itself are rejected by the backend (409). */
   disabled?: boolean;
 }
 
-export function ChangeRoleDialog({ user, disabled }: ChangeRoleDialogProps) {
+export function ChangeRoleDialog({ user, disabled, listKey }: ChangeRoleDialogProps) {
   const [open, setOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -42,9 +45,10 @@ export function ChangeRoleDialog({ user, disabled }: ChangeRoleDialogProps) {
   });
 
   const mutation = useChangeRole(
+    listKey,
     user,
-    (message) => setFormError(message),
     () => setOpen(false),
+    (message: string) => setFormError(message),
   );
 
   if (disabled) {

@@ -3,6 +3,8 @@ import { PageHeader } from "@/components/layout/page-header";
 import { InstitutionFormDialog } from "@/features/admin/institutions/components/institution-form-dialog";
 import { InstitutionsTable } from "@/features/admin/institutions/components/institutions-table";
 import { fetchInstitutionsServer } from "@/features/admin/institutions/api.server";
+import { InstitutionsIsland } from "@/features/admin/institutions/components/institutions-island";
+import { qk } from "@/lib/api/query-keys";
 
 export const metadata: Metadata = { title: "Data Institusi" };
 
@@ -10,8 +12,8 @@ export default async function InstitusiPage({ searchParams }: PageProps<"/admin/
   const sp = await searchParams;
   const page = Number(sp.page ?? "1") || 1;
 
-  const { data, meta } = await fetchInstitutionsServer({ page });
-  const tableMeta = meta ?? { page, limit: 10, total: data.length, totalPages: 1 };
+  const { data } = await fetchInstitutionsServer({ page });
+  const listKey = qk.admin.institutions.list({ page });
 
   return (
     <main className="flex-1 space-y-6 p-6">
@@ -20,9 +22,13 @@ export default async function InstitusiPage({ searchParams }: PageProps<"/admin/
           title="Data Institusi"
           description="Institusi klien B2B — pemilik sesi group dan invoice."
         />
-        <InstitutionFormDialog mode="create" />
+        <InstitutionFormDialog listKey={listKey} mode="create" />
       </div>
-      <InstitutionsTable rows={data} meta={tableMeta} />
+      <InstitutionsIsland
+        listKey={listKey}
+        initial={{ data }}
+        page={page}
+      />
     </main>
   );
 }

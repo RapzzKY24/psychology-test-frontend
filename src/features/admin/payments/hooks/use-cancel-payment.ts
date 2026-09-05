@@ -1,19 +1,21 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { QueryKey } from "@tanstack/react-query";
+import { asOptimistic, useOptimisticList } from "@/features/admin/hooks/use-optimistic-list";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
-import { qk } from "@/lib/api/query-keys";
 import type { AdminPaymentListItem } from "@/lib/api/types";
 import { cancelPayment } from "../api";
 import type { CancelPaymentInput } from "../schemas";
 
 export function useCancelPayment(
+  listKey: QueryKey,
   payment: AdminPaymentListItem,
   handlers: { onSaved: () => void; onFailed: (message: string) => void },
 ) {
-  const queryClient = useQueryClient();
+  const list = useOptimisticList<AdminPaymentListItem>(listKey);
 
   return useMutation({
     mutationFn: async (values: CancelPaymentInput) => {
@@ -21,13 +23,25 @@ export function useCancelPayment(
       return data;
     },
     meta: { silentError: true },
+    onMutate: async () => {
+      const rollback = list.begin();
+      list.patch((rows) =>
+        rows.map((row) =>
+          row.orderId === payment.orderId
+            ? asOptimistic({ ...row, status: "CANCELLED" })
+            : row,
+        ),
+      );
+      return { rollback };
+    },
+    onError: (error, _values, context) => {
+      context?.rollback();
+      handlers.onFailed(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
+    },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.payments.all });
       toast.success("Pesanan dibatalkan.");
       handlers.onSaved();
     },
-    onError: (error) => {
-      handlers.onFailed(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
-    },
+    onSettled: () => list.refetch(),
   });
 }

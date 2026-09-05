@@ -1,20 +1,34 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+"use client";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
+import { SavingChip } from "@/components/admin/saving-chip";
+import type { QueryKey } from "@tanstack/react-query";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
+import type { OptimisticRow } from "@/features/admin/hooks/use-optimistic-list";
 import type { AdminUser } from "@/lib/api/types";
 import { formatIdDate } from "@/lib/format/format-date";
+import { cn } from "@/lib/utils";
 import { ChangeRoleDialog } from "./change-role-dialog";
 import { ROLE_LABEL } from "../schemas";
 
 interface UsersTableProps {
-  rows: AdminUser[];
+  rows: OptimisticRow<AdminUser>[];
   meta: PaginationMeta;
   currentUserId: string;
   role?: string;
+  listKey: QueryKey;
 }
 
-export function UsersTable({ rows, meta, currentUserId, role }: UsersTableProps) {
+export function UsersTable({ rows, meta, currentUserId, role, listKey }: UsersTableProps) {
   if (rows.length === 0) {
     return <TableEmpty title="Belum ada pengguna" filtered={Boolean(role)} />;
   }
@@ -40,7 +54,7 @@ export function UsersTable({ rows, meta, currentUserId, role }: UsersTableProps)
           </TableHeader>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.id} className={cn(row._optimistic && "opacity-60")}>
                 <TableCell>
                   <p className="font-medium">{row.name}</p>
                   <p className="text-xs text-muted-foreground">{row.email}</p>
@@ -48,7 +62,15 @@ export function UsersTable({ rows, meta, currentUserId, role }: UsersTableProps)
                 <TableCell>{ROLE_LABEL[row.role]}</TableCell>
                 <TableCell className="tabular-nums">{formatIdDate(row.createdAt)}</TableCell>
                 <TableCell>
-                  <ChangeRoleDialog user={row} disabled={row.id === currentUserId} />
+                  {row._optimistic ? (
+                    <SavingChip />
+                  ) : (
+                    <ChangeRoleDialog
+                      user={row}
+                      disabled={row.id === currentUserId}
+                      listKey={listKey}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))}

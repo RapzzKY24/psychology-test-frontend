@@ -16,6 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FORM_INVALID_TOAST } from "@/features/admin/copy";
+import type { QueryKey } from "@tanstack/react-query";
 import type { Institution } from "@/lib/api/types";
 import { useCreateInvoice } from "../hooks/use-create-invoice";
 import { CreateInvoiceSchema } from "../schemas";
@@ -25,16 +26,18 @@ import { InvoiceFormFields } from "./invoice-form-fields";
 interface CreateInvoiceButtonProps {
   /** RSC passes the institutions list (mapped to a Select) — no cross-feature import. */
   institutions: Institution[];
+  /** List cache key — the mutation prepends the new invoice optimistically. */
+  listKey: QueryKey;
 }
 
-export function CreateInvoiceButton({ institutions }: CreateInvoiceButtonProps) {
+export function CreateInvoiceButton({ institutions, listKey }: CreateInvoiceButtonProps) {
   const [open, setOpen] = useState(false);
   const form = useForm<CreateInvoiceInput>({
     resolver: zodResolver(CreateInvoiceSchema),
     defaultValues: { institutionId: "", amount: 0, dueDate: "", notes: "" },
   });
 
-  const mutation = useCreateInvoice(() => {
+  const mutation = useCreateInvoice(listKey, () => {
     setOpen(false);
     form.reset();
   });

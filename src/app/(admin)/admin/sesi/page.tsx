@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { CreateSessionDialog } from "@/features/admin/sessions/components/create-session-dialog";
-import { SessionsTable } from "@/features/admin/sessions/components/sessions-table";
+import { SessionsIsland } from "@/features/admin/sessions/components/sessions-island";
 import { fetchSessionsServer } from "@/features/admin/sessions/api.server";
+import { qk } from "@/lib/api/query-keys";
 import { fetchAdminTestsServer } from "@/features/admin/tests-builder/api.server";
 import { fetchInstitutionsServer } from "@/features/admin/institutions/api.server";
 
@@ -18,6 +19,7 @@ export default async function SesiPage({ searchParams }: PageProps<"/admin/sesi"
     fetchInstitutionsServer({ page: 1, limit: 100 }),
   ]);
 
+  const listKey = qk.admin.sessions.list({ page });
   const tableMeta = sessionPage.meta ?? {
     page,
     limit: 10,
@@ -33,11 +35,12 @@ export default async function SesiPage({ searchParams }: PageProps<"/admin/sesi"
           description="Sesi group dengan tautan undangan — peserta masuk tanpa akun."
         />
         <CreateSessionDialog
+          listKey={listKey}
           tests={publishedTests.data.map((test) => ({ id: test.id, name: test.name }))}
           institutions={institutions.data}
         />
       </div>
-      <SessionsTable rows={sessionPage.data} meta={tableMeta} />
+      <SessionsIsland listKey={listKey} initial={{ data: sessionPage.data, meta: tableMeta }} page={page} />
     </main>
   );
 }

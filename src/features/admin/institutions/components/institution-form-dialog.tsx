@@ -16,6 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FORM_INVALID_TOAST } from "@/features/admin/copy";
+import type { QueryKey } from "@tanstack/react-query";
 import type { Institution } from "@/lib/api/types";
 import { useInstitutionForm } from "../hooks/use-institution-form";
 import { InstitutionSchema } from "../schemas";
@@ -23,11 +24,12 @@ import type { InstitutionInput } from "../schemas";
 import { InstitutionFormFields } from "./institution-form-fields";
 
 interface InstitutionFormDialogProps {
+  listKey: QueryKey;
   mode: "create" | "edit";
   institution?: Institution;
 }
 
-export function InstitutionFormDialog({ mode, institution }: InstitutionFormDialogProps) {
+export function InstitutionFormDialog({ listKey, mode, institution }: InstitutionFormDialogProps) {
   const isEdit = mode === "edit";
   const [open, setOpen] = useState(false);
 
@@ -55,9 +57,14 @@ export function InstitutionFormDialog({ mode, institution }: InstitutionFormDial
   }, [open, institution, form]);
 
   const mutation = useInstitutionForm({
+    listKey,
     mode,
     institution,
     onSaved: () => setOpen(false),
+    onFailed: (message) => {
+      toast.error(message);
+      setOpen(false);
+    },
   });
 
   return (

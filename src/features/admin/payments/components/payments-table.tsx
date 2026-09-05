@@ -10,21 +10,24 @@ import {
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
+import type { QueryKey } from "@tanstack/react-query";
 import type { AdminPaymentListItem } from "@/lib/api/types";
 import { formatIdDate } from "@/lib/format/format-date";
 import { formatIdr } from "@/lib/format/format-idr";
 import { CancelPaymentDialog } from "./cancel-payment-dialog";
 import { PaymentStatusBadge } from "./payment-status-badge";
+import { cn } from "@/lib/utils";
 import { VerifyPaymentButton } from "./verify-payment-button";
 
 interface PaymentsTableProps {
   rows: AdminPaymentListItem[];
+  listKey: QueryKey;
   meta: PaginationMeta;
   status?: string;
   amount?: string;
 }
 
-export function PaymentsTable({ rows, meta, status, amount }: PaymentsTableProps) {
+export function PaymentsTable({ rows, meta, listKey, status, amount }: PaymentsTableProps) {
   if (rows.length === 0) {
     return (
       <TableEmpty
@@ -59,7 +62,7 @@ export function PaymentsTable({ rows, meta, status, amount }: PaymentsTableProps
           </TableHeader>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.orderId}>
+              <TableRow key={row.orderId} className={cn(row._optimistic && "opacity-60")}>
                 <TableCell>
                   <p className="font-medium">{row.userName}</p>
                   <p className="text-xs text-muted-foreground">
@@ -88,8 +91,8 @@ export function PaymentsTable({ rows, meta, status, amount }: PaymentsTableProps
                 <TableCell>
                   {row.status === "PENDING" ? (
                     <div className="flex gap-1.5">
-                      <VerifyPaymentButton payment={row} />
-                      <CancelPaymentDialog payment={row} />
+                      <VerifyPaymentButton listKey={listKey} payment={row} />
+                      <CancelPaymentDialog listKey={listKey} payment={row} />
                     </div>
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>

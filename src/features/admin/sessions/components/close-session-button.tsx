@@ -13,11 +13,18 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import type { QueryKey } from "@tanstack/react-query";
 import { useCloseSession } from "../hooks/use-session-mutations";
 
-export function CloseSessionButton({ sessionId }: { sessionId: string }) {
+export function CloseSessionButton({
+  sessionId,
+  listKey,
+}: {
+  sessionId: string;
+  listKey: QueryKey;
+}) {
   const router = useRouter();
-  const mutation = useCloseSession(() => router.refresh());
+  const mutation = useCloseSession(listKey, sessionId, () => router.refresh());
 
   return (
     <AlertDialog>
@@ -36,7 +43,7 @@ export function CloseSessionButton({ sessionId }: { sessionId: string }) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={() => mutation.mutate(sessionId)}>
+          <AlertDialogAction onClick={() => mutation.mutate()}>
             Ya, tutup
           </AlertDialogAction>
         </AlertDialogFooter>

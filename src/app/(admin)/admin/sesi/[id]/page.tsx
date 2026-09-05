@@ -7,6 +7,7 @@ import { CloseSessionButton } from "@/features/admin/sessions/components/close-s
 import { SessionAttemptsTable } from "@/features/admin/sessions/components/session-attempts-table";
 import { SessionParticipantsTable } from "@/features/admin/sessions/components/session-participants-table";
 import { fetchSessionDetailServer } from "@/features/admin/sessions/api.server";
+import { qk } from "@/lib/api/query-keys";
 import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
@@ -25,6 +26,8 @@ export default async function SessionDetailPage({ params }: PageProps<"/admin/se
     throw error;
   }
 
+  const listKey = qk.admin.sessions.all;
+
   return (
     <main className="flex-1 space-y-6 p-6">
       <PageHeader
@@ -34,7 +37,7 @@ export default async function SessionDetailPage({ params }: PageProps<"/admin/se
 
       <div className="flex flex-wrap items-center gap-3">
         <CopyInviteButton token={detail.session.token} label="Salin Tautan Undangan" />
-        {detail.session.status === "ACTIVE" && <CloseSessionButton sessionId={detail.session.id} />}
+        {detail.session.status === "ACTIVE" && <CloseSessionButton sessionId={detail.session.id} listKey={listKey} />}
         <Link href="/admin/sesi" className="text-sm text-muted-foreground hover:underline">
           ← Kembali ke daftar sesi
         </Link>

@@ -1,16 +1,17 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import type { QueryKey } from "@tanstack/react-query";
+import { asOptimistic, useOptimisticList } from "@/features/admin/hooks/use-optimistic-list";
 import { toast } from "sonner";
-import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import { isApiError } from "@/lib/api/client";
-import { qk } from "@/lib/api/query-keys";
+import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import type { Invoice } from "@/lib/api/types";
 import { createInvoice } from "../api";
 import type { CreateInvoiceInput } from "../schemas";
 
-export function useCreateInvoice(onSaved: (created: Invoice) => void) {
-  const queryClient = useQueryClient();
+export function useCreateInvoice(listKey: QueryKey, onSaved: (created: Invoice) => void) {
+  const list = useOptimisticList<Invoice>(listKey);
 
   return useMutation({
     mutationFn: async (values: CreateInvoiceInput) => {
@@ -24,12 +25,29 @@ export function useCreateInvoice(onSaved: (created: Invoice) => void) {
       return data;
     },
     meta: { silentError: true },
-    onSuccess: (created) => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.invoices.all });
-      toast.success(`Invoice ${created.number} dibuat.`);
-      onSaved(created);
+    onMutate: async (values) => {
+      const rollback = list.begin();
+      // The server assigns the INV-YYYY-NNNN number — the optimistic row shows
+      // an empty number until the refetch lands.
+      list.patch((rows) => [
+        asOptimistic({
+          id: `optimistic-${Date.now()}`,
+          number: "",
+          institutionId: values.institutionId,
+          amount: values.amount,
+          status: "UNPAID",
+          issuedAt: new Date().toISOString(),
+          dueDate: values.dueDate || null,
+          notes: values.notes || null,
+        }),
+        ...rows,
+      ]);
+      return { rollback };
     },
-    onError: (error) =>
-      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE),
+    onError: (error, _values, context) => {
+      context?.rollback();
+      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
+    },
+    onSettled: () => list.refetch(),
   });
 }

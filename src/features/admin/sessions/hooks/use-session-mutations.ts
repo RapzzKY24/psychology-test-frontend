@@ -1,16 +1,17 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
+import type { QueryKey } from "@tanstack/react-query";
+import { asOptimistic, useOptimisticList } from "@/features/admin/hooks/use-optimistic-list";
 import { isApiError } from "@/lib/api/client";
-import { qk } from "@/lib/api/query-keys";
+import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import type { SessionSummary } from "@/lib/api/types";
 import { closeSession, createSession } from "../api";
 import type { CreateSessionInput } from "../schemas";
 
-export function useCreateSession(onCreated: (created: SessionSummary) => void) {
-  const queryClient = useQueryClient();
+export function useCreateSession(listKey: QueryKey, onCreated: (created: SessionSummary) => void) {
+  const list = useOptimisticList<SessionSummary>(listKey);
 
   return useMutation({
     mutationFn: async (values: CreateSessionInput) => {
@@ -24,41 +25,57 @@ export function useCreateSession(onCreated: (created: SessionSummary) => void) {
       return data;
     },
     meta: { silentError: true },
-    onSuccess: (created) => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.sessions.all });
-      toast.success("Sesi dibuat — bagikan tautan undangannya.");
-      onCreated(created);
+    onMutate: async (values) => {
+      const rollback = list.begin();
+      list.patch((rows) => [
+        asOptimistic({
+          id: `optimistic-${Date.now()}`,
+          title: values.title,
+          kind: "GROUP",
+          institutionId: values.institutionId || null,
+          token: "",
+          slotLimit: values.slotLimit,
+          expiresAt: new Date(values.expiresAt).toISOString(),
+          status: "ACTIVE",
+        }),
+        ...rows,
+      ]);
+      return { rollback };
     },
-    onError: (error) => {
-      if (isApiError(error)) {
-        toast.error(error.message);
-        return;
-      }
-      toast.error(GENERIC_ERROR_MESSAGE);
+    onError: (error, _values, context) => {
+      context?.rollback();
+      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
     },
+    onSettled: () => list.refetch(),
   });
 }
 
-export function useCloseSession(onClosed: () => void) {
-  const queryClient = useQueryClient();
+export function useCloseSession(listKey: QueryKey, sessionId: string, onClosed: () => void) {
+  const list = useOptimisticList<SessionSummary>(listKey);
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      const { data } = await closeSession(id);
+    mutationFn: async () => {
+      const { data } = await closeSession(sessionId);
       return data;
     },
     meta: { silentError: true },
+    onMutate: async () => {
+      const rollback = list.begin();
+      list.patch((rows) =>
+        rows.map((row) =>
+          row.id === sessionId ? asOptimistic({ ...row, status: "CLOSED" }) : row,
+        ),
+      );
+      return { rollback };
+    },
+    onError: (error, _values, context) => {
+      context?.rollback();
+      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
+    },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.sessions.all });
       toast.success("Sesi ditutup.");
       onClosed();
     },
-    onError: (error) => {
-      if (isApiError(error)) {
-        toast.error(error.message);
-        return;
-      }
-      toast.error(GENERIC_ERROR_MESSAGE);
-    },
+    onSettled: () => list.refetch(),
   });
 }
