@@ -35,10 +35,10 @@ export function ResultFilters({ status }: { status?: string }) {
           key={s.value}
           type="button"
           onClick={() => apply(s.value)}
-          aria-pressed={status === s.value}
+          aria-pressed={(status ?? "") === s.value}
           className={cn(
             "rounded-md px-3 py-1.5 text-sm transition-colors",
-            status === s.value
+            (status ?? "") === s.value
               ? "bg-primary font-medium text-primary-foreground"
               : "text-muted-foreground hover:text-foreground",
           )}

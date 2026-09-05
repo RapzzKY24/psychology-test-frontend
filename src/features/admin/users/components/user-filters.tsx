@@ -34,10 +34,10 @@ export function UserFilters({ role }: { role?: string }) {
           key={option.value}
           type="button"
           onClick={() => apply(option.value)}
-          aria-pressed={role === option.value}
+          aria-pressed={(role ?? "") === option.value}
           className={cn(
             "rounded-md px-3 py-1.5 text-sm transition-colors",
-            role === option.value
+            (role ?? "") === option.value
               ? "bg-primary font-medium text-primary-foreground"
               : "text-muted-foreground hover:text-foreground",
           )}
