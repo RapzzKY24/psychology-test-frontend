@@ -19,6 +19,18 @@ export interface AdminTest extends PublicTest {
   updatedAt?: string;
 }
 
+/** Builder payload (`GET /api/v1/admin/tests/:id` — merged 2026-09-05, PR #6). */
+export interface AdminTestItem {
+  id: string;
+  order: number;
+  content: DiscItemContent;
+}
+
+export interface AdminTestDetail extends AdminTest {
+  items: AdminTestItem[];
+  interpretations: Interpretation[];
+}
+
 /** Body of `POST /api/v1/admin/tests` (CreateTestSchema, verified). */
 export interface CreateTestInput {
   name: string;
