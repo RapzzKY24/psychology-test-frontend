@@ -22,15 +22,13 @@ export const BETTER_AUTH_ERROR_MESSAGES: Record<string, string> = {
   RATE_LIMITED: "Terlalu banyak percobaan — tunggu sebentar.",
 };
 
-export interface BetterAuthErrorLike {
-  code?: string;
-}
-
 const GENERIC_AUTH_ERROR = "Terjadi kesalahan — coba lagi.";
 
-export function betterAuthErrorMessage(error?: BetterAuthErrorLike | null): string {
-  if (!error?.code) return GENERIC_AUTH_ERROR;
-  return BETTER_AUTH_ERROR_MESSAGES[error.code] ?? GENERIC_AUTH_ERROR;
+/** Accepts the raw better-auth error (BetterFetchError) — narrowed internally. */
+export function betterAuthErrorMessage(error?: unknown): string {
+  const code = (error as { code?: unknown } | null | undefined)?.code;
+  if (typeof code !== "string") return GENERIC_AUTH_ERROR;
+  return BETTER_AUTH_ERROR_MESSAGES[code] ?? GENERIC_AUTH_ERROR;
 }
 
 export type { UserRole };
