@@ -10,8 +10,9 @@ import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { CreateTestInput } from "./schemas";
 
 /**
- * Admin tests endpoints (features/admin/tests-builder). All role-gated ADMIN
- * by the backend; errors arrive as ApiError with catalog codes.
+ * Admin tests endpoints (features/admin/tests-builder) — browser-safe.
+ * Server variants live in api.server.ts (they need next/headers).
+ * All role-gated ADMIN by the backend; errors arrive as ApiError with catalog codes.
  */
 
 export type TestStatusFilter = TestStatus | undefined;
