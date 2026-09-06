@@ -16,12 +16,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FORM_INVALID_TOAST } from "@/features/admin/copy";
+import type { QueryKey } from "@tanstack/react-query";
 import { CreateUserSchema } from "../schemas";
 import type { CreateUserInput } from "../schemas";
 import { useCreateUser } from "../hooks/use-create-user";
 import { UserFormFields } from "./user-form-fields";
 
-export function CreateUserButton() {
+interface CreateUserButtonProps {
+  /** List cache key — the mutation prepends the new account optimistically. */
+  listKey: QueryKey;
+}
+
+export function CreateUserButton({ listKey }: CreateUserButtonProps) {
   const [open, setOpen] = useState(false);
 
   const form = useForm<CreateUserInput>({
@@ -29,7 +35,7 @@ export function CreateUserButton() {
     defaultValues: { name: "", email: "", password: "", role: "PARTICIPANT" },
   });
 
-  const mutation = useCreateUser(() => {
+  const mutation = useCreateUser(listKey, () => {
     setOpen(false);
     form.reset();
   });

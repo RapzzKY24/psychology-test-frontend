@@ -13,6 +13,8 @@ export interface CreateSessionInput {
 
 /** Session row — `token` is the invite-link token (`/join/<token>`). */
 export interface SessionSummary {
+  /** FE-only: set while an optimistic mutation is in flight (rendered grayed). */
+  _optimistic?: boolean;
   id: string;
   title: string;
   kind: SessionKind;
@@ -24,26 +26,31 @@ export interface SessionSummary {
   createdAt?: string;
 }
 
-/** `GET /api/v1/admin/sessions/:id` (SessionDetail from sessions.repository.ts, verified). */
+/**
+ * `GET /api/v1/admin/sessions/:id` — verified against
+ * sessions.prisma-repository.findDetailById (2026-09-06, updated same day:
+ * participants now returns the full rows; attempts is a summary object).
+ */
+export interface SessionAttemptsSummary {
+  total: number;
+  inProgress: number;
+  completed: number;
+}
+
+export interface SessionParticipantRow {
+  id: string;
+  name: string;
+  email: string | null;
+  candidateNumber: string | null;
+  joinedAt: string;
+}
+
 export interface SessionDetail {
+  /** Full TestSession row (admin-only endpoint; pinHash present — never rendered). */
   session: SessionSummary;
   tests: Array<{ id: string; testId: string; testName: string; order: number }>;
-  participants: Array<{
-    id: string;
-    name: string;
-    email: string | null;
-    candidateNumber: string | null;
-    joinedAt: string;
-  }>;
-  attempts: Array<{
-    id: string;
-    testId: string;
-    participantId: string | null;
-    userId: string | null;
-    status: string;
-    startedAt: string | null;
-    completedAt: string | null;
-  }>;
+  participants: SessionParticipantRow[];
+  attempts: SessionAttemptsSummary;
 }
 
 /** Body of `POST /api/v1/public/sessions/:token/join` (JoinSessionSchema, verified). */

@@ -13,16 +13,21 @@ export interface ReviewListItem {
   reviewNote: string | null;
 }
 
-/** Row of `GET /api/v1/admin/results`. */
+/**
+ * Row of `GET /api/v1/admin/results` (AdminResultListItemDto — enriched backend
+ * shape, verified 2026-09-06). `id` = result id (resubmit); `attemptId` = link
+ * to the result detail page.
+ */
 export interface QueryResultsItem {
-  resultId: string;
+  id: string;
+  attemptId: string;
   testName: string;
   sessionTitle: string;
   participantName: string;
   status: ResultStatus;
   patternCode: string | null;
   correctedPatternCode: string | null;
-  completedAt: string;
+  completedAt: string | null;
 }
 
 /** `GET /api/v1/psychologist/reviews/:id` (ReviewDetail incl. per-item raw answers). */

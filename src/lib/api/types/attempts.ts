@@ -79,5 +79,18 @@ export interface MeResultItem {
   approvedAt: string;
 }
 
+/** Row of `GET /api/v1/me/attempts` (own attempts in any status — dashboard). */
+export interface MeAttemptItem {
+  id: string;
+  testId: string;
+  testName: string;
+  status: AttemptStatus;
+  startedAt: string;
+  completedAt: string | null;
+  sessionId: string;
+  sessionTitle: string;
+  resultStatus: ResultStatus | null;
+}
+
 /** Scorer registry key — the attempt runner picks a renderer by this (renderer registry). */
 export type RunnerScorerType = ScorerType;

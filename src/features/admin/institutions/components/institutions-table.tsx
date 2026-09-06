@@ -9,15 +9,20 @@ import {
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
+import type { OptimisticRow } from "@/features/admin/hooks/use-optimistic-list";
 import type { Institution } from "@/lib/api/types";
+import type { QueryKey } from "@tanstack/react-query";
+import { SavingChip } from "@/components/admin/saving-chip";
+import { cn } from "@/lib/utils";
 import { InstitutionFormDialog } from "./institution-form-dialog";
 
 interface InstitutionsTableProps {
-  rows: Institution[];
+  rows: OptimisticRow<Institution>[];
+  listKey: QueryKey;
   meta: PaginationMeta;
 }
 
-export function InstitutionsTable({ rows, meta }: InstitutionsTableProps) {
+export function InstitutionsTable({ rows, meta, listKey }: InstitutionsTableProps) {
   if (rows.length === 0) {
     return (
       <TableEmpty
@@ -43,7 +48,7 @@ export function InstitutionsTable({ rows, meta }: InstitutionsTableProps) {
           </TableHeader>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.id} className={cn(row._optimistic && "opacity-60")}>
                 <TableCell>
                   <p className="font-medium">{row.name}</p>
                   {row.notes && <p className="text-xs text-muted-foreground">{row.notes}</p>}
@@ -54,7 +59,7 @@ export function InstitutionsTable({ rows, meta }: InstitutionsTableProps) {
                 </TableCell>
                 <TableCell className="tabular-nums">{row.phone || "—"}</TableCell>
                 <TableCell>
-                  <InstitutionFormDialog mode="edit" institution={row} />
+                  {row._optimistic ? <SavingChip /> : <InstitutionFormDialog listKey={listKey} mode="edit" institution={row} />}
                 </TableCell>
               </TableRow>
             ))}

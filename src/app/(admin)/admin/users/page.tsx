@@ -4,6 +4,8 @@ import { CreateUserButton } from "@/features/admin/users/components/create-user-
 import { UserFilters } from "@/features/admin/users/components/user-filters";
 import { UsersTable } from "@/features/admin/users/components/users-table";
 import { fetchAdminUsersServer } from "@/features/admin/users/api.server";
+import { UsersIsland } from "@/features/admin/users/components/users-island";
+import { qk } from "@/lib/api/query-keys";
 import { getServerSession } from "@/lib/api/server";
 import { USER_ROLES } from "@/lib/api/types";
 import type { UserRole } from "@/lib/api/types";
@@ -20,7 +22,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/admin/user
     fetchAdminUsersServer({ page, role }),
   ]);
 
-  const tableMeta = meta ?? { page, limit: 10, total: data.length, totalPages: 1 };
+  const listKey = qk.admin.users.list({ page, role });
 
   return (
     <main className="flex-1 space-y-6 p-6">
@@ -29,14 +31,15 @@ export default async function UsersPage({ searchParams }: PageProps<"/admin/user
           title="Manajemen Pengguna"
           description="Kelola akun dan role: admin, psikolog, dan peserta."
         />
-        <CreateUserButton />
+        <CreateUserButton listKey={listKey} />
       </div>
       <UserFilters role={role} />
-      <UsersTable
-        rows={data}
-        meta={tableMeta}
-        currentUserId={session?.user.id ?? ""}
+      <UsersIsland
+        listKey={listKey}
+        initial={{ data }}
+        page={page}
         role={role}
+        currentUserId={session?.user.id ?? ""}
       />
     </main>
   );

@@ -24,20 +24,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { INVOICE_STATUSES } from "@/lib/api/types";
+import type { QueryKey } from "@tanstack/react-query";
 import type { Invoice } from "@/lib/api/types";
 import { useInvoiceStatus } from "../hooks/use-invoice-status";
 import { INVOICE_STATUS_LABEL, UpdateStatusSchema } from "../schemas";
 import type { UpdateStatusInput } from "../schemas";
 
-export function InvoiceStatusDialog({ invoice }: { invoice: Invoice }) {
+export function InvoiceStatusDialog({ listKey, invoice }: { listKey: QueryKey; invoice: Invoice }) {
   const [open, setOpen] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm<UpdateStatusInput>({
     resolver: zodResolver(UpdateStatusSchema),
     defaultValues: { status: invoice.status, notes: "" },
   });
 
-  const mutation = useInvoiceStatus(invoice, () => setOpen(false));
+  const mutation = useInvoiceStatus(
+    listKey,
+    invoice,
+    () => setOpen(false),
+    (message) => setFormError(message),
+  );
 
   return (
     <Dialog
@@ -115,6 +122,11 @@ export function InvoiceStatusDialog({ invoice }: { invoice: Invoice }) {
             <Button type="submit" disabled={mutation.isPending}>
               {mutation.isPending ? "Menyimpan..." : "Simpan"}
             </Button>
+          {formError && (
+            <p role="alert" className="text-sm text-destructive">
+              {formError}
+            </p>
+          )}
           </DialogFooter>
         </form>
       </DialogContent>

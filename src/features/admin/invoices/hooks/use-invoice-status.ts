@@ -1,29 +1,47 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import type { QueryKey } from "@tanstack/react-query";
+import { asOptimistic, useOptimisticList } from "@/features/admin/hooks/use-optimistic-list";
 import { toast } from "sonner";
-import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import { isApiError } from "@/lib/api/client";
-import { qk } from "@/lib/api/query-keys";
-import type { Invoice } from "@/lib/api/types";
+import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
+import type { Invoice, InvoiceStatus } from "@/lib/api/types";
 import { updateInvoiceStatus } from "../api";
 import { INVOICE_STATUS_LABEL } from "../schemas";
 
-export function useInvoiceStatus(invoice: Invoice, onSaved: () => void) {
-  const queryClient = useQueryClient();
+export function useInvoiceStatus(
+  listKey: QueryKey,
+  invoice: Invoice,
+  onSaved: () => void,
+  onFailed: (message: string) => void,
+) {
+  const list = useOptimisticList<Invoice>(listKey);
 
   return useMutation({
-    mutationFn: async (values: { status: Invoice["status"]; notes?: string }) => {
+    mutationFn: async (values: { status: InvoiceStatus; notes?: string }) => {
       const { data } = await updateInvoiceStatus(invoice.id, values.status, values.notes);
       return data;
     },
     meta: { silentError: true },
-    onSuccess: (updated) => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.invoices.all });
-      toast.success(`Invoice ${updated.number} → ${INVOICE_STATUS_LABEL[updated.status]}.`);
-      onSaved();
+    onMutate: async (values) => {
+      const rollback = list.begin();
+      list.patch((rows) =>
+        rows.map((row) =>
+          row.id === invoice.id
+            ? asOptimistic({ ...row, status: values.status, notes: values.notes || row.notes })
+            : row,
+        ),
+      );
+      return { rollback };
     },
-    onError: (error) =>
-      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE),
+    onError: (error, _values, context) => {
+      context?.rollback();
+      onFailed(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
+    },
+    onSuccess: (updated) => {
+      toast.success(`Invoice ${updated.number} → ${INVOICE_STATUS_LABEL[updated.status]}.`);
+    },
+    onSettled: () => list.refetch(),
   });
 }

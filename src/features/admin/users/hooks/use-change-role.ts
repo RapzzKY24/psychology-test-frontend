@@ -1,20 +1,20 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import type { QueryKey } from "@tanstack/react-query";
+import { asOptimistic, useOptimisticList } from "@/features/admin/hooks/use-optimistic-list";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
-import { qk } from "@/lib/api/query-keys";
 import type { AdminUser, UserRole } from "@/lib/api/types";
 import { updateUserRole } from "../api";
-import { ROLE_LABEL } from "../schemas";
 
 export function useChangeRole(
+  listKey: QueryKey,
   user: AdminUser,
-  onOwnRoleBlocked: (message: string) => void,
   onSaved: () => void,
+  onFailed: (message: string) => void,
 ) {
-  const queryClient = useQueryClient();
+  const list = useOptimisticList<AdminUser>(listKey);
 
   return useMutation({
     mutationFn: async (values: { role: UserRole }) => {
@@ -22,17 +22,19 @@ export function useChangeRole(
       return data;
     },
     meta: { silentError: true },
-    onSuccess: (updated) => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.users.all });
-      toast.success(`Role ${user.email} → ${ROLE_LABEL[updated.role]}.`);
-      onSaved();
+    onMutate: async (values) => {
+      const rollback = list.begin();
+      list.patch((rows) =>
+        rows.map((row) =>
+          row.id === user.id ? asOptimistic({ ...row, role: values.role }) : row,
+        ),
+      );
+      return { rollback };
     },
-    onError: (error) => {
-      if (isApiError(error) && error.code === "cannot_change_own_role") {
-        onOwnRoleBlocked("Anda tidak bisa mengubah role akun sendiri.");
-        return;
-      }
-      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
+    onError: (error, _values, context) => {
+      context?.rollback();
+      onFailed(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
     },
+    onSettled: () => list.refetch(),
   });
 }

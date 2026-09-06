@@ -2,6 +2,8 @@ import type { InvoiceStatus, UserRole } from "./enums";
 
 /** Row of `GET /api/v1/admin/users` (admin-users.controller.ts). */
 export interface AdminUser {
+  /** FE-only: set while an optimistic mutation is in flight (rendered grayed). */
+  _optimistic?: boolean;
   id: string;
   name: string;
   email: string;
@@ -24,6 +26,8 @@ export interface UpdateRoleInput {
 
 /** Row of `GET /api/v1/admin/institutions`. */
 export interface Institution {
+  /** FE-only: set while an optimistic mutation is in flight (rendered grayed). */
+  _optimistic?: boolean;
   id: string;
   name: string;
   contactName: string;
@@ -42,6 +46,8 @@ export interface InstitutionInput {
 
 /** Row of `GET /api/v1/admin/invoices` (number auto: INV-YYYY-NNNN). */
 export interface Invoice {
+  /** FE-only: set while an optimistic mutation is in flight (rendered grayed). */
+  _optimistic?: boolean;
   id: string;
   institutionId: string;
   number: string;
@@ -59,20 +65,21 @@ export interface CreateInvoiceInput {
   notes?: string;
 }
 
-/** Row of `GET /api/v1/admin/payments`. */
-export interface PaymentRecord {
-  id: string;
-  userId: string;
-  userName?: string;
-  testId: string;
-  testName?: string;
-  basePrice: number;
-  uniqueCode: number;
+/** Row of `GET /api/v1/admin/payments` (AdminPaymentListItemSchema, verified 2026-09-05). */
+export interface AdminPaymentListItem {
+  /** FE-only: set while an optimistic mutation is in flight (rendered grayed). */
+  _optimistic?: boolean;
+  orderId: string;
+  userName: string;
+  userEmail: string;
+  testName: string;
   amount: number;
-  status: "PENDING" | "PAID" | "EXPIRED" | "CANCELLED";
+  uniqueCode: number;
+  createdAt: string;
   expiresAt: string;
-  userClaimedAt: string | null;
-  createdAt?: string;
+  claimed: boolean;
+  status: "PENDING" | "PAID" | "EXPIRED" | "CANCELLED";
+  verifiedBy: { id: string; name: string; email: string } | null;
 }
 
 /** `POST /api/v1/admin/payments/:id/verify` — wasLate = late-verify of an EXPIRED order. */

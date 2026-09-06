@@ -8,15 +8,20 @@ import {
 } from "@/components/ui/table";
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
+import type { QueryKey } from "@tanstack/react-query";
+import type { OptimisticRow } from "@/features/admin/hooks/use-optimistic-list";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
 import type { Invoice } from "@/lib/api/types";
 import { formatIdDate } from "@/lib/format/format-date";
 import { formatIdr } from "@/lib/format/format-idr";
 import { InvoiceStatusBadge } from "./invoice-status-badge";
 import { InvoiceStatusDialog } from "./invoice-status-dialog";
+import { SavingChip } from "@/components/admin/saving-chip";
+import { cn } from "@/lib/utils";
 
 interface InvoicesTableProps {
-  rows: Invoice[];
+  rows: OptimisticRow<Invoice>[];
+  listKey: QueryKey;
   meta: PaginationMeta;
   institutionMap: Record<string, string>;
   status?: string;
@@ -25,6 +30,7 @@ interface InvoicesTableProps {
 export function InvoicesTable({
   rows,
   meta,
+  listKey,
   institutionMap,
   status,
 }: InvoicesTableProps) {
@@ -61,7 +67,7 @@ export function InvoicesTable({
           </TableHeader>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.id} className={cn(row._optimistic && "opacity-60")}>
                 <TableCell className="font-medium tabular-nums">{row.number}</TableCell>
                 <TableCell>{institutionMap[row.institutionId] ?? "—"}</TableCell>
                 <TableCell className="tabular-nums">{formatIdr(row.amount)}</TableCell>
@@ -70,7 +76,7 @@ export function InvoicesTable({
                   <InvoiceStatusBadge status={row.status} />
                 </TableCell>
                 <TableCell>
-                  <InvoiceStatusDialog invoice={row} />
+                  {row._optimistic ? <SavingChip /> : <InvoiceStatusDialog listKey={listKey} invoice={row} />}
                 </TableCell>
               </TableRow>
             ))}
