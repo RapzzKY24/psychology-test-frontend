@@ -6,6 +6,7 @@ describe("ROLE_HOME", () => {
     expect(ROLE_HOME.ADMIN).toBe("/admin");
     expect(ROLE_HOME.PSYCHOLOGIST).toBe("/psikolog");
     expect(ROLE_HOME.PARTICIPANT).toBe("/dashboard");
+    expect(ROLE_HOME.INSTANSI).toBe("/instansi");
   });
 });
 
@@ -14,6 +15,7 @@ describe("roleHome", () => {
     expect(roleHome("ADMIN")).toBe("/admin");
     expect(roleHome("PSYCHOLOGIST")).toBe("/psikolog");
     expect(roleHome("PARTICIPANT")).toBe("/dashboard");
+    expect(roleHome("INSTANSI")).toBe("/instansi");
   });
 
   it("falls back to /dashboard for unknown roles", () => {

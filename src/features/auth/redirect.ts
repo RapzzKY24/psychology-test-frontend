@@ -5,6 +5,7 @@ export const ROLE_HOME: Record<UserRole, string> = {
   ADMIN: "/admin",
   PSYCHOLOGIST: "/psikolog",
   PARTICIPANT: "/dashboard",
+  INSTANSI: "/instansi",
 };
 
 export function roleHome(role: string): string {
