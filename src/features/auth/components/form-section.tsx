@@ -44,6 +44,24 @@ export function AuthTextField<T extends FieldValues>({
   );
 }
 
+export interface AuthSectionSpec<T extends FieldValues> {
+  icon: LucideIcon;
+  title: string;
+  hint: string;
+  fields: AuthTextSpec<T>[];
+}
+
+export function FormAlert({ message }: { message: string }) {
+  return (
+    <div
+      role="alert"
+      className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"
+    >
+      {message}
+    </div>
+  );
+}
+
 export function AuthSection({
   icon: Icon,
   title,

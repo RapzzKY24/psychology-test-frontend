@@ -4,15 +4,10 @@ import { KeyRound, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSignUpForm } from "../hooks/use-sign-up-form";
 import type { SignUpInput } from "../schemas";
-import { AuthSection, AuthTextField } from "./form-section";
-import type { AuthTextSpec } from "./form-section";
+import { AuthSection, AuthTextField, FormAlert } from "./form-section";
+import type { AuthSectionSpec } from "./form-section";
 
-const SECTIONS: {
-  icon: typeof UserRound;
-  title: string;
-  hint: string;
-  fields: AuthTextSpec<SignUpInput>[];
-}[] = [
+const SECTIONS: AuthSectionSpec<SignUpInput>[] = [
   {
     icon: UserRound,
     title: "Data diri",
@@ -38,14 +33,7 @@ export function SignUpForm({ next }: { next?: string | null }) {
 
   return (
     <form onSubmit={submit} noValidate className="grid gap-6">
-      {formError && (
-        <div
-          role="alert"
-          className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"
-        >
-          {formError}
-        </div>
-      )}
+      {formError && <FormAlert message={formError} />}
       {SECTIONS.map((section) => (
         <AuthSection
           key={section.title}

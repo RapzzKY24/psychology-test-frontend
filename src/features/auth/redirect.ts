@@ -14,10 +14,10 @@ export function roleHome(role: string): string {
 
 /**
  * Post-login target: safe ?next= wins, otherwise the role home.
- * Single source for client (sign-in hook) and server (auth pages).
+ * Single source for the client sign-in hook and the server auth pages.
  */
-export function postLoginTarget(next?: string | null, role?: string): string {
-  return resolveSafeNext(next) ?? roleHome(role ?? "");
+export function postLoginTarget(next?: string | null, role?: UserRole): string {
+  return resolveSafeNext(next) ?? roleHome(role ?? "PARTICIPANT");
 }
 
 /**

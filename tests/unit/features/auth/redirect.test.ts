@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { UserRole } from "@/lib/api/types";
 import { ROLE_HOME, postLoginTarget, resolveSafeNext, roleHome } from "@/features/auth/redirect";
 
 describe("ROLE_HOME", () => {
@@ -25,7 +26,7 @@ describe("roleHome", () => {
 });
 
 describe("postLoginTarget", () => {
-  it.each([
+  it.each<[UserRole, string]>([
     ["ADMIN", "/admin"],
     ["PSYCHOLOGIST", "/psikolog"],
     ["PARTICIPANT", "/dashboard"],
@@ -39,8 +40,8 @@ describe("postLoginTarget", () => {
     expect(postLoginTarget("/masuk", "ADMIN")).toBe("/admin");
   });
 
-  it("falls back to /dashboard for an empty role", () => {
-    expect(postLoginTarget(null, "")).toBe("/dashboard");
+  it("falls back to /dashboard for a missing role", () => {
+    expect(postLoginTarget(null, undefined)).toBe("/dashboard");
   });
 });
 

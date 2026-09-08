@@ -1,13 +1,8 @@
-import { apiFetch } from "@/lib/api/client";
+import { apiFetch } from "./client";
+import type { InstansiSignUpInput } from "@/features/auth/schemas";
 
-export interface RegisterInstitutionPayload {
-  companyName: string;
-  picName: string;
-  email: string;
-  phone: string;
-  address: string;
-  password: string;
-}
+/** Wire payload: form input minus the client-only confirmation field. */
+export type RegisterInstitutionPayload = Omit<InstansiSignUpInput, "confirmPassword">;
 
 export interface RegisteredInstitution {
   user: { id: string; email: string; role: string };

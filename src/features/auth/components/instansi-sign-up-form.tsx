@@ -8,15 +8,10 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { useInstansiSignUpForm } from "../hooks/use-instansi-sign-up-form";
 import type { InstansiSignUpInput } from "../schemas";
-import { AuthSection, AuthTextField } from "./form-section";
-import type { AuthTextSpec } from "./form-section";
+import { AuthSection, AuthTextField, FormAlert } from "./form-section";
+import type { AuthSectionSpec } from "./form-section";
 
-const SECTIONS: {
-  icon: typeof Building2;
-  title: string;
-  hint: string;
-  fields: AuthTextSpec<InstansiSignUpInput>[];
-}[] = [
+const SECTIONS: AuthSectionSpec<InstansiSignUpInput>[] = [
   {
     icon: Building2,
     title: "Data perusahaan",
@@ -52,14 +47,7 @@ export function InstansiSignUpForm() {
 
   return (
     <form onSubmit={submit} noValidate className="grid gap-7">
-      {formError && (
-        <div
-          role="alert"
-          className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"
-        >
-          {formError}
-        </div>
-      )}
+      {formError && <FormAlert message={formError} />}
       {duplicateEmail && (
         <div className="rounded-md border p-3 text-sm">
           Sudah punya akun?{" "}

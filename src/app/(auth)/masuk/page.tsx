@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { AuthCard } from "@/features/auth/components/auth-card";
 import { SignInForm } from "@/features/auth/components/sign-in-form";
-import { resolveSafeNext, roleHome } from "@/features/auth/constants";
+import { postLoginTarget } from "@/features/auth/constants";
 import { getServerSession } from "@/lib/api/server";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -15,7 +15,7 @@ export default async function MasukPage({ searchParams }: PageProps<"/masuk">) {
 
   const session = await getServerSession();
   if (session) {
-    redirect(resolveSafeNext(nextPath) ?? roleHome(session.user.role));
+    redirect(postLoginTarget(nextPath, session.user.role));
   }
 
   return (

@@ -4,13 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { ApiError } from "@/lib/api/error";
-import { registerInstitution } from "../api";
+import { ApiError, ERROR_MESSAGES } from "@/lib/api/error";
+import { registerInstitution } from "@/lib/api/instansi-auth";
 import { roleHome } from "../constants";
 import { InstansiSignUpSchema } from "../schemas";
 import type { InstansiSignUpInput } from "../schemas";
-
-const DUPLICATE_EMAIL_MESSAGE = "Email sudah terdaftar — silakan masuk.";
 
 export function useInstansiSignUpForm() {
   const router = useRouter();
@@ -41,7 +39,7 @@ export function useInstansiSignUpForm() {
       router.refresh();
     } catch (error) {
       if (error instanceof ApiError && error.statusCode === 409) {
-        form.setError("email", { message: DUPLICATE_EMAIL_MESSAGE });
+        form.setError("email", { message: ERROR_MESSAGES.duplicate_email });
         setDuplicateEmail(true);
         return;
       }

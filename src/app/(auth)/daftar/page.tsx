@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthCard } from "@/features/auth/components/auth-card";
 import { InstansiSignUpForm } from "@/features/auth/components/instansi-sign-up-form";
 import { SignUpForm } from "@/features/auth/components/sign-up-form";
-import { resolveSafeNext, roleHome } from "@/features/auth/constants";
+import { postLoginTarget } from "@/features/auth/constants";
 import { getServerSession } from "@/lib/api/server";
 
 export const metadata: Metadata = { title: "Daftar" };
@@ -17,7 +17,7 @@ export default async function DaftarPage({ searchParams }: PageProps<"/daftar">)
 
   const session = await getServerSession();
   if (session) {
-    redirect(resolveSafeNext(nextPath) ?? roleHome(session.user.role));
+    redirect(postLoginTarget(nextPath, session.user.role));
   }
 
   return (
