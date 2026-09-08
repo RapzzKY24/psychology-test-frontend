@@ -1,34 +1,49 @@
 "use client";
 
 import Link from "next/link";
+import { Building2, KeyRound, UserRound } from "lucide-react";
 import { Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useInstansiSignUpForm } from "../hooks/use-instansi-sign-up-form";
+import type { InstansiSignUpInput } from "../schemas";
+import { AuthSection, AuthTextField } from "./form-section";
+import type { AuthTextSpec } from "./form-section";
 
-type TextFieldName =
-  | "companyName"
-  | "picName"
-  | "email"
-  | "phone"
-  | "password"
-  | "confirmPassword";
-
-const FIELD_PAIRS: { name: TextFieldName; label: string; placeholder: string; type: string; autoComplete: string }[][] = [
-  [
-    { name: "companyName", label: "Nama perusahaan", placeholder: "PT Maju Jaya", type: "text", autoComplete: "organization" },
-    { name: "picName", label: "Nama PIC", placeholder: "Nama penanggung jawab", type: "text", autoComplete: "name" },
-  ],
-  [
-    { name: "email", label: "Email (akun)", placeholder: "hr@perusahaan.com", type: "email", autoComplete: "email" },
-    { name: "phone", label: "Kontak PIC (HP)", placeholder: "08xxxxxxxxxx", type: "tel", autoComplete: "tel" },
-  ],
-  [
-    { name: "password", label: "Kata sandi", placeholder: "Min. 8 karakter", type: "password", autoComplete: "new-password" },
-    { name: "confirmPassword", label: "Konfirmasi kata sandi", placeholder: "Ulangi kata sandi", type: "password", autoComplete: "new-password" },
-  ],
+const SECTIONS: {
+  icon: typeof Building2;
+  title: string;
+  hint: string;
+  fields: AuthTextSpec<InstansiSignUpInput>[];
+}[] = [
+  {
+    icon: Building2,
+    title: "Data perusahaan",
+    hint: "Identitas resmi instansi Anda.",
+    fields: [
+      { name: "companyName", label: "Nama perusahaan", placeholder: "PT Maju Jaya", autoComplete: "organization" },
+      { name: "picName", label: "Nama PIC", placeholder: "Nama penanggung jawab", autoComplete: "name" },
+    ],
+  },
+  {
+    icon: UserRound,
+    title: "Kontak",
+    hint: "Email dipakai untuk masuk; HP untuk verifikasi.",
+    fields: [
+      { name: "email", label: "Email (akun)", placeholder: "hr@perusahaan.com", type: "email", autoComplete: "email" },
+      { name: "phone", label: "Kontak PIC (HP)", placeholder: "08xxxxxxxxxx", type: "tel", autoComplete: "tel" },
+    ],
+  },
+  {
+    icon: KeyRound,
+    title: "Keamanan akun",
+    hint: "Minimal 8 karakter. Jangan bagikan ke siapa pun.",
+    fields: [
+      { name: "password", label: "Kata sandi", placeholder: "Min. 8 karakter", type: "password", autoComplete: "new-password" },
+      { name: "confirmPassword", label: "Konfirmasi kata sandi", placeholder: "Ulangi kata sandi", type: "password", autoComplete: "new-password" },
+    ],
+  },
 ];
 
 export function InstansiSignUpForm() {
@@ -36,7 +51,7 @@ export function InstansiSignUpForm() {
     useInstansiSignUpForm();
 
   return (
-    <form onSubmit={submit} noValidate className="grid gap-4">
+    <form onSubmit={submit} noValidate className="grid gap-7">
       {formError && (
         <div
           role="alert"
@@ -53,30 +68,17 @@ export function InstansiSignUpForm() {
           </Link>
         </div>
       )}
-      {FIELD_PAIRS.map((pair, i) => (
-        <div key={i} className="grid gap-4 md:grid-cols-2">
-          {pair.map((f) => (
-            <Controller
-              key={f.name}
-              name={f.name}
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={f.name}>{f.label}</FieldLabel>
-                  <Input
-                    {...field}
-                    id={f.name}
-                    type={f.type}
-                    autoComplete={f.autoComplete}
-                    placeholder={f.placeholder || undefined}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
+      {SECTIONS.map((section) => (
+        <AuthSection
+          key={section.title}
+          icon={section.icon}
+          title={section.title}
+          hint={section.hint}
+        >
+          {section.fields.map((f) => (
+            <AuthTextField key={f.name} spec={f} control={form.control} />
           ))}
-        </div>
+        </AuthSection>
       ))}
       <Controller
         name="address"
@@ -87,14 +89,15 @@ export function InstansiSignUpForm() {
             <Textarea
               {...field}
               id="address"
-              placeholder="Jalan, kota"
+              rows={3}
+              placeholder="Jalan, kota, kode pos"
               aria-invalid={fieldState.invalid}
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="h-11 w-full md:w-auto md:justify-self-end md:px-8">
         {isSubmitting ? "Memproses..." : "Daftarkan Instansi"}
       </Button>
     </form>

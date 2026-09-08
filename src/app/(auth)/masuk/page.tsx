@@ -25,10 +25,13 @@ export default async function MasukPage({ searchParams }: PageProps<"/masuk">) {
       footerText="Belum punya akun?"
       footerHref="/daftar"
       footerLinkLabel="Daftar"
+      className="max-w-2xl"
     >
-      <Suspense fallback={<Skeleton className="h-40 w-full" />}>
-        <SignInForm next={nextPath} />
-      </Suspense>
+      <div className="mx-auto w-full max-w-sm">
+        <Suspense fallback={<Skeleton className="h-40 w-full" />}>
+          <SignInForm next={nextPath} />
+        </Suspense>
+      </div>
     </AuthCard>
   );
 }

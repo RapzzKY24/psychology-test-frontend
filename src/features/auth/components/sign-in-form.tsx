@@ -32,6 +32,7 @@ export function SignInForm({ next }: { next?: string | null }) {
               autoComplete="email"
               placeholder="nama@email.com"
               aria-invalid={fieldState.invalid}
+              className="h-11"
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -49,12 +50,13 @@ export function SignInForm({ next }: { next?: string | null }) {
               type="password"
               autoComplete="current-password"
               aria-invalid={fieldState.invalid}
+              className="h-11"
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="h-11 w-full">
         {isSubmitting ? "Memproses..." : "Masuk"}
       </Button>
     </form>

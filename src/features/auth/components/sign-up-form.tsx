@@ -1,16 +1,43 @@
 "use client";
 
-import { Controller } from "react-hook-form";
+import { KeyRound, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { useSignUpForm } from "../hooks/use-sign-up-form";
+import type { SignUpInput } from "../schemas";
+import { AuthSection, AuthTextField } from "./form-section";
+import type { AuthTextSpec } from "./form-section";
+
+const SECTIONS: {
+  icon: typeof UserRound;
+  title: string;
+  hint: string;
+  fields: AuthTextSpec<SignUpInput>[];
+}[] = [
+  {
+    icon: UserRound,
+    title: "Data diri",
+    hint: "Nama dan email aktif Anda.",
+    fields: [
+      { name: "name", label: "Nama lengkap", placeholder: "Nama Anda", autoComplete: "name" },
+      { name: "email", label: "Email", placeholder: "nama@email.com", type: "email", autoComplete: "email" },
+    ],
+  },
+  {
+    icon: KeyRound,
+    title: "Keamanan akun",
+    hint: "Minimal 8 karakter.",
+    fields: [
+      { name: "password", label: "Kata sandi", type: "password", autoComplete: "new-password" },
+      { name: "confirmPassword", label: "Konfirmasi kata sandi", type: "password", autoComplete: "new-password" },
+    ],
+  },
+];
 
 export function SignUpForm({ next }: { next?: string | null }) {
   const { form, submit, formError, isSubmitting } = useSignUpForm(next);
 
   return (
-    <form onSubmit={submit} noValidate className="grid gap-4">
+    <form onSubmit={submit} noValidate className="grid gap-6">
       {formError && (
         <div
           role="alert"
@@ -19,76 +46,19 @@ export function SignUpForm({ next }: { next?: string | null }) {
           {formError}
         </div>
       )}
-      <Controller
-        name="name"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="name">Nama lengkap</FieldLabel>
-            <Input
-              {...field}
-              id="name"
-              autoComplete="name"
-              placeholder="Nama Anda"
-              aria-invalid={fieldState.invalid}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-      <Controller
-        name="email"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input
-              {...field}
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="nama@email.com"
-              aria-invalid={fieldState.invalid}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-      <Controller
-        name="password"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="password">Kata sandi</FieldLabel>
-            <Input
-              {...field}
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              aria-invalid={fieldState.invalid}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-      <Controller
-        name="confirmPassword"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="confirmPassword">Konfirmasi kata sandi</FieldLabel>
-            <Input
-              {...field}
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              aria-invalid={fieldState.invalid}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-      <Button type="submit" disabled={isSubmitting}>
+      {SECTIONS.map((section) => (
+        <AuthSection
+          key={section.title}
+          icon={section.icon}
+          title={section.title}
+          hint={section.hint}
+        >
+          {section.fields.map((f) => (
+            <AuthTextField key={f.name} spec={f} control={form.control} />
+          ))}
+        </AuthSection>
+      ))}
+      <Button type="submit" disabled={isSubmitting} className="h-11 w-full">
         {isSubmitting ? "Memproses..." : "Daftar"}
       </Button>
     </form>
