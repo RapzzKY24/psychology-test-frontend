@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ROLE_HOME, resolveSafeNext, roleHome } from "@/features/auth/redirect";
+import { ROLE_HOME, postLoginTarget, resolveSafeNext, roleHome } from "@/features/auth/redirect";
 
 describe("ROLE_HOME", () => {
   it("maps every role to its console", () => {
@@ -21,6 +21,26 @@ describe("roleHome", () => {
   it("falls back to /dashboard for unknown roles", () => {
     expect(roleHome("WEIRD")).toBe("/dashboard");
     expect(roleHome("")).toBe("/dashboard");
+  });
+});
+
+describe("postLoginTarget", () => {
+  it.each([
+    ["ADMIN", "/admin"],
+    ["PSYCHOLOGIST", "/psikolog"],
+    ["PARTICIPANT", "/dashboard"],
+    ["INSTANSI", "/instansi"],
+  ])("sends %s to %s without next", (role, home) => {
+    expect(postLoginTarget(null, role)).toBe(home);
+  });
+
+  it("prefers a safe ?next= over the role home", () => {
+    expect(postLoginTarget("/hasil/abc", "INSTANSI")).toBe("/hasil/abc");
+    expect(postLoginTarget("/masuk", "ADMIN")).toBe("/admin");
+  });
+
+  it("falls back to /dashboard for an empty role", () => {
+    expect(postLoginTarget(null, "")).toBe("/dashboard");
   });
 });
 

@@ -13,6 +13,14 @@ export function roleHome(role: string): string {
 }
 
 /**
+ * Post-login target: safe ?next= wins, otherwise the role home.
+ * Single source for client (sign-in hook) and server (auth pages).
+ */
+export function postLoginTarget(next?: string | null, role?: string): string {
+  return resolveSafeNext(next) ?? roleHome(role ?? "");
+}
+
+/**
  * Open-redirect guard for ?next=: only internal paths survive. Rejects empty,
  * relative, scheme-based, protocol-relative, backslash tricks, and the auth
  * pages themselves (redirect loop).

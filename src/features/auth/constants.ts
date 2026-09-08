@@ -1,7 +1,7 @@
 import type { UserRole } from "@/lib/api/types";
 
 /** Landing route per role — re-exported here for form hooks' convenience. */
-export { ROLE_HOME, resolveSafeNext, roleHome } from "./redirect";
+export { ROLE_HOME, postLoginTarget, resolveSafeNext, roleHome } from "./redirect";
 
 /** After sign-up the role is always server-assigned PARTICIPANT. */
 export const SIGNUP_FALLBACK_HOME = "/dashboard";
