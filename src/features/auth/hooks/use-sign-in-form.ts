@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { authClient } from "@/lib/api/auth-client";
-import { betterAuthErrorMessage, resolveSafeNext, roleHome } from "../constants";
+import { USER_ROLES } from "@/lib/api/types";
+import type { UserRole } from "@/lib/api/types";
+import { betterAuthErrorMessage, postLoginTarget } from "../constants";
 import { SignInSchema } from "../schemas";
 import type { SignInInput } from "../schemas";
 
@@ -25,10 +27,17 @@ export function useSignInForm(next?: string | null) {
         onError: (ctx) => {
           setFormError(betterAuthErrorMessage(ctx.error));
         },
-        onSuccess: (data) => {
-          // `role` is an additionalField unknown to the client's inferred type.
-          const role = (data.data.user as { role?: string }).role ?? "";
-          router.replace(resolveSafeNext(next) ?? roleHome(role));
+        onSuccess: async () => {
+          // Fresh session (not the sign-in payload): guarantees the
+          // server-assigned role, including INSTANSI for institution users.
+          const { data: session } = await authClient.getSession();
+          const rawRole = (session?.user as { role?: string } | undefined)?.role;
+          const role: UserRole | undefined = (USER_ROLES as readonly string[]).includes(
+            rawRole ?? "",
+          )
+            ? (rawRole as UserRole)
+            : undefined;
+          router.replace(postLoginTarget(next, role));
           router.refresh();
         },
       },

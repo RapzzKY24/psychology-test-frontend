@@ -42,6 +42,8 @@ export const KNOWN_ERROR_CODES = [
   "not_returned",
   // Admin
   "cannot_change_own_role",
+  // Instansi
+  "duplicate_email",
   // Misc
   "invalid_query",
   "email_failed",
@@ -74,6 +76,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   profile_incomplete: "Lengkapi profil dan tanda tangan terlebih dahulu.",
   not_returned: "Hasil tidak dalam status dikembalikan.",
   cannot_change_own_role: "Anda tidak bisa mengubah role akun sendiri.",
+  duplicate_email: "Email sudah terdaftar — silakan masuk.",
   invalid_query: "Parameter query tidak valid.",
   email_failed: "Gagal mengirim email — coba lagi nanti.",
 };

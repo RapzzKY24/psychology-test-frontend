@@ -29,5 +29,6 @@ export const config = {
     "/hasil/:path*",
     "/admin/:path*",
     "/psikolog/:path*",
+    "/instansi/:path*",
   ],
 };

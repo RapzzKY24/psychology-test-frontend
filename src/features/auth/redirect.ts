@@ -5,10 +5,19 @@ export const ROLE_HOME: Record<UserRole, string> = {
   ADMIN: "/admin",
   PSYCHOLOGIST: "/psikolog",
   PARTICIPANT: "/dashboard",
+  INSTANSI: "/instansi",
 };
 
 export function roleHome(role: string): string {
   return ROLE_HOME[role as UserRole] ?? "/dashboard";
+}
+
+/**
+ * Post-login target: safe ?next= wins, otherwise the role home.
+ * Single source for the client sign-in hook and the server auth pages.
+ */
+export function postLoginTarget(next?: string | null, role?: UserRole): string {
+  return resolveSafeNext(next) ?? roleHome(role ?? "PARTICIPANT");
 }
 
 /**

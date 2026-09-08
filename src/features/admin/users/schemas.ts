@@ -16,4 +16,5 @@ export const ROLE_LABEL: Record<UserRole, string> = {
   ADMIN: "Admin",
   PSYCHOLOGIST: "Psikolog",
   PARTICIPANT: "Peserta",
+  INSTANSI: "Instansi",
 };

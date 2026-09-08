@@ -2,9 +2,11 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthCard } from "@/features/auth/components/auth-card";
+import { InstansiSignUpForm } from "@/features/auth/components/instansi-sign-up-form";
 import { SignUpForm } from "@/features/auth/components/sign-up-form";
-import { resolveSafeNext, roleHome } from "@/features/auth/constants";
+import { postLoginTarget } from "@/features/auth/constants";
 import { getServerSession } from "@/lib/api/server";
 
 export const metadata: Metadata = { title: "Daftar" };
@@ -15,7 +17,7 @@ export default async function DaftarPage({ searchParams }: PageProps<"/daftar">)
 
   const session = await getServerSession();
   if (session) {
-    redirect(resolveSafeNext(nextPath) ?? roleHome(session.user.role));
+    redirect(postLoginTarget(nextPath, session.user.role));
   }
 
   return (
@@ -25,10 +27,24 @@ export default async function DaftarPage({ searchParams }: PageProps<"/daftar">)
       footerText="Sudah punya akun?"
       footerHref="/masuk"
       footerLinkLabel="Masuk"
+      className="max-w-2xl"
     >
-      <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-        <SignUpForm next={nextPath} />
-      </Suspense>
+      <Tabs defaultValue="personal" className="grid gap-5">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="personal">Personal</TabsTrigger>
+          <TabsTrigger value="instansi">Instansi</TabsTrigger>
+        </TabsList>
+        <TabsContent value="personal">
+          <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+            <SignUpForm next={nextPath} />
+          </Suspense>
+        </TabsContent>
+        <TabsContent value="instansi">
+          <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+            <InstansiSignUpForm />
+          </Suspense>
+        </TabsContent>
+      </Tabs>
     </AuthCard>
   );
 }
