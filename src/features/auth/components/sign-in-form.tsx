@@ -19,44 +19,46 @@ export function SignInForm({ next }: { next?: string | null }) {
           {formError}
         </div>
       )}
-      <Controller
-        name="email"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input
-              {...field}
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="nama@email.com"
-              aria-invalid={fieldState.invalid}
-              className="h-11"
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-      <Controller
-        name="password"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="password">Kata sandi</FieldLabel>
-            <Input
-              {...field}
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              aria-invalid={fieldState.invalid}
-              className="h-11"
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-      <Button type="submit" disabled={isSubmitting} className="h-11 w-full">
+      <div className="grid gap-4 md:grid-cols-2">
+        <Controller
+          name="email"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                {...field}
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="nama@email.com"
+                aria-invalid={fieldState.invalid}
+                className="h-11"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="password"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="password">Kata sandi</FieldLabel>
+              <Input
+                {...field}
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                aria-invalid={fieldState.invalid}
+                className="h-11"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </div>
+      <Button type="submit" disabled={isSubmitting} className="h-11 w-full md:w-auto md:justify-self-end md:px-8">
         {isSubmitting ? "Memproses..." : "Masuk"}
       </Button>
     </form>

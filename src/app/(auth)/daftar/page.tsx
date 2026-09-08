@@ -27,8 +27,9 @@ export default async function DaftarPage({ searchParams }: PageProps<"/daftar">)
       footerText="Sudah punya akun?"
       footerHref="/masuk"
       footerLinkLabel="Masuk"
+      className="max-w-2xl"
     >
-      <Tabs defaultValue="personal" className="grid gap-4">
+      <Tabs defaultValue="personal" className="grid gap-5">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="personal">Personal</TabsTrigger>
           <TabsTrigger value="instansi">Instansi</TabsTrigger>

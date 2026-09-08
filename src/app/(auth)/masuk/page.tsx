@@ -27,11 +27,9 @@ export default async function MasukPage({ searchParams }: PageProps<"/masuk">) {
       footerLinkLabel="Daftar"
       className="max-w-2xl"
     >
-      <div className="mx-auto w-full max-w-sm">
-        <Suspense fallback={<Skeleton className="h-40 w-full" />}>
-          <SignInForm next={nextPath} />
-        </Suspense>
-      </div>
+      <Suspense fallback={<Skeleton className="h-40 w-full" />}>
+        <SignInForm next={nextPath} />
+      </Suspense>
     </AuthCard>
   );
 }
