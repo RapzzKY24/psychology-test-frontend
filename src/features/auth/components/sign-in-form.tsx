@@ -17,7 +17,7 @@ export function SignInForm({ next }: { next?: string | null }) {
   return (
     <form onSubmit={submit} noValidate className="grid gap-4">
       {formError && <FormAlert message={formError} />}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4">
         {FIELDS.map((f) => (
           <AuthTextField key={f.name} spec={f} control={form.control} />
         ))}
