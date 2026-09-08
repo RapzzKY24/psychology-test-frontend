@@ -8,14 +8,28 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useInstansiSignUpForm } from "../hooks/use-instansi-sign-up-form";
 
-const TEXT_FIELDS = [
-  { name: "companyName", label: "Nama perusahaan", placeholder: "PT Maju Jaya", type: "text", autoComplete: "organization" },
-  { name: "picName", label: "Nama PIC", placeholder: "Nama penanggung jawab", type: "text", autoComplete: "name" },
-  { name: "email", label: "Email (akun)", placeholder: "hr@perusahaan.com", type: "email", autoComplete: "email" },
-  { name: "phone", label: "Kontak PIC (HP)", placeholder: "08xxxxxxxxxx", type: "tel", autoComplete: "tel" },
-  { name: "password", label: "Kata sandi", placeholder: "", type: "password", autoComplete: "new-password" },
-  { name: "confirmPassword", label: "Konfirmasi kata sandi", placeholder: "", type: "password", autoComplete: "new-password" },
-] as const;
+type TextFieldName =
+  | "companyName"
+  | "picName"
+  | "email"
+  | "phone"
+  | "password"
+  | "confirmPassword";
+
+const FIELD_PAIRS: { name: TextFieldName; label: string; placeholder: string; type: string; autoComplete: string }[][] = [
+  [
+    { name: "companyName", label: "Nama perusahaan", placeholder: "PT Maju Jaya", type: "text", autoComplete: "organization" },
+    { name: "picName", label: "Nama PIC", placeholder: "Nama penanggung jawab", type: "text", autoComplete: "name" },
+  ],
+  [
+    { name: "email", label: "Email (akun)", placeholder: "hr@perusahaan.com", type: "email", autoComplete: "email" },
+    { name: "phone", label: "Kontak PIC (HP)", placeholder: "08xxxxxxxxxx", type: "tel", autoComplete: "tel" },
+  ],
+  [
+    { name: "password", label: "Kata sandi", placeholder: "Min. 8 karakter", type: "password", autoComplete: "new-password" },
+    { name: "confirmPassword", label: "Konfirmasi kata sandi", placeholder: "Ulangi kata sandi", type: "password", autoComplete: "new-password" },
+  ],
+];
 
 export function InstansiSignUpForm() {
   const { form, submit, formError, duplicateEmail, isSubmitting } =
@@ -39,26 +53,30 @@ export function InstansiSignUpForm() {
           </Link>
         </div>
       )}
-      {TEXT_FIELDS.map((f) => (
-        <Controller
-          key={f.name}
-          name={f.name}
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={f.name}>{f.label}</FieldLabel>
-              <Input
-                {...field}
-                id={f.name}
-                type={f.type}
-                autoComplete={f.autoComplete}
-                placeholder={f.placeholder || undefined}
-                aria-invalid={fieldState.invalid}
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+      {FIELD_PAIRS.map((pair, i) => (
+        <div key={i} className="grid gap-4 md:grid-cols-2">
+          {pair.map((f) => (
+            <Controller
+              key={f.name}
+              name={f.name}
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={f.name}>{f.label}</FieldLabel>
+                  <Input
+                    {...field}
+                    id={f.name}
+                    type={f.type}
+                    autoComplete={f.autoComplete}
+                    placeholder={f.placeholder || undefined}
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+          ))}
+        </div>
       ))}
       <Controller
         name="address"
