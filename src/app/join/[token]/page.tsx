@@ -4,6 +4,7 @@ import { fetchSessionPreviewServer } from "@/features/guest/api.server";
 import { isSessionExpired } from "@/features/guest/lib/session-state";
 import { SessionPreviewCard } from "@/features/guest/components/session-preview-card";
 import { JoinView } from "@/features/guest/components/join-view";
+import { RosterClaimView } from "@/features/guest/components/roster-claim-view";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata = { title: "Gabung Sesi" };
@@ -49,7 +50,11 @@ export default async function JoinPage({ params }: PageProps<"/join/[token]">) {
       ) : (
         <>
           <SessionPreviewCard preview={preview} />
-          <JoinView token={token} preview={preview} />
+          {preview.joinMode === "ROSTER" ? (
+            <RosterClaimView token={token} roster={preview.roster ?? []} />
+          ) : (
+            <JoinView token={token} preview={preview} />
+          )}
         </>
       )}
     </main>
