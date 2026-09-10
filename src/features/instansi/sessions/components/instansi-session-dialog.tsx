@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FormProvider } from "react-hook-form";
+import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +38,11 @@ export function InstansiSessionDialog({ listKey, tests, employees }: InstansiSes
 
   const next = async () => {
     const valid = await form.trigger(["title", "testIds"]);
-    if (valid) setStep(2);
+    if (valid) {
+      setStep(2);
+    } else {
+      toast.error("Lengkapi judul dan pilih minimal 1 tes.");
+    }
   };
 
   return (
