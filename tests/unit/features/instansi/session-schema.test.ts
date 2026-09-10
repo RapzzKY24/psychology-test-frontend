@@ -42,6 +42,15 @@ describe("CreateInstansiSessionSchema", () => {
     }
   });
 
+  it("rejects a short PIN like the backend (min 4)", () => {
+    expect(
+      CreateInstansiSessionSchema.safeParse({ ...valid, pin: "123" }).success,
+    ).toBe(false);
+    expect(
+      CreateInstansiSessionSchema.safeParse({ ...valid, pin: "1234" }).success,
+    ).toBe(true);
+  });
+
   it("rejects empty testIds and past expiry", () => {
     expect(
       CreateInstansiSessionSchema.safeParse({ ...valid, testIds: [] }).success,

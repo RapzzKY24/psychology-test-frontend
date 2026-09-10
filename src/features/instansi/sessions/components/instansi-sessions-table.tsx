@@ -13,6 +13,7 @@ import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { SavingChip } from "@/components/admin/saving-chip";
 import { CopyInviteButton } from "@/features/admin/sessions/components/copy-invite-button";
+import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
 import { cn } from "@/lib/utils";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
 import type { OptimisticRow } from "@/features/admin/hooks/use-optimistic-list";
@@ -29,7 +30,7 @@ interface InstansiSessionsTableProps {
 function StatusBadge({ status }: { status: SessionSummary["status"] }) {
   return (
     <Badge variant={status === "ACTIVE" ? "default" : "secondary"}>
-      {status === "ACTIVE" ? "Aktif" : "Ditutup"}
+      {SESSION_STATUS_LABEL[status]}
     </Badge>
   );
 }

@@ -17,9 +17,9 @@ export const CreateInstansiSessionSchema = z
       .refine((ids) => new Set(ids).size === ids.length, {
         message: "Pegawai tidak boleh duplikat.",
       }),
-    slotLimit: z.coerce.number().int().min(1).max(1000),
+    slotLimit: z.number().int().min(1, "Slot minimal 1.").max(1000, "Slot maksimal 1000."),
     expiresAt: z.string().min(1, "Tanggal kedaluwarsa wajib diisi."),
-    pin: z.string().trim().max(8).optional().or(z.literal("")),
+    pin: z.string().trim().min(4, "PIN minimal 4 karakter.").max(8, "PIN maksimal 8 karakter.").optional().or(z.literal("")),
   })
   .strict()
   .refine((v) => v.employeeIds.length <= v.slotLimit, {

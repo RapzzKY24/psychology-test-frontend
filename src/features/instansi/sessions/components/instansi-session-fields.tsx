@@ -55,7 +55,7 @@ function MultiPicker({
           ))}
         </FieldGroup>
       )}
-      {error && <FieldError>{error.message}</FieldError>}
+      {error && <FieldError errors={[{ message: error.message }]} />}
     </Field>
   );
 }
@@ -67,22 +67,28 @@ export function InstansiSessionStepOne({
   tests: Option[];
   disabled: boolean;
 }) {
-  const { register, formState } = useFormContext<CreateInstansiSessionInput>();
-  const titleError = formState.errors.title;
+  const { control } = useFormContext<CreateInstansiSessionInput>();
 
   return (
     <div className="grid gap-4">
-      <Field data-invalid={Boolean(titleError)}>
-        <FieldLabel htmlFor="session-title">Judul sesi</FieldLabel>
-        <Input
-          {...register("title")}
-          id="session-title"
-          placeholder="cth. Rekrutmen Batch September"
-          disabled={disabled}
-          className="h-11"
-        />
-        {titleError && <FieldError>{titleError.message}</FieldError>}
-      </Field>
+      <Controller
+        name="title"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="session-title">Judul sesi</FieldLabel>
+            <Input
+              {...field}
+              id="session-title"
+              placeholder="cth. Rekrutmen Batch September"
+              disabled={disabled}
+              aria-invalid={fieldState.invalid}
+              className="h-11"
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
       <FieldLabel>Tes yang dikerjakan</FieldLabel>
       <MultiPicker
         fieldName="testIds"
@@ -101,9 +107,7 @@ export function InstansiSessionStepTwo({
   employees: Option[];
   disabled: boolean;
 }) {
-  const { register, formState } = useFormContext<CreateInstansiSessionInput>();
-  const slotError = formState.errors.slotLimit;
-  const expiresError = formState.errors.expiresAt;
+  const { control } = useFormContext<CreateInstansiSessionInput>();
 
   return (
     <div className="grid gap-4">
@@ -115,41 +119,68 @@ export function InstansiSessionStepTwo({
         disabled={disabled}
       />
       <div className="grid gap-4 md:grid-cols-2">
-        <Field data-invalid={Boolean(slotError)}>
-          <FieldLabel htmlFor="session-slot">Slot</FieldLabel>
-          <Input
-            {...register("slotLimit", { valueAsNumber: true })}
-            id="session-slot"
-            type="number"
-            min={1}
-            max={1000}
-            disabled={disabled}
-            className="h-11"
-          />
-          {slotError && <FieldError>{slotError.message}</FieldError>}
-        </Field>
-        <Field data-invalid={Boolean(expiresError)}>
-          <FieldLabel htmlFor="session-expires">Kedaluwarsa</FieldLabel>
-          <Input
-            {...register("expiresAt")}
-            id="session-expires"
-            type="datetime-local"
-            disabled={disabled}
-            className="h-11"
-          />
-          {expiresError && <FieldError>{expiresError.message}</FieldError>}
-        </Field>
-      </div>
-      <Field>
-        <FieldLabel htmlFor="session-pin">PIN (opsional)</FieldLabel>
-        <Input
-          {...register("pin")}
-          id="session-pin"
-          placeholder="4–8 karakter"
-          disabled={disabled}
-          className="h-11"
+        <Controller
+          name="slotLimit"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="session-slot">Slot</FieldLabel>
+              <Input
+                {...field}
+                value={field.value ?? ""}
+                onChange={(e) =>
+                  field.onChange(e.target.value === "" ? "" : Number(e.target.value))
+                }
+                id="session-slot"
+                type="number"
+                min={1}
+                max={1000}
+                disabled={disabled}
+                aria-invalid={fieldState.invalid}
+                className="h-11"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
         />
-      </Field>
+        <Controller
+          name="expiresAt"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="session-expires">Kedaluwarsa</FieldLabel>
+              <Input
+                {...field}
+                id="session-expires"
+                type="datetime-local"
+                disabled={disabled}
+                aria-invalid={fieldState.invalid}
+                className="h-11"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </div>
+      <Controller
+        name="pin"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="session-pin">PIN (opsional, 4–8 karakter)</FieldLabel>
+            <Input
+              {...field}
+              value={field.value ?? ""}
+              id="session-pin"
+              placeholder="Kosongkan bila tanpa PIN"
+              disabled={disabled}
+              aria-invalid={fieldState.invalid}
+              className="h-11"
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
     </div>
   );
 }

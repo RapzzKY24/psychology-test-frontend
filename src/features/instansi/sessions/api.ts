@@ -27,10 +27,6 @@ export function fetchInstansiSessions(
   return apiFetch<SessionSummary[]>(`/instansi/sessions${buildQuery(filters)}`);
 }
 
-export function fetchInstansiSessionDetail(id: string): Promise<ApiSuccess<SessionDetail>> {
-  return apiFetch<SessionDetail>(`/instansi/sessions/${id}`);
-}
-
 export function createInstansiSession(
   input: CreateInstansiSessionInput,
 ): Promise<ApiSuccess<SessionSummary>> {
@@ -46,9 +42,4 @@ export function createInstansiSession(
 
 export function closeInstansiSession(id: string): Promise<ApiSuccess<SessionSummary>> {
   return apiFetch<SessionSummary>(`/instansi/sessions/${id}/close`, { method: "POST" });
-}
-
-/** PUBLISHED test catalog for the session wizard (public endpoint). */
-export function fetchPublishedTests(): Promise<ApiSuccess<PublishedTestOption[]>> {
-  return apiFetch<PublishedTestOption[]>("/tests");
 }
