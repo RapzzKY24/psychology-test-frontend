@@ -7,6 +7,7 @@ import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import type { Employee } from "@/lib/api/types";
 import { createEmployee, updateEmployee } from "../api";
+import { toCreatePayload, toUpdatePayload } from "../payload";
 import type { EmployeeInput } from "../schemas";
 
 interface UseEmployeeFormOptions {
@@ -28,16 +29,10 @@ export function useEmployeeForm({
 
   return useMutation({
     mutationFn: async (values: EmployeeInput) => {
-      const payload = {
-        ...values,
-        birthDate: values.birthDate || undefined,
-        phone: values.phone || undefined,
-        notes: values.notes || undefined,
-      };
       const { data } =
         mode === "edit" && employee
-          ? await updateEmployee(employee.id, payload)
-          : await createEmployee(payload);
+          ? await updateEmployee(employee.id, toUpdatePayload(values))
+          : await createEmployee(toCreatePayload(values));
       return data;
     },
     meta: { silentError: true },

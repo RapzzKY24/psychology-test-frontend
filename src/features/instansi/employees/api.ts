@@ -1,7 +1,7 @@
 import { apiFetch } from "@/lib/api/client";
 import type { Employee } from "@/lib/api/types";
-import type { ApiResponse, ApiSuccess } from "@/lib/api/types/pagination";
-import type { EmployeeInput } from "./schemas";
+import type { ApiSuccess } from "@/lib/api/types/pagination";
+import type { EmployeeCreatePayload, EmployeeUpdatePayload } from "./payload";
 
 export interface EmployeeFilters {
   page?: number;
@@ -22,14 +22,14 @@ export function fetchEmployees(
   return apiFetch<Employee[]>(`/instansi/participants${buildQuery(filters)}`);
 }
 
-export function createEmployee(input: EmployeeInput): Promise<ApiSuccess<Employee>> {
+export function createEmployee(input: EmployeeCreatePayload): Promise<ApiSuccess<Employee>> {
   return apiFetch<Employee>("/instansi/participants", { method: "POST", body: input });
 }
 
 export function updateEmployee(
   id: string,
-  input: Partial<EmployeeInput>,
-): Promise<ApiResponse<Employee>> {
+  input: EmployeeUpdatePayload,
+): Promise<ApiSuccess<Employee>> {
   return apiFetch<Employee>(`/instansi/participants/${id}`, { method: "PATCH", body: input });
 }
 
