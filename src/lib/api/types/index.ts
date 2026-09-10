@@ -7,4 +7,5 @@ export * from "./attempts";
 export * from "./orders";
 export * from "./reviews";
 export * from "./admin";
+export * from "./instansi";
 export * from "./verify";

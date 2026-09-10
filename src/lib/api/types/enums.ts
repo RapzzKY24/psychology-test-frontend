@@ -27,6 +27,9 @@ export type SessionKind = (typeof SESSION_KINDS)[number];
 export const SESSION_STATUSES = ["ACTIVE", "CLOSED"] as const;
 export type SessionStatus = (typeof SESSION_STATUSES)[number];
 
+export const ID_TYPES = ["NIK", "PASPOR"] as const;
+export type IdType = (typeof ID_TYPES)[number];
+
 export const ATTEMPT_STATUSES = ["IN_PROGRESS", "COMPLETED", "ABANDONED"] as const;
 export type AttemptStatus = (typeof ATTEMPT_STATUSES)[number];
 
