@@ -73,5 +73,11 @@ export const qk = {
       list: (filters?: { page?: number }) =>
         ["instansi", "employees", "list", filters ?? {}] as const,
     },
+    sessions: {
+      all: ["instansi", "sessions"] as const,
+      list: (filters?: { page?: number }) =>
+        ["instansi", "sessions", "list", filters ?? {}] as const,
+      detail: (id: string) => ["instansi", "sessions", "detail", id] as const,
+    },
   },
 } as const;
