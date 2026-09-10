@@ -67,4 +67,11 @@ export const qk = {
       detail: (attemptId: string) => ["admin", "results", "detail", attemptId] as const,
     },
   },
+  instansi: {
+    employees: {
+      all: ["instansi", "employees"] as const,
+      list: (filters?: { page?: number }) =>
+        ["instansi", "employees", "list", filters ?? {}] as const,
+    },
+  },
 } as const;
