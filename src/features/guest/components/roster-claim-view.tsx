@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { setGuestTokenForAttempt } from "@/lib/guest-token";
 import type { JoinSessionResult } from "@/lib/api/types/sessions";
 import { useClaimSeat } from "../hooks/use-claim-seat";
@@ -37,6 +38,7 @@ export function RosterClaimView({
   const [copied, setCopied] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pickError, setPickError] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
 
   const mutation = useClaimSeat(
     token,
@@ -52,6 +54,11 @@ export function RosterClaimView({
 
   const firstAttempt = joined?.attempts[0];
   const available = roster.filter((seat) => !seat.claimed);
+  const q = query.trim().toLowerCase();
+  const visible =
+    q.length === 0
+      ? available
+      : available.filter((seat) => seat.name.toLowerCase().includes(q));
 
   const copyToken = async () => {
     if (!joined) return;
@@ -87,23 +94,44 @@ export function RosterClaimView({
             ) : (
               <Field data-invalid={Boolean(pickError)}>
                 <FieldLabel>Nama peserta</FieldLabel>
+                {available.length > 5 && (
+                  <div className="relative">
+                    <Search
+                      className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden
+                    />
+                    <Input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={`Cari dari ${available.length} nama...`}
+                      aria-label="Cari nama"
+                      className="h-11 pl-9"
+                    />
+                  </div>
+                )}
                 <div className="grid max-h-64 gap-1 overflow-y-auto rounded-lg border p-2">
-                  {available.map((seat) => (
-                    <label
-                      key={seat.id}
-                      className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-2 text-sm hover:bg-muted"
-                    >
-                      <Checkbox
-                        checked={selectedId === seat.id}
-                        disabled={mutation.isPending}
-                        onCheckedChange={(checked) =>
-                          setSelectedId(checked === true ? seat.id : null)
-                        }
-                        aria-label={seat.name}
-                      />
-                      {seat.name}
-                    </label>
-                  ))}
+                  {visible.length === 0 ? (
+                    <p className="p-2 text-sm text-muted-foreground">
+                      Tidak ada nama yang cocok dengan “{query.trim()}”.
+                    </p>
+                  ) : (
+                    visible.map((seat) => (
+                      <label
+                        key={seat.id}
+                        className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-2 text-sm hover:bg-muted"
+                      >
+                        <Checkbox
+                          checked={selectedId === seat.id}
+                          disabled={mutation.isPending}
+                          onCheckedChange={(checked) =>
+                            setSelectedId(checked === true ? seat.id : null)
+                          }
+                          aria-label={seat.name}
+                        />
+                        {seat.name}
+                      </label>
+                    ))
+                  )}
                 </div>
                 {pickError && <FieldError>{pickError}</FieldError>}
               </Field>
