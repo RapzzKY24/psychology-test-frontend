@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy, Search } from "lucide-react";
+import { Check, ChevronsUpDown, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,11 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { setGuestTokenForAttempt } from "@/lib/guest-token";
 import type { JoinSessionResult } from "@/lib/api/types/sessions";
 import { useClaimSeat } from "../hooks/use-claim-seat";
@@ -39,6 +44,7 @@ export function RosterClaimView({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pickError, setPickError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [comboOpen, setComboOpen] = useState(false);
 
   const mutation = useClaimSeat(
     token,
@@ -59,6 +65,7 @@ export function RosterClaimView({
     q.length === 0
       ? available
       : available.filter((seat) => seat.name.toLowerCase().includes(q));
+  const selected = available.find((seat) => seat.id === selectedId) ?? null;
 
   const copyToken = async () => {
     if (!joined) return;
@@ -94,45 +101,71 @@ export function RosterClaimView({
             ) : (
               <Field data-invalid={Boolean(pickError)}>
                 <FieldLabel>Nama peserta</FieldLabel>
-                {available.length > 5 && (
-                  <div className="relative">
-                    <Search
-                      className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                      aria-hidden
-                    />
-                    <Input
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder={`Cari dari ${available.length} nama...`}
-                      aria-label="Cari nama"
-                      className="h-11 pl-9"
-                    />
-                  </div>
-                )}
-                <div className="grid max-h-64 gap-1 overflow-y-auto rounded-lg border p-2">
-                  {visible.length === 0 ? (
-                    <p className="p-2 text-sm text-muted-foreground">
-                      Tidak ada nama yang cocok dengan “{query.trim()}”.
-                    </p>
-                  ) : (
-                    visible.map((seat) => (
-                      <label
-                        key={seat.id}
-                        className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-2 text-sm hover:bg-muted"
-                      >
-                        <Checkbox
-                          checked={selectedId === seat.id}
-                          disabled={mutation.isPending}
-                          onCheckedChange={(checked) =>
-                            setSelectedId(checked === true ? seat.id : null)
-                          }
-                          aria-label={seat.name}
-                        />
-                        {seat.name}
-                      </label>
-                    ))
-                  )}
-                </div>
+                <Popover open={comboOpen} onOpenChange={setComboOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={comboOpen}
+                      aria-label="Pilih nama Anda"
+                      disabled={mutation.isPending}
+                      className="h-11 w-full justify-between font-normal"
+                    >
+                      <span className="truncate">
+                        {selected?.name ?? `Pilih dari ${available.length} nama...`}
+                      </span>
+                      <ChevronsUpDown className="size-4 shrink-0 opacity-50" aria-hidden />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-[var(--radix-popover-trigger-width)] p-0"
+                    align="start"
+                  >
+                    <div className="border-b p-2">
+                      <Input
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Ketik untuk mencari..."
+                        aria-label="Cari nama"
+                        className="h-9 border-0 shadow-none focus-visible:ring-0"
+                      />
+                    </div>
+                    <div className="max-h-60 overflow-y-auto p-1">
+                      {visible.length === 0 ? (
+                        <p className="p-3 text-sm text-muted-foreground">
+                          Tidak ada nama yang cocok dengan “{query.trim()}”.
+                        </p>
+                      ) : (
+                        visible.map((seat) => (
+                          <button
+                            key={seat.id}
+                            type="button"
+                            role="option"
+                            aria-selected={selectedId === seat.id}
+                            disabled={mutation.isPending}
+                            onClick={() => {
+                              setSelectedId(seat.id);
+                              setPickError(null);
+                              setComboOpen(false);
+                            }}
+                            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm hover:bg-muted"
+                          >
+                            <Check
+                              className={
+                                selectedId === seat.id
+                                  ? "size-4 shrink-0 opacity-100"
+                                  : "size-4 shrink-0 opacity-0"
+                              }
+                              aria-hidden
+                            />
+                            {seat.name}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 {pickError && <FieldError>{pickError}</FieldError>}
               </Field>
             )}
