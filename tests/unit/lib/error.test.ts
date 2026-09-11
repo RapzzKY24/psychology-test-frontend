@@ -21,6 +21,7 @@ describe("errorMessageFor", () => {
     expect(errorMessageFor("result_not_released", 403)).toBe(
       "Hasil belum dirilis — menunggu review psikolog.",
     );
+    expect(errorMessageFor("duplicate_nik", 409)).toBe("NIK sudah terdaftar.");
   });
 
   it("falls back by status for unknown codes (404s use human messages)", () => {

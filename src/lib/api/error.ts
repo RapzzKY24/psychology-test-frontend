@@ -40,6 +40,7 @@ export const KNOWN_ERROR_CODES = [
   // Psychologist
   "profile_incomplete",
   "not_returned",
+  "duplicate_nik",
   // Admin
   "cannot_change_own_role",
   // Instansi
@@ -77,6 +78,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   unsupported_media_type: "Format file tidak didukung.",
   profile_incomplete: "Lengkapi profil dan tanda tangan terlebih dahulu.",
   not_returned: "Hasil tidak dalam status dikembalikan.",
+  duplicate_nik: "NIK sudah terdaftar.",
   cannot_change_own_role: "Anda tidak bisa mengubah role akun sendiri.",
   duplicate_id_number: "Nomor identitas sudah terdaftar di institusi ini.",
   duplicate_email: "Email sudah terdaftar — silakan masuk.",
