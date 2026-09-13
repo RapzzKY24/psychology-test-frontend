@@ -2,9 +2,9 @@ import { apiFetch } from "@/lib/api/client";
 import { parseErrorResponse, unwrapEnvelope } from "@/lib/api/error";
 import type { PsychologistProfile } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
-import type { ProfileInput } from "./schemas";
+import type { ProfilePayload } from "./schemas";
 
-export function updateMyProfile(input: ProfileInput) {
+export function updateMyProfile(input: ProfilePayload) {
   return apiFetch<{ profile: PsychologistProfile; complete: boolean }>(
     "/psychologist/me/profile",
     { method: "PUT", body: input },

@@ -9,8 +9,9 @@ import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import type { PsychologistProfile } from "@/lib/api/types";
 import { updateMyProfile } from "../api";
-import { ProfileSchema } from "../schemas";
+import { ProfileSchema, toProfilePayload } from "../schemas";
 import type { ProfileInput } from "../schemas";
+import { joinDisplayName } from "../utils/split-display-name";
 
 export function useProfileForm(
   profile: PsychologistProfile | null,
@@ -20,15 +21,16 @@ export function useProfileForm(
   const form = useForm<ProfileInput>({
     resolver: zodResolver(ProfileSchema),
     defaultValues: {
-      fullName: profile?.fullName ?? "",
-      degree: profile?.degree ?? "",
+      displayName: profile ? joinDisplayName(profile) : "",
       licenseNumber: profile?.licenseNumber ?? "",
+      nik: profile?.nik ?? "",
+      institutionName: profile?.institutionName ?? "",
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (values: ProfileInput) => {
-      const { data } = await updateMyProfile(values);
+      const { data } = await updateMyProfile(toProfilePayload(values));
       return data;
     },
     meta: { silentError: true },
