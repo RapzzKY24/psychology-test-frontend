@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SignaturePadField } from "@/features/psikolog/profil/components/signature-pad-field";
+import { SignaturePreviewImage } from "@/features/psikolog/profil/components/signature-preview-image";
 import { SignatureUploadField } from "@/features/psikolog/profil/components/signature-upload-field";
-
-const SIGNATURE_IMAGE_URL = "/api/v1/psychologist/me/signature-image";
 
 export function SignatureSection({ imagePath }: { imagePath: string | null }) {
   const router = useRouter();
@@ -29,11 +28,7 @@ export function SignatureSection({ imagePath }: { imagePath: string | null }) {
       <CardContent className="grid gap-6">
         {hasSignature ? (
           <figure className="grid gap-2">
-            <img
-              src={`${SIGNATURE_IMAGE_URL}?v=${savedCount}`}
-              alt="Tanda tangan tersimpan"
-              className="h-32 w-full rounded-lg border bg-white object-contain"
-            />
+            <SignaturePreviewImage key={savedCount} cacheKey={savedCount} />
             <figcaption className="text-sm text-muted-foreground">
               Tanda tangan aktif tersimpan.
             </figcaption>
