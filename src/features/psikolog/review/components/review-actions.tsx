@@ -67,10 +67,13 @@ export function ApproveButton({ resultId }: { resultId: string }) {
               className="size-8 shrink-0"
               aria-label="Salin kode"
               onClick={() => {
-                void navigator.clipboard.writeText(verifyCode).then(() => {
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                });
+                void navigator.clipboard
+                  .writeText(verifyCode)
+                  .then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  })
+                  .catch(() => toast.error("Gagal menyalin kode, salin manual."));
               }}
             >
               {copied ? <Check className="size-4" aria-hidden /> : <Copy className="size-4" aria-hidden />}
