@@ -81,6 +81,7 @@ export const qk = {
     },
   },
   psikolog: {
+    profile: ["psikolog", "profile"] as const,
     reviews: {
       all: ["psikolog", "reviews"] as const,
       list: (filters?: { page?: number; status?: string }) =>

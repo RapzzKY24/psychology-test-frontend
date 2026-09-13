@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
+import { qk } from "@/lib/api/query-keys";
 import { uploadMySignature } from "../api";
 
 function dataUrlToPngFile(dataUrl: string): File {
@@ -29,7 +30,7 @@ export function useUploadSignature(onSaved: () => void) {
       toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
     },
     onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: ["psikolog", "profile"] });
+      void queryClient.invalidateQueries({ queryKey: qk.psikolog.profile });
     },
   });
 }
