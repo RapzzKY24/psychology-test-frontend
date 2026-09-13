@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ResultStatusBadge } from "@/features/admin/results-monitor/components/result-status-badge";
+import { ResultStatusBadge } from "@/components/admin/result-status-badge";
 import { ApproveButton, ReturnDialog } from "@/features/psikolog/review/components/review-actions";
 import { ReviewCorrectionDialog } from "@/features/psikolog/review/components/review-correction-dialog";
 import { ReviewNotesDialog } from "@/features/psikolog/review/components/review-notes-dialog";

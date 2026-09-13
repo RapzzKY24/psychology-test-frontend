@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
-import { ResultStatusBadge } from "@/features/admin/results-monitor/components/result-status-badge";
+import { ResultStatusBadge } from "@/components/admin/result-status-badge";
 import { formatIdDate } from "@/lib/format/format-date";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
 import type { ReviewListItem } from "@/lib/api/types";

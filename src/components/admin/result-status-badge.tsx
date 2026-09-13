@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import type { ResultStatus } from "@/lib/api/types";
-import { RESULT_STATUS_LABEL } from "../constants";
+import { RESULT_STATUS_LABELS } from "@/lib/api/types";
 
 const STYLE: Record<ResultStatus, string> = {
   // Gold accent = waiting on the psychologist (the operational queue).
@@ -12,7 +12,7 @@ const STYLE: Record<ResultStatus, string> = {
 export function ResultStatusBadge({ status }: { status: ResultStatus }) {
   return (
     <Badge variant="outline" className={STYLE[status]}>
-      {RESULT_STATUS_LABEL[status]}
+      {RESULT_STATUS_LABELS[status]}
     </Badge>
   );
 }

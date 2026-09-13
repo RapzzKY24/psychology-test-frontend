@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { ResubmitButton } from "@/features/admin/results-monitor/components/resubmit-button";
-import { ResultStatusBadge } from "@/features/admin/results-monitor/components/result-status-badge";
+import { ResultStatusBadge } from "@/components/admin/result-status-badge";
 import { fetchAdminResultServer } from "@/features/admin/results-monitor/api.server";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";

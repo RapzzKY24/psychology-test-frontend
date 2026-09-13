@@ -16,7 +16,7 @@ import type { PaginationMeta } from "@/lib/api/types/pagination";
 import type { QueryResultsItem } from "@/lib/api/types/reviews";
 import { formatIdDate } from "@/lib/format/format-date";
 import { ResubmitButton } from "./resubmit-button";
-import { ResultStatusBadge } from "./result-status-badge";
+import { ResultStatusBadge } from "@/components/admin/result-status-badge";
 
 interface ResultsTableProps {
   rows: QueryResultsItem[];
