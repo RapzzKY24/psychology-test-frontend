@@ -4,6 +4,13 @@ import { z } from "zod";
  * Public-safe session preview (`GET /api/v1/public/sessions/:token`,
  * PublicSessionPreviewSchema on the backend). No PIN material, no PII.
  */
+export interface RosterSeat {
+  id: string;
+  name: string;
+  candidateNumber: string | null;
+  claimed: boolean;
+}
+
 export interface SessionPreview {
   title: string;
   status: "ACTIVE" | "CLOSED";
@@ -12,6 +19,8 @@ export interface SessionPreview {
   slotLimit: number;
   slotsUsed: number;
   requiresPin: boolean;
+  joinMode: "OPEN" | "ROSTER";
+  roster?: RosterSeat[];
 }
 
 /** Mirrors the backend JoinSessionSchema (strict). */

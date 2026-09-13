@@ -21,3 +21,14 @@ export function joinSession(
     body: input,
   });
 }
+
+/** Roster claim: pick a pre-created seat, get a working token. */
+export function claimSeat(
+  token: string,
+  participantId: string,
+): Promise<ApiSuccess<JoinSessionResult>> {
+  return apiFetch<JoinSessionResult>(`/public/sessions/${token}/claim`, {
+    method: "POST",
+    body: { participantId },
+  });
+}
