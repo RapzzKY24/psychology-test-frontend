@@ -91,13 +91,4 @@ export interface VerifyPaymentResult {
   attemptId: string;
 }
 
-/** Psychologist profile (`GET/PUT /api/v1/psychologist/me/profile` — non-standard: `complete` sibling). */
-export interface PsychologistProfileResponse {
-  data: {
-    fullName: string;
-    degree: string;
-    licenseNumber: string;
-    signatureImagePath?: string | null;
-  };
-  complete: boolean;
-}
+
