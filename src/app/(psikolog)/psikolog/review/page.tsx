@@ -12,7 +12,7 @@ export default async function ReviewPage({
   searchParams: Promise<{ page?: string; status?: string }>;
 }) {
   const sp = await searchParams;
-  const page = Number(sp.page ?? "1") || 1;
+  const page = Math.max(Number(sp.page ?? "1") || 1, 1);
   const status =
     sp.status === "RETURNED" || sp.status === "PENDING_REVIEW" ? sp.status : undefined;
 

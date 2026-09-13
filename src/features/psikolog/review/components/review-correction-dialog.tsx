@@ -102,7 +102,7 @@ export function ReviewCorrectionDialog({
               <FieldError>{form.formState.errors.patternCode.message}</FieldError>
             )}
           </Field>
-          <Field>
+          <Field data-invalid={Boolean(form.formState.errors.scoresText)}>
             <FieldLabel htmlFor="correction-scores">Skor (JSON)</FieldLabel>
             <Textarea
               {...form.register("scoresText")}
@@ -111,6 +111,9 @@ export function ReviewCorrectionDialog({
               className="font-mono text-xs"
               disabled={mutation.isPending}
             />
+            {form.formState.errors.scoresText && (
+              <FieldError>{form.formState.errors.scoresText.message}</FieldError>
+            )}
           </Field>
           <Field data-invalid={Boolean(form.formState.errors.reason)}>
             <FieldLabel htmlFor="correction-reason">Alasan (min. 10 karakter)</FieldLabel>

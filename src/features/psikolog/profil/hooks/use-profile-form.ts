@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FORM_INVALID_TOAST } from "@/features/admin/copy";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
+import { qk } from "@/lib/api/query-keys";
 import type { PsychologistProfile } from "@/lib/api/types";
 import { updateMyProfile } from "../api";
 import { ProfileSchema, toProfilePayload } from "../schemas";
@@ -42,7 +43,7 @@ export function useProfileForm(
       toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
     },
     onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: ["psikolog", "profile"] });
+      void queryClient.invalidateQueries({ queryKey: qk.psikolog.profile });
     },
   });
 
