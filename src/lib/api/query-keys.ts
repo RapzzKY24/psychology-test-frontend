@@ -80,4 +80,12 @@ export const qk = {
       detail: (id: string) => ["instansi", "sessions", "detail", id] as const,
     },
   },
+  psikolog: {
+    reviews: {
+      all: ["psikolog", "reviews"] as const,
+      list: (filters?: { page?: number; status?: string }) =>
+        ["psikolog", "reviews", "list", filters ?? {}] as const,
+      detail: (id: string) => ["psikolog", "reviews", "detail", id] as const,
+    },
+  },
 } as const;
