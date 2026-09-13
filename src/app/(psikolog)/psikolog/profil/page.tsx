@@ -19,7 +19,7 @@ export default async function ProfilPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Data profil</CardTitle>
-          <CardDescription>NIK dan asal instansi diisi admin, tidak bisa diubah.</CardDescription>
+          <CardDescription>Nama ditulis sekali beserta gelar; NIK dan asal instansi bisa diubah sendiri.</CardDescription>
         </CardHeader>
         <CardContent>
           <ProfileForm profile={profile.data} />
