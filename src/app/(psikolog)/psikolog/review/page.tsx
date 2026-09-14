@@ -23,6 +23,7 @@ export default async function ReviewPage({
   const sp = await searchParams;
   const page = Math.max(Number(sp.page ?? "1") || 1, 1);
   const allowed = ["PENDING_REVIEW", "RETURNED", "APPROVED"] as const;
+  // Semua (no status) now includes APPROVED via BE 4900410 (ReviewsService default [PENDING,RETURNED,APPROVED])
   const status = (allowed as readonly string[]).includes(sp.status ?? "")
     ? (sp.status as (typeof allowed)[number])
     : undefined;
