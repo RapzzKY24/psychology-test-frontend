@@ -23,10 +23,11 @@ export function ReviewQueueIsland({
     queryKey: listKey,
     queryFn: () =>
       fetchReviewQueue({
-        status: status as "PENDING_REVIEW" | "RETURNED" | undefined,
+        status: status as "PENDING_REVIEW" | "RETURNED" | "APPROVED" | undefined,
         page,
       }),
     initialData: initial,
+    placeholderData: (prev) => prev,
   });
 
   const tableMeta = data.meta ?? { page, limit: 10, total: data.data.length, totalPages: 1 };
