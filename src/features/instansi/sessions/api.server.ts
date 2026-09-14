@@ -26,5 +26,6 @@ export function fetchInstansiSessionDetailServer(
 }
 
 export function fetchPublishedTestsServer(): Promise<ApiSuccess<PublishedTestOption[]>> {
-  return apiFetchServer<PublishedTestOption[]>("/tests");
+  // Instansi only sees CPMI (WPT hidden) — BE whitelist via GET /instansi/tests
+  return apiFetchServer<PublishedTestOption[]>("/instansi/tests");
 }
