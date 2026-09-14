@@ -79,3 +79,24 @@ export function publishTest(id: string): Promise<ApiSuccess<AdminTest>> {
 export function archiveTest(id: string): Promise<ApiSuccess<AdminTest>> {
   return apiFetch<AdminTest>(`/admin/tests/${id}/archive`, { method: "POST" });
 }
+
+export async function uploadItemImage(
+  testId: string,
+  file: File,
+): Promise<ApiSuccess<{ imageUrl: string }>> {
+  const form = new FormData();
+  form.append("file", file, file.name || "image.png");
+  const response = await fetch(`/api/v1/admin/tests/${testId}/items/image`, {
+    method: "POST",
+    body: form,
+    credentials: "include",
+  });
+  const text = await response.text();
+  const payload: unknown = text ? JSON.parse(text) : null;
+  if (!response.ok) {
+    const { parseErrorResponse } = await import("@/lib/api/error");
+    throw parseErrorResponse(response.status, payload);
+  }
+  const { unwrapEnvelope } = await import("@/lib/api/error");
+  return unwrapEnvelope<{ imageUrl: string }>(payload);
+}
