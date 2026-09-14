@@ -22,6 +22,7 @@ import {
 import { ApproveButton, ReturnDialog } from "@/features/psikolog/review/components/review-actions";
 import { ReviewCorrectionDialog } from "@/features/psikolog/review/components/review-correction-dialog";
 import { ReviewNotesDialog } from "@/features/psikolog/review/components/review-notes-dialog";
+import { RightWrongDetailTable } from "@/features/psikolog/review/components/right-wrong-detail-table";
 import { fetchReviewDetailServer } from "@/features/psikolog/review/api.server";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
@@ -152,35 +153,58 @@ export default async function ReviewDetailPage({
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Jawaban per soal</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-hidden rounded-lg border">
-            <Table>
-              <TableHeader className="bg-muted/50">
-                <TableRow>
-                  <TableHead className="w-16">No</TableHead>
-                  <TableHead>Kata</TableHead>
-                  <TableHead>Paling</TableHead>
-                  <TableHead>Kurang</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {detail.itemsDetailed.map((item) => (
-                  <TableRow key={item.itemOrder}>
-                    <TableCell className="tabular-nums">{item.itemOrder}</TableCell>
-                    <TableCell>{item.words.join(" · ")}</TableCell>
-                    <TableCell className="tabular-nums">{item.most ?? "—"}</TableCell>
-                    <TableCell className="tabular-nums">{item.least ?? "—"}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+      {(() => {
+        const firstContent = detail.items[0]?.content as unknown as { correctIndex?: number } | undefined;
+        const isRightWrong = typeof firstContent?.correctIndex === "number";
+        if (isRightWrong) {
+          return (
+            <RightWrongDetailTable
+              items={
+                detail.items as unknown as Array<{
+                  id: string;
+                  order: number;
+                  content: { question?: string | null; imageUrl?: string | null; options: string[]; correctIndex: number };
+                }>
+              }
+              responses={
+                detail.responses as unknown as Array<{ itemId: string; value: { chosen: number } }>
+              }
+              scores={result.scores as unknown as { raw: number; total: number; perItem: boolean[] } | undefined}
+            />
+          );
+        }
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Jawaban per soal</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-hidden rounded-lg border">
+                <Table>
+                  <TableHeader className="bg-muted/50">
+                    <TableRow>
+                      <TableHead className="w-16">No</TableHead>
+                      <TableHead>Kata</TableHead>
+                      <TableHead>Paling</TableHead>
+                      <TableHead>Kurang</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {detail.itemsDetailed.map((item) => (
+                      <TableRow key={item.itemOrder}>
+                        <TableCell className="tabular-nums">{item.itemOrder}</TableCell>
+                        <TableCell>{item.words.join(" · ")}</TableCell>
+                        <TableCell className="tabular-nums">{item.most ?? "—"}</TableCell>
+                        <TableCell className="tabular-nums">{item.least ?? "—"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
     </main>
   );
 }
