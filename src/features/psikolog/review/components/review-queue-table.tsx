@@ -29,7 +29,7 @@ interface ReviewQueueTableProps {
   status?: string;
 }
 
-function safeRenderScores(scores: unknown, patternCode: string): string {
+export function safeRenderScores(scores: unknown, patternCode: string): string {
   const code = patternCode?.trim() ?? "";
   if (!code) return "—";
   if (scores == null || scores === "") return code;
