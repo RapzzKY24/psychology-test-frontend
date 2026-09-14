@@ -11,7 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { ResultStatusBadge } from "@/components/admin/result-status-badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ApproveButton, ReturnDialog } from "@/features/psikolog/review/components/review-actions";
 import { ReviewCorrectionDialog } from "@/features/psikolog/review/components/review-correction-dialog";
 import { ReviewNotesDialog } from "@/features/psikolog/review/components/review-notes-dialog";
@@ -39,6 +46,7 @@ export default async function ReviewDetailPage({
 
   const { result } = detail;
   const isPending = result.status === "PENDING_REVIEW";
+  const isApproved = result.status === "APPROVED";
 
   return (
     <main className="flex-1 space-y-6 p-6">
@@ -49,18 +57,40 @@ export default async function ReviewDetailPage({
 
       <div className="flex flex-wrap items-center gap-3">
         <ResultStatusBadge status={result.status} />
-        {isPending && (
+        {isApproved ? (
           <>
-            <ApproveButton resultId={result.id} />
-            <ReturnDialog resultId={result.id} />
+            <span className="rounded-lg border bg-amber-50 px-3 py-1.5 text-sm text-amber-800">
+              Hasil sudah disetujui — read-only
+            </span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span tabIndex={0}>
+                    <Button variant="outline" className="h-11" disabled aria-disabled>
+                      Rilis Hasil
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Segera hadir — hold</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </>
+        ) : (
+          <>
+            {isPending && (
+              <>
+                <ApproveButton resultId={result.id} />
+                <ReturnDialog resultId={result.id} />
+              </>
+            )}
+            <ReviewNotesDialog resultId={result.id} initialNotes={result.notes ?? null} />
+            <ReviewCorrectionDialog
+              resultId={result.id}
+              currentScores={result.correctedScores ?? result.scores}
+              currentPatternCode={result.correctedPatternCode ?? result.patternCode}
+            />
           </>
         )}
-        <ReviewNotesDialog resultId={result.id} initialNotes={result.notes ?? null} />
-        <ReviewCorrectionDialog
-          resultId={result.id}
-          currentScores={result.correctedScores ?? result.scores}
-          currentPatternCode={result.correctedPatternCode ?? result.patternCode}
-        />
         <Link href="/psikolog/review" className="text-sm text-muted-foreground hover:underline">
           ← Kembali ke antrean
         </Link>
