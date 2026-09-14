@@ -23,7 +23,8 @@ export const CorrectionSchema = z.object({
 export type CorrectionInput = z.infer<typeof CorrectionSchema>;
 
 export const ReviewFilterSchema = z.object({
-  status: z.enum(["PENDING_REVIEW", "RETURNED"]).optional(),
+  // APPROVED visible post-approval (dashboard history)
+  status: z.enum(["PENDING_REVIEW", "RETURNED", "APPROVED"]).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { QueryKey } from "@tanstack/react-query";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { ReviewListItem } from "@/lib/api/types";
@@ -23,10 +23,11 @@ export function ReviewQueueIsland({
     queryKey: listKey,
     queryFn: () =>
       fetchReviewQueue({
-        status: status as "PENDING_REVIEW" | "RETURNED" | undefined,
+        status: status as "PENDING_REVIEW" | "RETURNED" | "APPROVED" | undefined,
         page,
       }),
     initialData: initial,
+    placeholderData: keepPreviousData,
   });
 
   const tableMeta = data.meta ?? { page, limit: 10, total: data.data.length, totalPages: 1 };
