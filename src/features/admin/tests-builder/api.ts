@@ -54,7 +54,7 @@ export function updateTest(id: string, input: UpdateTestInput): Promise<ApiSucce
 
 export function putTestItems(
   id: string,
-  items: Array<{ content: DiscItemContent }>,
+  items: Array<{ content: unknown }>,
 ): Promise<ApiSuccess<{ count: number }>> {
   return apiFetch<{ count: number }>(`/admin/tests/${id}/items`, {
     method: "PUT",

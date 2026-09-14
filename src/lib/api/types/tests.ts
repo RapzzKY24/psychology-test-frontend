@@ -19,11 +19,19 @@ export interface AdminTest extends PublicTest {
   updatedAt?: string;
 }
 
+export interface RightWrongItemContent {
+  question?: string;
+  imageUrl?: string | null;
+  options: string[];
+  correctIndex: number;
+  subtest?: string;
+}
+
 /** Builder payload (`GET /api/v1/admin/tests/:id` — merged 2026-09-05, PR #6). */
 export interface AdminTestItem {
   id: string;
   order: number;
-  content: DiscItemContent;
+  content: DiscItemContent | RightWrongItemContent;
 }
 
 export interface AdminTestDetail extends AdminTest {

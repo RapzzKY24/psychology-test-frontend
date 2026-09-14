@@ -11,7 +11,23 @@ import { isApiError } from "@/lib/api/client";
 import { qk } from "@/lib/api/query-keys";
 import type { AdminTestDetail } from "@/lib/api/types";
 import { archiveTest, publishTest, putInterpretations, putTestItems } from "../api";
-import { DiscItemContentSchema } from "../schemas";
+import {
+  DiscItemContentSchema,
+  RightWrongItemContentSchema,
+  type DiscItemContentInput,
+  type RightWrongItemContentInput,
+} from "../schemas";
+
+function getBuilderFormSchema(scorerType: string) {
+  const itemContentSchema =
+    scorerType === "RIGHT_WRONG_NORM" ? RightWrongItemContentSchema : DiscItemContentSchema;
+  return z.object({
+    items: z.array(z.object({ content: itemContentSchema })),
+    interpretations: z.array(
+      z.object({ patternCode: z.string(), title: z.string(), body: z.string() }),
+    ),
+  });
+}
 
 const BuilderFormSchema = z.object({
   items: z.array(z.object({ content: DiscItemContentSchema })),
@@ -20,7 +36,10 @@ const BuilderFormSchema = z.object({
   ),
 });
 
-export type BuilderFormValues = z.infer<typeof BuilderFormSchema>;
+export type BuilderFormValues = {
+  items: { content: DiscItemContentInput | RightWrongItemContentInput }[];
+  interpretations: { patternCode: string; title: string; body: string }[];
+};
 export type BuilderTab = "soal" | "interpretasi";
 
 function toFormValues(detail: AdminTestDetail): BuilderFormValues {
@@ -50,8 +69,10 @@ export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
   const [locked, setLocked] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const formSchema = getBuilderFormSchema(initialData.scorerType);
   const form = useForm<BuilderFormValues>({
-    resolver: zodResolver(BuilderFormSchema),
+    // Dynamic schema (DISC vs RIGHT_WRONG) — cast to any to satisfy Resolver generic
+    resolver: zodResolver(formSchema as never) as never,
     defaultValues: toFormValues(initialData),
     mode: "onBlur",
   });

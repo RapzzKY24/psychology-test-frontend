@@ -70,7 +70,9 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
   const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
   const watchedItems = form.watch("items");
   const active = Math.min(builder.activeItem, Math.max(watchedItems.length - 1, 0));
-  const activeContent = form.watch(`items.${active}.content`);
+  const activeContent = form.watch(`items.${active}.content`) as unknown as
+    | { words: string[]; mostMapping: string[]; leastMapping: string[] }
+    | undefined;
 
   const move = (from: number, to: number) => {
     if (to < 0 || to >= watchedItems.length) return;
@@ -108,8 +110,11 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
         </div>
         <ol className="max-h-[60vh] space-y-1 overflow-y-auto">
           {itemsArray.fields.map((field, idx) => {
-            const words = watchedItems[idx]?.content.words ?? [];
-            const filled = words.every((w) => w.trim().length > 0);
+            const discContent = watchedItems[idx]?.content as unknown as {
+              words?: string[];
+            };
+            const words = discContent?.words ?? [];
+            const filled = words.every((w: string) => w.trim().length > 0);
             return (
               <li key={field.id}>
                 <button
@@ -214,10 +219,10 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
                     <MappingChips
                       prefix="Most"
                       wordIndex={wordIdx}
-                      value={activeContent?.mostMapping[wordIdx] ?? "D"}
+                      value={(activeContent?.mostMapping[wordIdx] ?? "D") as never}
                       disabled={locked}
                       onChange={(dim) =>
-                        form.setValue(`items.${active}.content.mostMapping.${wordIdx}`, dim, {
+                        form.setValue(`items.${active}.content.mostMapping.${wordIdx}`, dim as never, {
                           shouldDirty: true,
                         })
                       }
@@ -236,7 +241,7 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
                     onClick={() =>
                       form.setValue(
                         `items.${active}.content.leastMapping`,
-                        [...(activeContent?.mostMapping ?? ["D", "I", "S", "C"])],
+                        [...(activeContent?.mostMapping ?? ["D", "I", "S", "C"])] as never,
                         { shouldDirty: true },
                       )
                     }
@@ -251,10 +256,10 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
                     <MappingChips
                       prefix="Least"
                       wordIndex={wordIdx}
-                      value={activeContent?.leastMapping[wordIdx] ?? "D"}
+                      value={(activeContent?.leastMapping[wordIdx] ?? "D") as never}
                       disabled={locked}
                       onChange={(dim) =>
-                        form.setValue(`items.${active}.content.leastMapping.${wordIdx}`, dim, {
+                        form.setValue(`items.${active}.content.leastMapping.${wordIdx}`, dim as never, {
                           shouldDirty: true,
                         })
                       }

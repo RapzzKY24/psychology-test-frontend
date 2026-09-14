@@ -18,7 +18,7 @@ export type TestCategory = (typeof TEST_CATEGORIES)[number];
 export const TEST_STATUSES = ["DRAFT", "PUBLISHED", "ARCHIVED"] as const;
 export type TestStatus = (typeof TEST_STATUSES)[number];
 
-export const SCORER_TYPES = ["FORCED_CHOICE_DISC"] as const;
+export const SCORER_TYPES = ["FORCED_CHOICE_DISC", "RIGHT_WRONG_NORM"] as const;
 export type ScorerType = (typeof SCORER_TYPES)[number];
 
 export const SESSION_KINDS = ["INDIVIDUAL", "GROUP"] as const;

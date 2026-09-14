@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BuilderHeader } from "./builder-header";
 import { ItemsTab } from "./items-tab";
+import { RightWrongItemsTab } from "./right-wrong-items-tab";
 import { InterpretationsTab } from "./interpretations-tab";
 import { useBuilderForm } from "../hooks/use-builder-form";
 import type { AdminTestDetail } from "@/lib/api/types";
@@ -74,7 +75,12 @@ export function TestBuilderStudio({
         ))}
       </div>
 
-      {builder.tab === "soal" && <ItemsTab builder={builder} locked={builder.locked} />}
+      {builder.tab === "soal" &&
+        (initialData.scorerType === "RIGHT_WRONG_NORM" ? (
+          <RightWrongItemsTab builder={builder} locked={builder.locked} testId={testId} />
+        ) : (
+          <ItemsTab builder={builder} locked={builder.locked} />
+        ))}
       {builder.tab === "interpretasi" && (
         <InterpretationsTab builder={builder} locked={builder.locked} />
       )}
