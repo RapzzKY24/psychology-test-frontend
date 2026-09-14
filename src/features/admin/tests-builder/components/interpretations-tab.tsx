@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { PATTERN_CODES } from "../constants";
+import { getPatternCodes } from "../constants";
 import { coverage, isFilled } from "../coverage";
 import type { BuilderController } from "../hooks/use-builder-form";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,11 @@ export function InterpretationsTab({
 }) {
   const { form, interpretationsArray } = builder;
   const watched = form.watch("interpretations");
-  const stat = coverage(watched);
+  // RIGHT_WRONG_NORM uses RAW_0..RAW_n, DISC uses 1..40 — pull count from builder
+  const scorerType = (builder as unknown as { scorerType?: string }).scorerType ?? "FORCED_CHOICE_DISC";
+  const itemCount = form.watch("items")?.length;
+  const patternCodes = getPatternCodes(scorerType, itemCount);
+  const stat = coverage(watched, scorerType, itemCount);
   const rowIndex = watched.findIndex((row) => row.patternCode === builder.activePattern);
   const activeRow = rowIndex >= 0 ? watched[rowIndex] : undefined;
   const isMissing = builder.missingCodes.includes(builder.activePattern);
@@ -43,7 +47,7 @@ export function InterpretationsTab({
           )}
         </div>
         <div className="grid max-h-[60vh] grid-cols-8 gap-1.5 overflow-y-auto pb-1">
-          {PATTERN_CODES.map((code) => {
+          {patternCodes.map((code) => {
             const row = watched.find((r) => r.patternCode === code);
             const filled = row !== undefined && isFilled(row);
             const highlighted = builder.missingCodes.includes(code);
@@ -52,7 +56,15 @@ export function InterpretationsTab({
               <button
                 key={code}
                 type="button"
-                onClick={() => builder.setActivePattern(code)}
+                title={code}
+                onClick={() => {
+                  // Chip kosong langsung dibikin row (user gak malu klik "Buat interpretasi" dua kali).
+                  if (row === undefined && !locked) {
+                    createRow(code);
+                  } else {
+                    builder.setActivePattern(code);
+                  }
+                }}
                 aria-pressed={active}
                 aria-label={`Pola ${code}${filled ? " (terisi)" : " (kosong)"}`}
                 className={cn(
@@ -63,7 +75,8 @@ export function InterpretationsTab({
                   active && "ring-2 ring-primary ring-offset-1 ring-offset-background",
                 )}
               >
-                {code}
+                {/* RIGHT_WRONG_NORM: tampilkan hanya indeks angka biar gak overflow (kode lengkap di tooltip/aria). */}
+                {code.replace(/^RAW_/, "")}
               </button>
             );
           })}

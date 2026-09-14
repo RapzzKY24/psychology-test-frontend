@@ -1,4 +1,4 @@
-import { PATTERN_CODES } from "./constants";
+import { getPatternCodes, PATTERN_CODES } from "./constants";
 
 export interface InterpretationDraft {
   patternCode: string;
@@ -11,10 +11,15 @@ export function isFilled(row: InterpretationDraft): boolean {
   return row.title.trim().length > 0 && row.body.trim().length > 0;
 }
 
-/** Unfilled codes in natural order ('1'..'40') — matches the publish 422 payload. */
-export function missingPatternCodes(interpretations: InterpretationDraft[]): string[] {
+/** Unfilled codes in natural order — matches the publish 422 payload. */
+export function missingPatternCodes(
+  interpretations: InterpretationDraft[],
+  scorerType = "FORCED_CHOICE_DISC",
+  itemCount?: number,
+): string[] {
+  const codes = getPatternCodes(scorerType, itemCount);
   const filled = new Set(interpretations.filter(isFilled).map((i) => i.patternCode));
-  return PATTERN_CODES.filter((code) => !filled.has(code));
+  return (codes as readonly string[]).filter((code) => !filled.has(code));
 }
 
 export interface InterpretationCoverage {
@@ -23,11 +28,16 @@ export interface InterpretationCoverage {
   missing: number;
 }
 
-export function coverage(interpretations: InterpretationDraft[]): InterpretationCoverage {
-  const missing = missingPatternCodes(interpretations);
+export function coverage(
+  interpretations: InterpretationDraft[],
+  scorerType = "FORCED_CHOICE_DISC",
+  itemCount?: number,
+): InterpretationCoverage {
+  const codes = getPatternCodes(scorerType, itemCount);
+  const missing = missingPatternCodes(interpretations, scorerType, itemCount);
   return {
-    filled: PATTERN_CODES.length - missing.length,
-    total: PATTERN_CODES.length,
+    filled: codes.length - missing.length,
+    total: codes.length,
     missing: missing.length,
   };
 }

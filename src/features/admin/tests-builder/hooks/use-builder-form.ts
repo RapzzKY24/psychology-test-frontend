@@ -202,6 +202,7 @@ export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
     activeItem,
     setActiveItem,
     activePattern,
+    scorerType: initialData.scorerType,
     setActivePattern,
     missingCodes,
     locked,
