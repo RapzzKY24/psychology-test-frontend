@@ -16,12 +16,13 @@ export interface PutResponseInput {
   value: DiscResponse;
 }
 
-/** `GET /api/v1/public/attempts/:id` (AttemptReadDto, verified). Items arrive sanitized: content only — never `mapping`. */
+/** `GET /api/v1/public/attempts/:id` (AttemptReadDto, verified). Items arrive sanitized: content only — never `mapping`/`correctIndex`. */
 export interface AttemptRead {
   id: string;
   sessionId: string;
   testId: string;
   testName: string;
+  scorerType: ScorerType;
   status: AttemptStatus;
   startedAt: string;
   completedAt: string | null;

@@ -1,7 +1,6 @@
 import { apiFetch } from "@/lib/api/client";
 import type { AttemptRead, AttemptComplete } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
-import type { DiscResponse } from "./schemas";
 
 /**
  * Attempt endpoints — public routes guarded by cookie (participant) OR
@@ -18,7 +17,7 @@ export function fetchAttempt(
 export function putResponse(
   attemptId: string,
   itemId: string,
-  value: DiscResponse,
+  value: unknown,
   participantToken?: string | undefined,
 ): Promise<ApiSuccess<unknown>> {
   return apiFetch<unknown>(`/public/attempts/${attemptId}/responses`, {

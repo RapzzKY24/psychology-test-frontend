@@ -11,3 +11,10 @@ export const DiscResponseSchema = z
   });
 
 export type DiscResponse = z.infer<typeof DiscResponseSchema>;
+
+/** RIGHT_WRONG_NORM answer (RightWrongResponseSchema on the backend): option index. */
+export const RightWrongResponseSchema = z.object({
+  chosen: z.number().int().min(0).max(5),
+});
+
+export type RightWrongResponse = z.infer<typeof RightWrongResponseSchema>;
