@@ -2,14 +2,18 @@ import type { ResultStatus } from "./enums";
 import type { TestResultRow } from "./attempts";
 import type { Interpretation } from "./tests";
 
-/** Row of `GET /api/v1/psychologist/reviews` (ReviewListItem — participant is masked). */
+/** Row of `GET /api/v1/psychologist/reviews` (ReviewListItem — enriched after approval). */
 export interface ReviewListItem {
   resultId: string;
   testName: string;
   sessionTitle: string;
   participantName: string;
-  completedAt: string;
-  status: Extract<ResultStatus, "PENDING_REVIEW" | "RETURNED">;
+  participantEmail: string | null;
+  institutionName: string | null;
+  scores: unknown;
+  patternCode: string;
+  completedAt: string | null;
+  status: Extract<ResultStatus, "PENDING_REVIEW" | "RETURNED" | "APPROVED">;
   reviewNote: string | null;
 }
 
