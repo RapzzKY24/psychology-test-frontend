@@ -29,7 +29,7 @@ interface ReviewQueueTableProps {
   status?: string;
 }
 
-function safeRenderScores(scores: unknown, patternCode: string): string {
+export function safeRenderScores(scores: unknown, patternCode: string): string {
   const code = patternCode?.trim() ?? "";
   if (!code) return "—";
   if (scores == null || scores === "") return code;
@@ -64,7 +64,7 @@ export function ReviewQueueTable({ rows, meta, status }: ReviewQueueTableProps) 
   return (
     <TooltipProvider>
       <div className="space-y-3">
-        <div className="hidden overflow-hidden rounded-lg border md:block">
+        <div className="hidden overflow-hidden rounded-lg border sm:block">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
@@ -114,8 +114,14 @@ export function ReviewQueueTable({ rows, meta, status }: ReviewQueueTableProps) 
                         {isApproved && (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span tabIndex={0}>
-                                <Button variant="outline" size="sm" disabled aria-disabled>
+                              <span tabIndex={0} title="Segera hadir — hold">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled
+                                  aria-disabled={true}
+                                  title="Segera hadir — hold"
+                                >
                                   Rilis Hasil
                                 </Button>
                               </span>
@@ -132,7 +138,7 @@ export function ReviewQueueTable({ rows, meta, status }: ReviewQueueTableProps) 
           </Table>
         </div>
 
-        <div className="grid gap-3 md:hidden">
+        <div className="grid gap-3 sm:hidden">
           {rows.map((row) => {
             const scoreText = safeRenderScores(row.scores, row.patternCode);
             const scoreTitle = scoreText === "—" ? undefined : scoreText;
@@ -162,8 +168,15 @@ export function ReviewQueueTable({ rows, meta, status }: ReviewQueueTableProps) 
                   {isApproved && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span tabIndex={0} className="flex-1">
-                          <Button variant="outline" size="sm" disabled aria-disabled className="w-full">
+                        <span tabIndex={0} className="flex-1" title="Segera hadir — hold">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled
+                            aria-disabled={true}
+                            title="Segera hadir — hold"
+                            className="w-full"
+                          >
                             Rilis Hasil
                           </Button>
                         </span>

@@ -65,8 +65,14 @@ export default async function ReviewDetailPage({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span tabIndex={0}>
-                    <Button variant="outline" className="h-11" disabled aria-disabled>
+                  <span tabIndex={0} title="Segera hadir — hold">
+                    <Button
+                      variant="outline"
+                      className="h-11"
+                      disabled
+                      aria-disabled={true}
+                      title="Segera hadir — hold"
+                    >
                       Rilis Hasil
                     </Button>
                   </span>
