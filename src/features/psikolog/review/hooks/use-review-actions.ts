@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { isApiError } from "@/lib/api/client";
@@ -14,6 +15,7 @@ function handleError(error: unknown) {
 
 export function useApproveReview(resultId: string, onApproved: (verifyCode: string) => void) {
   const queryClient = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: async () => {
       const { data } = await approveReview(resultId);
@@ -25,7 +27,20 @@ export function useApproveReview(resultId: string, onApproved: (verifyCode: stri
       toast.success("Hasil disetujui.");
       onApproved(data.verifyCode);
     },
-    onError: handleError,
+    onError: (error) => {
+      if (
+        isApiError(error) &&
+        error.statusCode === 409 &&
+        error.code === "result_already_approved"
+      ) {
+        toast.info("Sudah disetujui psikolog lain.");
+        void queryClient.invalidateQueries({ queryKey: qk.psikolog.reviews.all });
+        router.push("/psikolog/review?status=APPROVED");
+        router.refresh();
+        return;
+      }
+      handleError(error);
+    },
   });
 }
 

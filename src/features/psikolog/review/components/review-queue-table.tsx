@@ -30,15 +30,16 @@ interface ReviewQueueTableProps {
 }
 
 function safeRenderScores(scores: unknown, patternCode: string): string {
-  if (!patternCode) return "—";
-  if (!scores) return patternCode;
+  const code = patternCode?.trim() ?? "";
+  if (!code) return "—";
+  if (scores == null || scores === "") return code;
   try {
     const graph = (scores as { graph?: unknown })?.graph ?? scores;
     const text = JSON.stringify(graph);
     const truncated = text.length > 60 ? `${text.slice(0, 60)}…` : text;
-    return `${patternCode} · ${truncated}`;
+    return `${code} · ${truncated}`;
   } catch {
-    return patternCode;
+    return code;
   }
 }
 
@@ -79,21 +80,23 @@ export function ReviewQueueTable({ rows, meta, status }: ReviewQueueTableProps) 
             <TableBody>
               {rows.map((row) => {
                 const scoreText = safeRenderScores(row.scores, row.patternCode);
-                const institutionText = row.institutionName ?? "—";
+                const scoreTitle = scoreText === "—" ? undefined : scoreText;
+                const institutionText = row.institutionName?.trim() || "—";
+                const institutionTitle = row.institutionName?.trim() || undefined;
                 const isApproved = row.status === "APPROVED";
                 return (
                   <TableRow key={row.resultId}>
                     <TableCell className="font-medium">{row.participantName}</TableCell>
                     <TableCell
                       className="max-w-[12rem] truncate"
-                      title={row.institutionName ?? undefined}
+                      title={institutionTitle}
                     >
                       {institutionText}
                     </TableCell>
                     <TableCell>{row.testName}</TableCell>
                     <TableCell
                       className="max-w-[14rem] truncate font-mono text-xs"
-                      title={scoreText}
+                      title={scoreTitle}
                     >
                       {scoreText}
                     </TableCell>
@@ -132,6 +135,7 @@ export function ReviewQueueTable({ rows, meta, status }: ReviewQueueTableProps) 
         <div className="grid gap-3 md:hidden">
           {rows.map((row) => {
             const scoreText = safeRenderScores(row.scores, row.patternCode);
+            const scoreTitle = scoreText === "—" ? undefined : scoreText;
             const isApproved = row.status === "APPROVED";
             return (
               <div key={row.resultId} className="rounded-lg border bg-card p-4">
@@ -139,10 +143,13 @@ export function ReviewQueueTable({ rows, meta, status }: ReviewQueueTableProps) 
                   <p className="font-medium">{row.participantName}</p>
                   <ResultStatusBadge status={row.status} />
                 </div>
-                <p className="truncate text-sm text-muted-foreground" title={row.institutionName ?? undefined}>
-                  {row.institutionName ?? "—"} · {row.testName}
+                <p
+                  className="truncate text-sm text-muted-foreground"
+                  title={row.institutionName?.trim() || undefined}
+                >
+                  {row.institutionName?.trim() || "—"} · {row.testName}
                 </p>
-                <p className="truncate font-mono text-xs" title={scoreText}>
+                <p className="truncate font-mono text-xs" title={scoreTitle}>
                   {scoreText}
                 </p>
                 <p className="text-xs tabular-nums text-muted-foreground">

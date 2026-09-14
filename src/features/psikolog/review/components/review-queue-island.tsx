@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { QueryKey } from "@tanstack/react-query";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { ReviewListItem } from "@/lib/api/types";
@@ -27,7 +27,7 @@ export function ReviewQueueIsland({
         page,
       }),
     initialData: initial,
-    placeholderData: (prev) => prev,
+    placeholderData: keepPreviousData,
   });
 
   const tableMeta = data.meta ?? { page, limit: 10, total: data.data.length, totalPages: 1 };
