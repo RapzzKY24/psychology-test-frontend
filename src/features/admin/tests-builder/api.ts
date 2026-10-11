@@ -2,7 +2,6 @@ import { apiFetch } from "@/lib/api/client";
 import type {
   AdminTest,
   AdminTestDetail,
-  DiscItemContent,
   TestCategory,
   TestStatus,
 } from "@/lib/api/types";

@@ -29,9 +29,16 @@ export function ItemImageUpload({ testId, value, onChange }: ItemImageUploadProp
     };
   }, [preview]);
 
-  useEffect(() => {
+  const displayUrl = preview ?? value ?? null;
+
+  // Reset load error when the displayed image changes. Done during render
+  // (React docs "adjusting state on prop change") instead of useEffect to
+  // avoid synchronous setState-in-effect cascading renders.
+  const [prevDisplayUrl, setPrevDisplayUrl] = useState(displayUrl);
+  if (displayUrl !== prevDisplayUrl) {
+    setPrevDisplayUrl(displayUrl);
     setLoadError(false);
-  }, [value, preview]);
+  }
 
   const pick = async (file: File | undefined) => {
     setError(null);
@@ -69,8 +76,6 @@ export function ItemImageUpload({ testId, value, onChange }: ItemImageUploadProp
     onChange(null);
     if (inputRef.current) inputRef.current.value = "";
   };
-
-  const displayUrl = preview ?? value ?? null;
 
   return (
     <Field data-invalid={Boolean(error)}>

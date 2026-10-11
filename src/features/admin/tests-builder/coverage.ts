@@ -1,4 +1,4 @@
-import { getPatternCodes, PATTERN_CODES } from "./constants";
+import { getPatternCodes } from "./constants";
 
 export interface InterpretationDraft {
   patternCode: string;

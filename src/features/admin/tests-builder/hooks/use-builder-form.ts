@@ -29,13 +29,6 @@ function getBuilderFormSchema(scorerType: string) {
   });
 }
 
-const BuilderFormSchema = z.object({
-  items: z.array(z.object({ content: DiscItemContentSchema })),
-  interpretations: z.array(
-    z.object({ patternCode: z.string(), title: z.string(), body: z.string() }),
-  ),
-});
-
 export type BuilderFormValues = {
   items: { content: DiscItemContentInput | RightWrongItemContentInput }[];
   interpretations: { patternCode: string; title: string; body: string }[];
