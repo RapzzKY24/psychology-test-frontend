@@ -1,5 +1,5 @@
 import type { IdType, InvoiceStatus } from "./enums";
-import type { SessionSummary } from "./sessions";
+import type { SessionDetail, SessionSummary } from "./sessions";
 
 /** Mirrors backend InstitutionParticipant (owner-scoped, NIK visible to owner). */
 export interface Employee {
@@ -34,6 +34,22 @@ export interface InstansiInvoice {
 export interface InstansiBatchCreateResult {
   session: SessionSummary;
   invoice: InstansiInvoice;
+}
+
+/**
+ * `GET /instansi/sessions/:id` — session detail plus the batch invoice
+ * (null until provisioned). The invoice `amount` drives the roster editor.
+ */
+export interface InstansiSessionDetail extends SessionDetail {
+  invoice: InstansiInvoice | null;
+}
+
+/** `POST /instansi/sessions/:id/participants/:participantId/reset`. */
+export interface ResetSeatResult {
+  id: string;
+  name: string;
+  candidateNumber: string | null;
+  claimed: boolean;
 }
 
 export interface EmployeeInput {

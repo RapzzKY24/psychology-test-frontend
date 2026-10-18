@@ -1,6 +1,11 @@
 import { apiFetch } from "@/lib/api/client";
-import type { SessionDetail, SessionSummary } from "@/lib/api/types";
-import type { InstansiBatchCreateResult } from "@/lib/api/types";
+import type { SessionSummary } from "@/lib/api/types";
+import type {
+  InstansiBatchCreateResult,
+  InstansiInvoice,
+  InstansiSessionDetail,
+  ResetSeatResult,
+} from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { CreateInstansiSessionInput } from "./schemas";
 
@@ -45,7 +50,51 @@ export function closeInstansiSession(id: string): Promise<ApiSuccess<SessionSumm
   return apiFetch<SessionSummary>(`/instansi/sessions/${id}/close`, { method: "POST" });
 }
 
-/** `GET /instansi/sessions/:id` — detail (incl. invite `token`). */
-export function fetchInstansiSessionDetail(id: string): Promise<ApiSuccess<SessionDetail>> {
-  return apiFetch<SessionDetail>(`/instansi/sessions/${id}`);
+/** `GET /instansi/sessions/:id` — detail (incl. invite `token` + batch invoice). */
+export function fetchInstansiSessionDetail(id: string): Promise<ApiSuccess<InstansiSessionDetail>> {
+  return apiFetch<InstansiSessionDetail>(`/instansi/sessions/${id}`);
+}
+
+/** Adds seats from the institution roster; returns the updated invoice amount. */
+export function addInstansiParticipants(
+  sessionId: string,
+  employeeIds: string[],
+): Promise<ApiSuccess<InstansiInvoice>> {
+  return apiFetch<InstansiInvoice>(`/instansi/sessions/${sessionId}/participants`, {
+    method: "POST",
+    body: { employeeIds },
+  });
+}
+
+/** Swaps a seat's linked employee (UNPAID batches only). */
+export function swapInstansiParticipant(
+  sessionId: string,
+  participantId: string,
+  employeeId: string,
+): Promise<ApiSuccess<InstansiInvoice>> {
+  return apiFetch<InstansiInvoice>(
+    `/instansi/sessions/${sessionId}/participants/${participantId}`,
+    { method: "PATCH", body: { employeeId } },
+  );
+}
+
+export function removeInstansiParticipant(
+  sessionId: string,
+  participantId: string,
+): Promise<ApiSuccess<InstansiInvoice>> {
+  return apiFetch<InstansiInvoice>(
+    `/instansi/sessions/${sessionId}/participants/${participantId}`,
+    { method: "DELETE" },
+  );
+}
+
+/** Unlocks a claimed seat so it can be re-claimed on another device. */
+export function resetInstansiParticipant(
+  sessionId: string,
+  participantId: string,
+): Promise<ApiSuccess<ResetSeatResult>> {
+  return apiFetch<ResetSeatResult>(
+    `/instansi/sessions/${sessionId}/participants/${participantId}/reset`,
+    { method: "POST" },
+  );
 }

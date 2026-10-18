@@ -1,5 +1,6 @@
 import { apiFetchServer } from "@/lib/api/server";
-import type { SessionDetail, SessionSummary } from "@/lib/api/types";
+import type { SessionSummary } from "@/lib/api/types";
+import type { InstansiSessionDetail } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { InstansiSessionFilters, PublishedTestOption } from "./api";
 
@@ -19,8 +20,10 @@ export function fetchInstansiSessionsServer(
   return apiFetchServer<SessionSummary[]>(`/instansi/sessions${buildQuery(filters)}`);
 }
 
-export function fetchInstansiSessionDetailServer(id: string): Promise<ApiSuccess<SessionDetail>> {
-  return apiFetchServer<SessionDetail>(`/instansi/sessions/${id}`);
+export function fetchInstansiSessionDetailServer(
+  id: string,
+): Promise<ApiSuccess<InstansiSessionDetail>> {
+  return apiFetchServer<InstansiSessionDetail>(`/instansi/sessions/${id}`);
 }
 
 export function fetchPublishedTestsServer(): Promise<ApiSuccess<PublishedTestOption[]>> {
