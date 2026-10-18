@@ -52,6 +52,19 @@ export interface ResetSeatResult {
   claimed: boolean;
 }
 
+/**
+ * `GET /instansi/results` — institution-scoped approved results
+ * (toInstansiResultItem). `scores` is an opaque JSON blob.
+ */
+export interface InstansiResultItem {
+  resultId: string;
+  participantName: string;
+  testName: string;
+  patternCode: string;
+  scores: unknown;
+  approvedAt: string | null;
+}
+
 export interface EmployeeInput {
   name: string;
   destinationCountry: string;
