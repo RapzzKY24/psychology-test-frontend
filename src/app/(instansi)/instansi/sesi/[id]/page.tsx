@@ -3,9 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { CopyInviteButton } from "@/features/admin/sessions/components/copy-invite-button";
-import { SessionStats } from "@/features/admin/sessions/components/session-stats";
-import { SessionParticipantsTable } from "@/features/admin/sessions/components/session-participants-table";
 import { fetchInstansiSessionDetailServer } from "@/features/instansi/sessions/api.server";
+import { InstansiSessionDetailIsland } from "@/features/instansi/sessions/components/instansi-session-detail-island";
 import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
@@ -40,19 +39,17 @@ export default async function InstansiSessionDetailPage({
       <div className="flex flex-wrap items-center gap-3">
         <CopyInviteButton token={detail.session.token} label="Salin Tautan Undangan" />
         {detail.session.status === "ACTIVE" && (
-          <CloseInstansiSessionButton sessionId={detail.session.id} listKey={qk.instansi.sessions.all} />
+          <CloseInstansiSessionButton
+            sessionId={detail.session.id}
+            listKey={qk.instansi.sessions.all}
+          />
         )}
         <Link href="/instansi/sesi" className="text-sm text-muted-foreground hover:underline">
           ← Kembali ke daftar sesi
         </Link>
       </div>
 
-      <SessionStats
-        participants={detail.participants.length}
-        slotLimit={detail.session.slotLimit}
-        attempts={detail.attempts}
-      />
-      <SessionParticipantsTable participants={detail.participants} />
+      <InstansiSessionDetailIsland sessionId={detail.session.id} initial={detail} />
     </main>
   );
 }

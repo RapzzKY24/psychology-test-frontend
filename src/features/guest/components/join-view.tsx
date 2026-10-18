@@ -18,7 +18,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { setGuestTokenForAttempt } from "@/lib/guest-token";
+import { setGuestResume, setGuestTokenForAttempt } from "@/lib/guest-token";
 import { useJoinSession } from "../hooks/use-join-session";
 import { JoinFormSchema } from "../schemas";
 import type { JoinSessionPayload, JoinFormInput, SessionPreview } from "../schemas";
@@ -38,20 +38,28 @@ export function JoinView({ token, preview }: { token: string; preview: SessionPr
     defaultValues: { name: "", email: "", candidateNumber: "", pin: "" },
   });
 
-  const mutation = useJoinSession(token, (result) => {
-    // Persist immediately (ADR-005: lost token = cannot resume), then reveal.
-    for (const attempt of result.attempts) {
-      setGuestTokenForAttempt(attempt.id, result.participantToken);
-    }
-    setJoined(result);
-    setPhase("revealed");
-  }, (message) => {
-    if (form.getValues("pin")) {
-      form.setError("pin", { message });
-      return;
-    }
-    toast.error(message);
-  });
+  const mutation = useJoinSession(
+    token,
+    (result) => {
+      // Persist immediately (ADR-005: lost token = cannot resume), then reveal.
+      for (const attempt of result.attempts) {
+        setGuestTokenForAttempt(attempt.id, result.participantToken);
+      }
+      setGuestResume(token, {
+        participantName: result.participant.name,
+        attemptIds: result.attempts.map((attempt) => attempt.id),
+      });
+      setJoined(result);
+      setPhase("revealed");
+    },
+    (message) => {
+      if (form.getValues("pin")) {
+        form.setError("pin", { message });
+        return;
+      }
+      toast.error(message);
+    },
+  );
 
   const firstAttempt = joined?.attempts[0];
 
@@ -84,7 +92,12 @@ export function JoinView({ token, preview }: { token: string; preview: SessionPr
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="join-name">Nama lengkap</FieldLabel>
-                  <Input {...field} id="join-name" placeholder="Nama Anda" aria-invalid={fieldState.invalid} />
+                  <Input
+                    {...field}
+                    id="join-name"
+                    placeholder="Nama Anda"
+                    aria-invalid={fieldState.invalid}
+                  />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -95,7 +108,13 @@ export function JoinView({ token, preview }: { token: string; preview: SessionPr
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="join-email">Email (opsional)</FieldLabel>
-                  <Input {...field} id="join-email" type="email" placeholder="nama@email.com" aria-invalid={fieldState.invalid} />
+                  <Input
+                    {...field}
+                    id="join-email"
+                    type="email"
+                    placeholder="nama@email.com"
+                    aria-invalid={fieldState.invalid}
+                  />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -106,7 +125,12 @@ export function JoinView({ token, preview }: { token: string; preview: SessionPr
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="join-number">Nomor peserta (opsional)</FieldLabel>
-                  <Input {...field} id="join-number" placeholder="Contoh: 07" aria-invalid={fieldState.invalid} />
+                  <Input
+                    {...field}
+                    id="join-number"
+                    placeholder="Contoh: 07"
+                    aria-invalid={fieldState.invalid}
+                  />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -138,10 +162,14 @@ export function JoinView({ token, preview }: { token: string; preview: SessionPr
         ) : (
           <div className="space-y-4" data-testid="token-reveal">
             <p className="text-sm text-muted-foreground">
-              Simpan token di bawah ini. Token dibutuhkan untuk melanjutkan tes jika halaman tertutup.
+              Simpan token di bawah ini. Token dibutuhkan untuk melanjutkan tes jika halaman
+              tertutup.
             </p>
             <div className="flex items-center gap-2 rounded-lg border bg-muted/50 p-3">
-              <code className="min-w-0 flex-1 truncate font-mono text-sm" data-testid="participant-token">
+              <code
+                className="min-w-0 flex-1 truncate font-mono text-sm"
+                data-testid="participant-token"
+              >
                 {joined?.participantToken}
               </code>
               <Button
@@ -154,7 +182,11 @@ export function JoinView({ token, preview }: { token: string; preview: SessionPr
                   void copyToken();
                 }}
               >
-                {copied ? <Check className="size-4" aria-hidden /> : <Copy className="size-4" aria-hidden />}
+                {copied ? (
+                  <Check className="size-4" aria-hidden />
+                ) : (
+                  <Copy className="size-4" aria-hidden />
+                )}
               </Button>
             </div>
             <label className="flex items-center gap-2.5 rounded-lg border p-3 text-sm">
@@ -165,7 +197,11 @@ export function JoinView({ token, preview }: { token: string; preview: SessionPr
               />
               Saya sudah menyimpan token
             </label>
-            <Button className="w-full" disabled={!saved} onClick={() => firstAttempt && router.push(`/tes/${firstAttempt.id}`)}>
+            <Button
+              className="w-full"
+              disabled={!saved}
+              onClick={() => firstAttempt && router.push(`/tes/${firstAttempt.id}`)}
+            >
               Mulai Tes
             </Button>
           </div>

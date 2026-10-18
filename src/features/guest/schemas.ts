@@ -13,7 +13,10 @@ export interface RosterSeat {
 
 export interface SessionPreview {
   title: string;
-  status: "ACTIVE" | "CLOSED";
+  /** `PENDING_PAYMENT` until the batch invoice is settled; then `ACTIVE`. */
+  status: "PENDING_PAYMENT" | "ACTIVE" | "CLOSED";
+  /** Convenience flag from the backend: true only when status is `ACTIVE`. */
+  active: boolean;
   expiresAt: string;
   tests: Array<{ order: number; testName: string }>;
   slotLimit: number;

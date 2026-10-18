@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,18 +22,14 @@ import {
   ComboboxList,
 } from "@/components/ui/combobox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { setGuestTokenForAttempt } from "@/lib/guest-token";
+import { isApiError } from "@/lib/api/client";
+import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
+import { setGuestResume, setGuestTokenForAttempt } from "@/lib/guest-token";
 import { useClaimSeat } from "../hooks/use-claim-seat";
 import type { RosterSeat } from "../schemas";
 
 /** Roster sessions: employee picks their pre-registered name, no typing. */
-export function RosterClaimView({
-  token,
-  roster,
-}: {
-  token: string;
-  roster: RosterSeat[];
-}) {
+export function RosterClaimView({ token, roster }: { token: string; roster: RosterSeat[] }) {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pickError, setPickError] = useState<string | null>(null);
@@ -52,13 +49,26 @@ export function RosterClaimView({
         toast.error("Sesi ini belum memiliki tes — hubungi penyelenggara.");
         return;
       }
+      setGuestResume(token, {
+        participantName: result.participant.name,
+        attemptIds: result.attempts.map((attempt) => attempt.id),
+      });
       router.push(`/tes/${first.id}`);
     },
-    (message) => toast.error(message),
+    (error) => {
+      if (isApiError(error) && error.code === "seat_claimed") {
+        toast.error(error.message);
+        // The seat was taken on another device — refresh so it leaves the list.
+        router.refresh();
+        return;
+      }
+      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
+    },
   );
 
   const available = roster.filter((seat) => !seat.claimed);
   const nameById = new Map(available.map((seat) => [seat.id, seat.name]));
+  const lockMessage = isApiError(mutation.error) ? mutation.error.message : null;
 
   const submit = () => {
     if (!selectedId) {
@@ -94,9 +104,7 @@ export function RosterClaimView({
                 }}
                 itemToStringLabel={(id: string) => nameById.get(id) ?? ""}
                 filter={(id: string, query: string) =>
-                  (nameById.get(id) ?? "")
-                    .toLowerCase()
-                    .includes(query.trim().toLowerCase())
+                  (nameById.get(id) ?? "").toLowerCase().includes(query.trim().toLowerCase())
                 }
               >
                 <ComboboxInput
@@ -104,12 +112,13 @@ export function RosterClaimView({
                   placeholder={`Pilih dari ${available.length} nama...`}
                   disabled={mutation.isPending}
                   aria-invalid={Boolean(pickError)}
+                  className="h-12 text-base"
                 />
                 <ComboboxContent>
                   <ComboboxList>
                     <ComboboxEmpty>Tidak ada nama yang cocok.</ComboboxEmpty>
                     {available.map((seat) => (
-                      <ComboboxItem key={seat.id} value={seat.id}>
+                      <ComboboxItem key={seat.id} value={seat.id} className="py-3 text-base">
                         {seat.name}
                       </ComboboxItem>
                     ))}
@@ -119,18 +128,29 @@ export function RosterClaimView({
               {pickError && <FieldError>{pickError}</FieldError>}
             </Field>
           )}
+
+          {lockMessage && (
+            <div
+              role="alert"
+              className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
+            >
+              <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+              <span>{lockMessage}</span>
+            </div>
+          )}
+
           <Button
             type="button"
             disabled={mutation.isPending || available.length === 0}
             onClick={submit}
-            className="h-11 w-full"
+            className="h-12 w-full text-base"
           >
             {mutation.isPending ? "Memproses..." : "Pilih & Mulai"}
           </Button>
         </div>
       </CardContent>
-      <CardFooter className="text-xs text-muted-foreground">
-        Nama tidak ada di daftar? Hubungi penyelenggara sesi.
+      <CardFooter className="text-sm text-muted-foreground">
+        Nama tidak ada di daftar atau sudah dipakai di HP lain? Hubungi petugas penyelenggara.
       </CardFooter>
     </Card>
   );

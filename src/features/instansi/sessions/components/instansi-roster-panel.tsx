@@ -1,0 +1,193 @@
+"use client";
+
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Lock, Pencil, RotateCcw, Trash2, UserPlus, Users } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { fetchEmployees } from "@/features/instansi/employees/api";
+import type { SessionParticipantRow } from "@/lib/api/types";
+import { qk } from "@/lib/api/query-keys";
+import { useInstansiRosterMutations } from "../hooks/use-instansi-roster-mutations";
+import { EmployeePickerDialog } from "./employee-picker-dialog";
+
+interface InstansiRosterPanelProps {
+  sessionId: string;
+  participants: SessionParticipantRow[];
+  slotLimit: number;
+  /** True once the invoice is paid — the roster is frozen (`batch_locked`). */
+  locked: boolean;
+}
+
+/** Roster list with add/swap/remove (UNPAID only) and per-seat reset. */
+export function InstansiRosterPanel({
+  sessionId,
+  participants,
+  slotLimit,
+  locked,
+}: InstansiRosterPanelProps) {
+  const mutations = useInstansiRosterMutations(sessionId);
+  const [addOpen, setAddOpen] = useState(false);
+  const [swapTarget, setSwapTarget] = useState<SessionParticipantRow | null>(null);
+
+  const employeesQuery = useQuery({
+    queryKey: qk.instansi.employees.list({ page: 1 }),
+    queryFn: () => fetchEmployees({ page: 1, limit: 100 }).then((r) => r.data),
+    enabled: addOpen || swapTarget !== null,
+    staleTime: 30_000,
+  });
+
+  const linkedIds = participants.map((p) => p.employeeId).filter((id): id is string => id !== null);
+  const isFull = participants.length >= slotLimit;
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Users className="size-4" aria-hidden />
+          Daftar Peserta ({participants.length}/{slotLimit})
+        </CardTitle>
+        <Button
+          size="sm"
+          disabled={locked || isFull}
+          title={locked ? "Roster terkunci setelah pembayaran" : undefined}
+          onClick={() => setAddOpen(true)}
+        >
+          <UserPlus className="size-4" aria-hidden />
+          Tambah
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {locked && (
+          <p className="bg-muted text-muted-foreground flex items-center gap-2 rounded-md p-3 text-sm">
+            <Lock className="size-4 shrink-0" aria-hidden />
+            Batch sudah dibayar — daftar peserta dikunci. Hubungi admin bila perlu mengubahnya.
+          </p>
+        )}
+
+        {participants.length === 0 ? (
+          <p className="text-muted-foreground py-6 text-center text-sm">
+            Belum ada peserta. Tambahkan dari daftar pegawai instansi.
+          </p>
+        ) : (
+          <ul className="divide-y">
+            {participants.map((participant) => (
+              <li
+                key={participant.id}
+                className="flex flex-wrap items-center justify-between gap-3 py-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{participant.name}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <Badge variant={participant.claimed ? "default" : "secondary"}>
+                      {participant.claimed ? "Terkunci" : "Belum diklaim"}
+                    </Badge>
+                    <span className="text-muted-foreground text-xs">
+                      {participant.answeredCount} jawaban
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={locked}
+                    title={locked ? "Roster terkunci" : undefined}
+                    onClick={() => setSwapTarget(participant)}
+                  >
+                    <Pencil className="size-4" aria-hidden />
+                    <span className="sr-only">Ganti</span>
+                  </Button>
+
+                  {participant.claimed && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="sm" disabled={mutations.reset.isPending}>
+                          <RotateCcw className="size-4" aria-hidden />
+                          <span className="sr-only">Reset akses</span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Reset akses {participant.name}?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Seat dibuka kembali dan bisa diklaim di HP lain. Jawaban yang sudah
+                            tersimpan tidak dihapus.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Batal</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => mutations.reset.mutate(participant.id)}>
+                            Ya, reset
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={locked}
+                    title={locked ? "Roster terkunci" : undefined}
+                    onClick={() => mutations.remove.mutate(participant.id)}
+                  >
+                    <Trash2 className="size-4" aria-hidden />
+                    <span className="sr-only">Hapus</span>
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+
+      <EmployeePickerDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        title="Tambah peserta"
+        description="Pilih pegawai untuk mengisi slot pada sesi ini."
+        employees={employeesQuery.data ?? []}
+        isLoading={employeesQuery.isLoading}
+        excludeIds={linkedIds}
+        mode="multi"
+        confirmLabel="Tambahkan"
+        pending={mutations.add.isPending}
+        onSubmit={(ids) => mutations.add.mutate(ids, { onSuccess: () => setAddOpen(false) })}
+      />
+
+      <EmployeePickerDialog
+        open={swapTarget !== null}
+        onOpenChange={(open) => !open && setSwapTarget(null)}
+        title={`Ganti ${swapTarget?.name ?? "peserta"}`}
+        description="Pilih pegawai pengganti untuk seat ini."
+        employees={employeesQuery.data ?? []}
+        isLoading={employeesQuery.isLoading}
+        excludeIds={linkedIds}
+        mode="single"
+        confirmLabel="Ganti"
+        pending={mutations.swap.isPending}
+        onSubmit={(ids) => {
+          if (!swapTarget || ids.length === 0) return;
+          mutations.swap.mutate(
+            { participantId: swapTarget.id, employeeId: ids[0] },
+            { onSuccess: () => setSwapTarget(null) },
+          );
+        }}
+      />
+    </Card>
+  );
+}

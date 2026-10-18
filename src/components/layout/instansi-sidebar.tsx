@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
-import { Brain, CalendarDays, LayoutDashboard, LogOut, Users } from "lucide-react";
+import { Brain, CalendarDays, FileText, LayoutDashboard, LogOut, Users } from "lucide-react";
 import { useSignOut } from "@/features/auth/hooks/use-sign-out";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
       { href: "/instansi", label: "Ringkasan", icon: LayoutDashboard },
       { href: "/instansi/pegawai", label: "Pegawai", icon: Users },
       { href: "/instansi/sesi", label: "Sesi", icon: CalendarDays },
+      { href: "/instansi/hasil", label: "Hasil", icon: FileText },
     ],
   },
 ];
@@ -60,7 +61,9 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
       <span
         className={cn(
           "flex size-7 shrink-0 items-center justify-center rounded-md",
-          active ? "bg-primary/15 text-primary" : "text-muted-foreground group-hover:text-foreground",
+          active
+            ? "bg-primary/15 text-primary"
+            : "text-muted-foreground group-hover:text-foreground",
         )}
       >
         <Icon className="size-4" aria-hidden />
