@@ -6,13 +6,13 @@ import type { QueryKey } from "@tanstack/react-query";
 import { asOptimistic, useOptimisticList } from "@/features/admin/hooks/use-optimistic-list";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
-import type { SessionSummary } from "@/lib/api/types";
+import type { InstansiBatchCreateResult, SessionSummary } from "@/lib/api/types";
 import { closeInstansiSession, createInstansiSession } from "../api";
 import type { CreateInstansiSessionInput } from "../schemas";
 
 export function useCreateInstansiSession(
   listKey: QueryKey,
-  onCreated: (created: SessionSummary) => void,
+  onCreated: (created: InstansiBatchCreateResult) => void,
 ) {
   const list = useOptimisticList<SessionSummary>(listKey);
 
@@ -33,7 +33,7 @@ export function useCreateInstansiSession(
           token: "",
           slotLimit: values.slotLimit,
           expiresAt: new Date(values.expiresAt).toISOString(),
-          status: "ACTIVE",
+          status: "PENDING_PAYMENT",
         }),
         ...rows,
       ]);

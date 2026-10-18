@@ -5,12 +5,16 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FORM_INVALID_TOAST } from "@/features/admin/copy";
 import type { QueryKey } from "@tanstack/react-query";
+import type { InstansiBatchCreateResult } from "@/lib/api/types";
 import { useCreateInstansiSession } from "./use-instansi-session-mutations";
 import { CreateInstansiSessionSchema } from "../schemas";
 import type { CreateInstansiSessionInput } from "../schemas";
 
 /** Form logic for the create-session wizard (§6.3 — logic in the hook). */
-export function useInstansiSessionForm(listKey: QueryKey, onCreated: () => void) {
+export function useInstansiSessionForm(
+  listKey: QueryKey,
+  onCreated: (created: InstansiBatchCreateResult) => void,
+) {
   const form = useForm<CreateInstansiSessionInput>({
     resolver: zodResolver(CreateInstansiSessionSchema),
     defaultValues: {
@@ -23,9 +27,9 @@ export function useInstansiSessionForm(listKey: QueryKey, onCreated: () => void)
     },
   });
 
-  const mutation = useCreateInstansiSession(listKey, () => {
+  const mutation = useCreateInstansiSession(listKey, (created) => {
     form.reset();
-    onCreated();
+    onCreated(created);
   });
 
   const submit = form.handleSubmit(

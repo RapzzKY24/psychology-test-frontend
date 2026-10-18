@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api/client";
 import type { SessionDetail, SessionSummary } from "@/lib/api/types";
+import type { InstansiBatchCreateResult } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { CreateInstansiSessionInput } from "./schemas";
 
@@ -29,8 +30,8 @@ export function fetchInstansiSessions(
 
 export function createInstansiSession(
   input: CreateInstansiSessionInput,
-): Promise<ApiSuccess<SessionSummary>> {
-  return apiFetch<SessionSummary>("/instansi/sessions", {
+): Promise<ApiSuccess<InstansiBatchCreateResult>> {
+  return apiFetch<InstansiBatchCreateResult>("/instansi/sessions", {
     method: "POST",
     body: {
       ...input,
@@ -42,4 +43,9 @@ export function createInstansiSession(
 
 export function closeInstansiSession(id: string): Promise<ApiSuccess<SessionSummary>> {
   return apiFetch<SessionSummary>(`/instansi/sessions/${id}/close`, { method: "POST" });
+}
+
+/** `GET /instansi/sessions/:id` — detail (incl. invite `token`). */
+export function fetchInstansiSessionDetail(id: string): Promise<ApiSuccess<SessionDetail>> {
+  return apiFetch<SessionDetail>(`/instansi/sessions/${id}`);
 }

@@ -47,6 +47,12 @@ export const KNOWN_ERROR_CODES = [
   "duplicate_id_number",
   // Instansi
   "duplicate_email",
+  // Instansi batch payment
+  "payment_gateway_unavailable",
+  "invoice_not_payable",
+  "session_unpaid",
+  "seat_claimed",
+  "batch_locked",
   // Misc
   "invalid_query",
   "email_failed",
@@ -82,6 +88,12 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   cannot_change_own_role: "Anda tidak bisa mengubah role akun sendiri.",
   duplicate_id_number: "Nomor identitas sudah terdaftar di institusi ini.",
   duplicate_email: "Email sudah terdaftar — silakan masuk.",
+  payment_gateway_unavailable:
+    "Pembayaran sedang tidak tersedia — hubungi admin atau coba lagi nanti.",
+  invoice_not_payable: "Tagihan ini tidak bisa dibayar lagi.",
+  session_unpaid: "Sesi belum dibuka — selesaikan pembayaran terlebih dahulu.",
+  seat_claimed: "Nama ini sudah dipakai di HP lain — hubungi petugas.",
+  batch_locked: "Data peserta terkunci karena tagihan sudah dibayar.",
   invalid_query: "Parameter query tidak valid.",
   email_failed: "Gagal mengirim email — coba lagi nanti.",
 };

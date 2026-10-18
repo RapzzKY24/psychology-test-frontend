@@ -19,9 +19,7 @@ export function fetchInstansiSessionsServer(
   return apiFetchServer<SessionSummary[]>(`/instansi/sessions${buildQuery(filters)}`);
 }
 
-export function fetchInstansiSessionDetailServer(
-  id: string,
-): Promise<ApiSuccess<SessionDetail>> {
+export function fetchInstansiSessionDetailServer(id: string): Promise<ApiSuccess<SessionDetail>> {
   return apiFetchServer<SessionDetail>(`/instansi/sessions/${id}`);
 }
 

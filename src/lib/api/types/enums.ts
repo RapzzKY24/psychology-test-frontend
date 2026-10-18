@@ -24,7 +24,7 @@ export type ScorerType = (typeof SCORER_TYPES)[number];
 export const SESSION_KINDS = ["INDIVIDUAL", "GROUP"] as const;
 export type SessionKind = (typeof SESSION_KINDS)[number];
 
-export const SESSION_STATUSES = ["ACTIVE", "CLOSED"] as const;
+export const SESSION_STATUSES = ["PENDING_PAYMENT", "ACTIVE", "CLOSED"] as const;
 export type SessionStatus = (typeof SESSION_STATUSES)[number];
 
 export const ID_TYPES = ["NIK", "PASPOR"] as const;

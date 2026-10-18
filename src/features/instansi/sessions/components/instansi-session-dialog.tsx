@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
@@ -30,10 +31,12 @@ interface InstansiSessionDialogProps {
 export function InstansiSessionDialog({ listKey, tests, employees }: InstansiSessionDialogProps) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
+  const router = useRouter();
 
-  const { form, mutation, submit } = useInstansiSessionForm(listKey, () => {
+  const { form, mutation, submit } = useInstansiSessionForm(listKey, (created) => {
     setOpen(false);
     setStep(1);
+    router.push(`/instansi/tagihan/${created.invoice.id}`);
   });
 
   const next = async () => {
