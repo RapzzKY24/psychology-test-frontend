@@ -115,15 +115,16 @@ export function ArticleFormDialog({ mode, listKey, article, trigger }: ArticleFo
           setCoverFile(null);
           setCoverPreview(null);
         } else if (mode === "edit" && article) {
+          // Prefer the cached detail (has content); fall back to list fields.
+          const d = detail.data;
           form.reset({
-            ...emptyArticleForm(),
-            title: article.title,
-            slug: article.slug,
-            excerpt: article.excerpt,
-            category: article.category ?? "",
-            content: [],
+            title: d?.title ?? article.title,
+            slug: d?.slug ?? article.slug,
+            excerpt: d?.excerpt ?? article.excerpt,
+            category: d?.category ?? article.category ?? "",
+            content: d?.content ?? [],
           });
-          setCoverPreview(article.coverUrl);
+          setCoverPreview(d?.coverUrl ?? article.coverUrl);
         }
       }}
     >
