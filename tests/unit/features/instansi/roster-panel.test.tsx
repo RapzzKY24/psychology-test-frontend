@@ -54,25 +54,20 @@ afterEach(() => {
 });
 
 describe("InstansiRosterPanel", () => {
-  it("freezes the roster when the batch is paid", () => {
-    render(<InstansiRosterPanel sessionId="s1" participants={[claimed]} slotLimit={5} locked />, {
+  it("keeps the roster editable after payment (no paid lock)", () => {
+    render(<InstansiRosterPanel sessionId="s1" participants={[claimed]} slotLimit={5} />, {
       wrapper,
     });
 
-    expect(screen.getByText(/dikunci/)).toBeTruthy();
+    expect(screen.queryByText(/dikunci/)).toBeNull();
     for (const btn of screen.getAllByRole("button", { name: /Tambah|Ganti|Hapus/ })) {
-      expect((btn as HTMLButtonElement).disabled).toBe(true);
+      expect((btn as HTMLButtonElement).disabled).toBe(false);
     }
   });
 
   it("shows claim state and only offers reset on a claimed seat", () => {
     render(
-      <InstansiRosterPanel
-        sessionId="s1"
-        participants={[claimed, unclaimed]}
-        slotLimit={5}
-        locked={false}
-      />,
+      <InstansiRosterPanel sessionId="s1" participants={[claimed, unclaimed]} slotLimit={5} />,
       { wrapper },
     );
 
@@ -85,15 +80,9 @@ describe("InstansiRosterPanel", () => {
   it("removes a participant through the mutation", async () => {
     mockRemove.mockResolvedValue({ data: {} } as never);
 
-    render(
-      <InstansiRosterPanel
-        sessionId="s1"
-        participants={[unclaimed]}
-        slotLimit={5}
-        locked={false}
-      />,
-      { wrapper },
-    );
+    render(<InstansiRosterPanel sessionId="s1" participants={[unclaimed]} slotLimit={5} />, {
+      wrapper,
+    });
 
     fireEvent.click(screen.getByRole("button", { name: "Hapus" }));
 
@@ -101,7 +90,7 @@ describe("InstansiRosterPanel", () => {
   });
 
   it("keeps reset available on a claimed seat even after payment", () => {
-    render(<InstansiRosterPanel sessionId="s1" participants={[claimed]} slotLimit={5} locked />, {
+    render(<InstansiRosterPanel sessionId="s1" participants={[claimed]} slotLimit={5} />, {
       wrapper,
     });
 

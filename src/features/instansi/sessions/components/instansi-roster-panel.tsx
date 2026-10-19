@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Lock, Pencil, RotateCcw, Trash2, UserPlus, Users } from "lucide-react";
+import { Pencil, RotateCcw, Trash2, UserPlus, Users } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,16 +27,13 @@ interface InstansiRosterPanelProps {
   sessionId: string;
   participants: SessionParticipantRow[];
   slotLimit: number;
-  /** True once the invoice is paid — the roster is frozen (`batch_locked`). */
-  locked: boolean;
 }
 
-/** Roster list with add/swap/remove (UNPAID only) and per-seat reset. */
+/** Roster list with add/swap/remove + per-seat reset. Free to edit anytime. */
 export function InstansiRosterPanel({
   sessionId,
   participants,
   slotLimit,
-  locked,
 }: InstansiRosterPanelProps) {
   const mutations = useInstansiRosterMutations(sessionId);
   const [addOpen, setAddOpen] = useState(false);
@@ -59,24 +56,12 @@ export function InstansiRosterPanel({
           <Users className="size-4" aria-hidden />
           Daftar Peserta ({participants.length}/{slotLimit})
         </CardTitle>
-        <Button
-          size="sm"
-          disabled={locked || isFull}
-          title={locked ? "Roster terkunci setelah pembayaran" : undefined}
-          onClick={() => setAddOpen(true)}
-        >
+        <Button size="sm" disabled={isFull} onClick={() => setAddOpen(true)}>
           <UserPlus className="size-4" aria-hidden />
           Tambah
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
-        {locked && (
-          <p className="bg-muted text-muted-foreground flex items-center gap-2 rounded-md p-3 text-sm">
-            <Lock className="size-4 shrink-0" aria-hidden />
-            Batch sudah dibayar — daftar peserta dikunci. Hubungi admin bila perlu mengubahnya.
-          </p>
-        )}
-
         {participants.length === 0 ? (
           <p className="text-muted-foreground py-6 text-center text-sm">
             Belum ada peserta. Tambahkan dari daftar pegawai instansi.
@@ -101,13 +86,7 @@ export function InstansiRosterPanel({
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={locked}
-                    title={locked ? "Roster terkunci" : undefined}
-                    onClick={() => setSwapTarget(participant)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => setSwapTarget(participant)}>
                     <Pencil className="size-4" aria-hidden />
                     <span className="sr-only">Ganti</span>
                   </Button>
@@ -141,8 +120,6 @@ export function InstansiRosterPanel({
                   <Button
                     variant="ghost"
                     size="sm"
-                    disabled={locked}
-                    title={locked ? "Roster terkunci" : undefined}
                     onClick={() => mutations.remove.mutate(participant.id)}
                   >
                     <Trash2 className="size-4" aria-hidden />
