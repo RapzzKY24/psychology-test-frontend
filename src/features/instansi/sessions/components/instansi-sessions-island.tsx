@@ -7,7 +7,7 @@ import type { SessionSummary } from "@/lib/api/types";
 import { fetchInstansiSessions } from "../api";
 import { InstansiSessionsTable } from "./instansi-sessions-table";
 
-/** Client island — the list cache enables optimistic create/close. */
+/** Client island — the list cache enables optimistic close. */
 export function InstansiSessionsIsland({
   listKey,
   initial,
