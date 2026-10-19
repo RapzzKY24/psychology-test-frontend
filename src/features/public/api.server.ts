@@ -12,9 +12,12 @@ import type { ApiSuccess } from "@/lib/api/types/pagination";
 const PUBLIC_REVALIDATE = 300;
 
 export const fetchPublicTestsServer = cache(
-  (filters: { limit?: number; category?: string } = {}): Promise<ApiSuccess<PublicTest[]>> => {
+  (filters: { limit?: number; page?: number; category?: string } = {}): Promise<
+    ApiSuccess<PublicTest[]>
+  > => {
     const params = new URLSearchParams();
     params.set("limit", String(filters.limit ?? 12));
+    if (filters.page && filters.page > 1) params.set("page", String(filters.page));
     if (filters.category) params.set("category", filters.category);
     return apiFetchServer<PublicTest[]>(`/tests?${params.toString()}`, {
       revalidate: PUBLIC_REVALIDATE,

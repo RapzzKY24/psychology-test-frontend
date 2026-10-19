@@ -29,7 +29,7 @@ export function ResumeSessionView({
         <Button
           className="h-12 w-full text-base"
           disabled={!firstAttempt}
-          onClick={() => firstAttempt && router.push(`/tes/${firstAttempt}`)}
+          onClick={() => firstAttempt && router.push(`/tes/kerjakan/${firstAttempt}`)}
         >
           <PlayCircle className="size-5" aria-hidden />
           Lanjutkan Tes

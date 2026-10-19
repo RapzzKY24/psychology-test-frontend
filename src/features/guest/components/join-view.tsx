@@ -200,7 +200,7 @@ export function JoinView({ token, preview }: { token: string; preview: SessionPr
             <Button
               className="w-full"
               disabled={!saved}
-              onClick={() => firstAttempt && router.push(`/tes/${firstAttempt.id}`)}
+              onClick={() => firstAttempt && router.push(`/tes/kerjakan/${firstAttempt.id}`)}
             >
               Mulai Tes
             </Button>
