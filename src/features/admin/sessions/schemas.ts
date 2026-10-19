@@ -29,3 +29,49 @@ export const CreateSessionSchema = z.object({
 });
 
 export type CreateSessionInput = z.infer<typeof CreateSessionSchema>;
+
+/**
+ * Admin edit form (partial): the dialog is prefilled with the current values,
+ * so both fields are present; `buildSessionUpdatePayload` keeps only the ones
+ * the admin actually changed. expiresAt arrives as a datetime-local string.
+ */
+export const UpdateSessionFormSchema = z.object({
+  title: z.string().trim().min(1, "Judul wajib diisi.").max(200),
+  expiresAt: z
+    .string()
+    .min(1, "Waktu kedaluwarsa wajib diisi.")
+    .refine((v) => new Date(v).getTime() > Date.now(), "Waktu kedaluwarsa harus di masa depan."),
+});
+
+export type UpdateSessionFormInput = z.infer<typeof UpdateSessionFormSchema>;
+
+export interface SessionUpdatePayload {
+  title?: string;
+  expiresAt?: string;
+}
+
+/** ISO → `datetime-local` value in local time (what the browser input expects). */
+export function toDatetimeLocalValue(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/**
+ * Diffs the form against the session's current values and returns only the
+ * changed fields (`expiresAt` as ISO). Returns null when nothing changed.
+ */
+export function buildSessionUpdatePayload(
+  initial: { title: string; expiresAt: string },
+  values: UpdateSessionFormInput,
+): SessionUpdatePayload | null {
+  const payload: SessionUpdatePayload = {};
+  const title = values.title.trim();
+  if (title !== initial.title) payload.title = title;
+  // Compare at minute precision — the datetime-local input has no seconds, so
+  // an untouched expiry must not look "changed" just because of its seconds.
+  if (values.expiresAt !== toDatetimeLocalValue(initial.expiresAt)) {
+    payload.expiresAt = new Date(values.expiresAt).toISOString();
+  }
+  return payload.title === undefined && payload.expiresAt === undefined ? null : payload;
+}

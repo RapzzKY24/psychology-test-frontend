@@ -3,12 +3,14 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { QueryKey } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { asOptimistic, useOptimisticList } from "@/features/admin/hooks/use-optimistic-list";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
+import { qk } from "@/lib/api/query-keys";
 import type { SessionSummary } from "@/lib/api/types";
-import { closeSession, createSession } from "../api";
-import type { CreateSessionInput } from "../schemas";
+import { closeSession, createSession, updateSession } from "../api";
+import type { CreateSessionInput, SessionUpdatePayload } from "../schemas";
 
 export function useCreateSession(listKey: QueryKey, onCreated: (created: SessionSummary) => void) {
   const list = useOptimisticList<SessionSummary>(listKey);
@@ -77,5 +79,23 @@ export function useCloseSession(listKey: QueryKey, sessionId: string, onClosed: 
       onClosed();
     },
     onSettled: () => list.refetch(),
+  });
+}
+
+export function useUpdateSession(sessionId: string, onUpdated: () => void) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: SessionUpdatePayload) => {
+      const { data } = await updateSession(sessionId, payload);
+      return data;
+    },
+    meta: { silentError: true },
+    onSuccess: () => {
+      toast.success("Sesi diperbarui.");
+      void queryClient.invalidateQueries({ queryKey: qk.admin.sessions.all });
+      onUpdated();
+    },
+    onError: (error) => toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE),
   });
 }
