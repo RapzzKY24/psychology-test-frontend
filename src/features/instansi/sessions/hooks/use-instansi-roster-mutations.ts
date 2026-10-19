@@ -14,8 +14,8 @@ import {
 
 /**
  * Roster mutations for one batch. Every call refetches the session detail so
- * the participant rows and the invoice amount stay in sync (edits are only
- * allowed while the invoice is UNPAID — the server enforces `batch_locked`).
+ * the participant rows stay in sync. Edits are free anytime — they never touch
+ * the prepaid invoice amount or its VA.
  */
 export function useInstansiRosterMutations(sessionId: string) {
   const queryClient = useQueryClient();

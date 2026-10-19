@@ -31,7 +31,6 @@ export function InstansiSessionDetailIsland({
   });
 
   const { session, participants, attempts, invoice } = data;
-  const locked = invoice?.status !== "UNPAID";
 
   return (
     <div className="space-y-6">
@@ -76,7 +75,6 @@ export function InstansiSessionDetailIsland({
         sessionId={sessionId}
         participants={participants}
         slotLimit={session.slotLimit}
-        locked={locked}
       />
     </div>
   );
