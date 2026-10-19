@@ -53,7 +53,7 @@ export function RosterClaimView({ token, roster }: { token: string; roster: Rost
         participantName: result.participant.name,
         attemptIds: result.attempts.map((attempt) => attempt.id),
       });
-      router.push(`/tes/${first.id}`);
+      router.push(`/tes/kerjakan/${first.id}`);
     },
     (error) => {
       if (isApiError(error) && error.code === "seat_claimed") {

@@ -34,7 +34,7 @@ function AttemptCard({ attempt }: { attempt: MeAttemptItem }) {
       <CardContent>
         {inProgress && (
           <Link
-            href={`/tes/${attempt.id}`}
+            href={`/tes/kerjakan/${attempt.id}`}
             className="inline-flex rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground"
           >
             Lanjutkan Tes
