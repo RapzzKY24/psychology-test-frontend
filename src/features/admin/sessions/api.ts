@@ -1,7 +1,7 @@
 import { apiFetch } from "@/lib/api/client";
 import type { SessionSummary } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
-import type { CreateSessionInput } from "./schemas";
+import type { CreateSessionInput, SessionUpdatePayload } from "./schemas";
 
 export interface SessionFilters {
   page?: number;
@@ -20,12 +20,18 @@ export function fetchSessions(filters: SessionFilters = {}): Promise<ApiSuccess<
   return apiFetch<SessionSummary[]>(`/admin/sessions${buildQuery(filters)}`);
 }
 
-export function createSession(
-  input: CreateSessionInput,
-): Promise<ApiSuccess<SessionSummary>> {
+export function createSession(input: CreateSessionInput): Promise<ApiSuccess<SessionSummary>> {
   return apiFetch<SessionSummary>("/admin/sessions", { method: "POST", body: input });
 }
 
 export function closeSession(id: string): Promise<ApiSuccess<SessionSummary>> {
   return apiFetch<SessionSummary>(`/admin/sessions/${id}/close`, { method: "POST" });
+}
+
+/** `PATCH /admin/sessions/:id` — tidy the title and/or expiry (partial). */
+export function updateSession(
+  id: string,
+  payload: SessionUpdatePayload,
+): Promise<ApiSuccess<SessionSummary>> {
+  return apiFetch<SessionSummary>(`/admin/sessions/${id}`, { method: "PATCH", body: payload });
 }

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { CopyInviteButton } from "@/features/admin/sessions/components/copy-invite-button";
 import { CloseSessionButton } from "@/features/admin/sessions/components/close-session-button";
+import { EditSessionDialog } from "@/features/admin/sessions/components/edit-session-dialog";
 import { SessionStats } from "@/features/admin/sessions/components/session-stats";
 import { SessionParticipantsTable } from "@/features/admin/sessions/components/session-participants-table";
 import { fetchSessionDetailServer } from "@/features/admin/sessions/api.server";
@@ -35,6 +36,11 @@ export default async function SessionDetailPage({ params }: PageProps<"/admin/se
 
       <div className="flex flex-wrap items-center gap-3">
         <CopyInviteButton token={detail.session.token} label="Salin Tautan Undangan" />
+        <EditSessionDialog
+          sessionId={detail.session.id}
+          title={detail.session.title}
+          expiresAt={detail.session.expiresAt}
+        />
         {detail.session.status === "ACTIVE" && (
           <CloseSessionButton sessionId={detail.session.id} listKey={qk.admin.sessions.all} />
         )}
