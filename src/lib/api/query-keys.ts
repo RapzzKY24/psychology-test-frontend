@@ -40,6 +40,12 @@ export const qk = {
         ["admin", "tests", "list", filters ?? {}] as const,
       detail: (id: string) => ["admin", "tests", "detail", id] as const,
     },
+    articles: {
+      all: ["admin", "articles"] as const,
+      list: (filters?: { page?: number; status?: string; search?: string }) =>
+        ["admin", "articles", "list", filters ?? {}] as const,
+      detail: (id: string) => ["admin", "articles", "detail", id] as const,
+    },
     sessions: {
       all: ["admin", "sessions"] as const,
       list: (filters?: { page?: number }) => ["admin", "sessions", "list", filters ?? {}] as const,

@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ChartColumn,
   ClipboardList,
+  Newspaper,
   ReceiptText,
   Users,
   Wallet,
@@ -23,6 +24,7 @@ interface AdminModule {
 const MODULES: AdminModule[] = [
   { href: "/admin/users", title: "Pengguna", description: "Kelola akun dan role (ADMIN, PSYCHOLOGIST, PARTICIPANT).", icon: Users },
   { href: "/admin/tes", title: "Tes", description: "Test Builder: soal, interpretasi, publish & archive.", icon: ClipboardList },
+  { href: "/admin/artikel", title: "Artikel", description: "Tulis dan terbitkan artikel untuk halaman publik.", icon: Newspaper },
   { href: "/admin/institusi", title: "Institusi", description: "Data institusi klien B2B dan kontaknya.", icon: Building2 },
   { href: "/admin/sesi", title: "Sesi", description: "Sesi group, slot, PIN, dan tautan undangan.", icon: CalendarDays },
   { href: "/admin/pembayaran", title: "Pembayaran", description: "Verifikasi QRIS manual berdasarkan kode unik.", icon: Wallet },
