@@ -129,7 +129,7 @@ export function ArticleFormDialog({ mode, listKey, article, trigger }: ArticleFo
       }}
     >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+      <DialogContent className="max-h-[92vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{mode === "create" ? "Tulis Artikel" : "Edit Artikel"}</DialogTitle>
           <DialogDescription>
