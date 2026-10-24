@@ -8,6 +8,8 @@ import { z } from "zod";
 const envSchema = z.object({
   API_INTERNAL_URL: z.url().default("http://localhost:4000"),
   NEXT_PUBLIC_FEATURE_REPORTS: z.enum(["true", "false"]).default("false"),
+  /** Public WhatsApp number (digits, country code first) for the B2B page CTA. */
+  NEXT_PUBLIC_WA_NUMBER: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -21,3 +23,6 @@ export const env = parsed.data;
 
 /** Feature 08 (PDF/email) is not implemented server-side yet (ADR-010.6). */
 export const featureReportsEnabled = env.NEXT_PUBLIC_FEATURE_REPORTS === "true";
+
+/** Public WhatsApp contact number from env (`NEXT_PUBLIC_WA_NUMBER`, e.g. "6281234567890"). */
+export const whatsappNumber = env.NEXT_PUBLIC_WA_NUMBER ?? "";
