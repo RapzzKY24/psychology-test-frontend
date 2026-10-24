@@ -108,7 +108,7 @@ export function CreateTestButton() {
           Buat Tes
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Buat Tes Baru</DialogTitle>
           <DialogDescription>
