@@ -50,7 +50,7 @@ export function CreateSessionDialog({ listKey, tests, institutions }: CreateSess
           Buat Sesi
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Buat Sesi</DialogTitle>
           <DialogDescription>
