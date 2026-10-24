@@ -6,7 +6,7 @@ export const INVOICE_STATUS_LABEL: Record<InvoiceStatus, string> = {
   CANCELLED: "Dibatalkan",
 };
 
-/** GDC bank codes we display a friendly name for (fallback: raw code). */
+/** VA bank codes we display a friendly name for (fallback: raw code). */
 export const BANK_CODE_LABEL: Record<string, string> = {
   "014": "BCA",
 };
