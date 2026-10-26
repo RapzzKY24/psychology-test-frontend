@@ -1,14 +1,16 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle2, Clock, Loader2, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, Loader2, RefreshCw, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatIdr } from "@/lib/format/format-idr";
 import type { CheckoutStatusResult } from "@/lib/api/types";
 import { SETTLED_HINTS } from "../constants";
 import { useCheckoutStatus } from "../hooks/use-checkout-status";
+import { useReconcileCheckout } from "../hooks/use-reconcile-checkout";
 
 type View = "paid" | "verifying" | "waiting" | "failed";
 
@@ -17,6 +19,11 @@ interface CheckoutResultProps {
   /** `transaction_status` from the Snap finish redirect — a hint, never proof. */
   hint?: string;
 }
+
+/** A link out of the page, or an in-place gateway check. */
+type PrimaryAction =
+  | { kind: "link"; href: string; label: string }
+  | { kind: "reconcile"; label: string };
 
 const VIEW: Record<View, { title: string; body: string }> = {
   paid: {
@@ -45,32 +52,33 @@ function resolveView(checkout: CheckoutStatusResult, hint?: string): View {
   return settled ? "verifying" : "waiting";
 }
 
-function primaryAction(checkout: CheckoutStatusResult, view: View) {
+function primaryAction(checkout: CheckoutStatusResult, view: View): PrimaryAction {
   if (view === "paid") {
     if (checkout.kind === "invoice") {
       return {
+        kind: "link",
         href: checkout.sessionId ? `/instansi/sesi/${checkout.sessionId}` : "/instansi/sesi",
         label: "Isi peserta sekarang",
       };
     }
-    return { href: "/dashboard", label: "Mulai tes" };
+    return { kind: "link", href: "/dashboard", label: "Mulai tes" };
   }
+  if (view === "verifying") return { kind: "reconcile", label: "Cek status sekarang" };
   if (view === "waiting" && checkout.kind === "invoice") {
-    return { href: `/instansi/tagihan/${checkout.id}`, label: "Lihat tagihan" };
+    return { kind: "link", href: `/instansi/tagihan/${checkout.id}`, label: "Lihat tagihan" };
   }
-  if (view === "failed") {
-    return { href: "/tes", label: "Beli lagi" };
-  }
-  return {
-    href: checkout.kind === "invoice" ? "/instansi/sesi" : "/dashboard",
-    label: "Ke dashboard",
-  };
+  if (view === "failed") return { kind: "link", href: "/tes", label: "Beli lagi" };
+  return { kind: "link", href: "/dashboard", label: "Ke dashboard" };
 }
 
 /**
  * Payment result page. It never claims success from the redirect alone: the
  * invoice/order status in the database decides, the Snap hint only explains why
  * a paid transaction may still read as unpaid.
+ *
+ * An unpaid checkout is checked against the gateway once on open — the Snap
+ * webhook cannot reach a local host, so without this the page would sit on
+ * "waiting" until the recovery pass happened to run.
  */
 export function CheckoutResult({ initial, hint }: CheckoutResultProps) {
   const query = useCheckoutStatus(initial);
@@ -78,6 +86,19 @@ export function CheckoutResult({ initial, hint }: CheckoutResultProps) {
   const view = resolveView(checkout, hint);
   const copy = VIEW[view];
   const action = primaryAction(checkout, view);
+  const reconcile = useReconcileCheckout(checkout.id);
+  const { mutate: reconcileNow, isPending } = reconcile;
+
+  const checkedOnOpen = useRef(false);
+  useEffect(() => {
+    if (checkedOnOpen.current || checkout.status !== "UNPAID") return;
+    checkedOnOpen.current = true;
+    reconcileNow();
+  }, [checkout.status, reconcileNow]);
+
+  const dashboardHref = checkout.kind === "invoice" ? "/instansi" : "/dashboard";
+  // Only hidden when the primary action already is that dashboard link.
+  const showDashboardLink = action.kind === "reconcile" || action.href !== dashboardHref;
 
   return (
     <Card className="mx-auto max-w-md">
@@ -114,12 +135,26 @@ export function CheckoutResult({ initial, hint }: CheckoutResultProps) {
           </div>
         </div>
 
-        <Button asChild className="w-full">
-          <Link href={action.href}>{action.label}</Link>
-        </Button>
-        <Button asChild variant="ghost" className="w-full">
-          <Link href={checkout.kind === "invoice" ? "/instansi" : "/dashboard"}>Ke dashboard</Link>
-        </Button>
+        {action.kind === "reconcile" ? (
+          <Button className="w-full" onClick={() => reconcileNow()} disabled={isPending}>
+            {isPending ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+            ) : (
+              <RefreshCw className="size-4" aria-hidden />
+            )}
+            {isPending ? "Mengecek status…" : action.label}
+          </Button>
+        ) : (
+          <Button asChild className="w-full">
+            <Link href={action.href}>{action.label}</Link>
+          </Button>
+        )}
+
+        {showDashboardLink && (
+          <Button asChild variant="ghost" className="w-full">
+            <Link href={dashboardHref}>Ke dashboard</Link>
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

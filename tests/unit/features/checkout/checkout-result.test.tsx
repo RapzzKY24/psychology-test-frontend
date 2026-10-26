@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { CheckoutResult } from "@/features/checkout/components/checkout-result";
+import { reconcileCheckoutStatus } from "@/features/checkout/api";
 import type { CheckoutStatusResult } from "@/lib/api/types";
 
 vi.mock("next/image", () => ({
@@ -12,6 +13,7 @@ vi.mock("next/image", () => ({
 }));
 vi.mock("@/features/checkout/api", () => ({
   fetchCheckoutStatus: vi.fn(),
+  reconcileCheckoutStatus: vi.fn(),
 }));
 
 function wrapper({ children }: { children: ReactNode }) {
@@ -55,6 +57,16 @@ describe("CheckoutResult", () => {
     expect(screen.queryByText("Pembayaran berhasil")).toBeNull();
   });
 
+  it("offers a gateway check instead of a second dashboard button while verifying", () => {
+    render(
+      <CheckoutResult initial={{ ...invoice, status: "UNPAID", paidAt: null }} hint="settlement" />,
+      { wrapper },
+    );
+
+    expect(screen.getByRole("button", { name: /Cek status sekarang/ })).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "Ke dashboard" })).toHaveLength(1);
+  });
+
   it("points an unpaid invoice back to its payment page", () => {
     render(<CheckoutResult initial={{ ...invoice, status: "UNPAID", paidAt: null }} />, {
       wrapper,
@@ -64,6 +76,28 @@ describe("CheckoutResult", () => {
     expect(screen.getByRole("link", { name: "Lihat tagihan" }).getAttribute("href")).toBe(
       "/instansi/tagihan/inv1",
     );
+  });
+
+  it("checks the gateway once when an unpaid checkout is opened", async () => {
+    vi.mocked(reconcileCheckoutStatus).mockResolvedValue({
+      data: { ...invoice, status: "PAID", paidAt: "2026-10-26T07:53:51.000Z" },
+      meta: undefined,
+    } as never);
+
+    render(<CheckoutResult initial={{ ...invoice, status: "UNPAID", paidAt: null }} />, {
+      wrapper,
+    });
+
+    await waitFor(() => expect(reconcileCheckoutStatus).toHaveBeenCalledWith("inv1"));
+    expect(reconcileCheckoutStatus).toHaveBeenCalledTimes(1);
+    // The patched status replaces the stale one without a manual reload.
+    await waitFor(() => expect(screen.getByText("Pembayaran berhasil")).toBeTruthy());
+  });
+
+  it("does not ask the gateway about a checkout that is already final", () => {
+    render(<CheckoutResult initial={invoice} />, { wrapper });
+
+    expect(reconcileCheckoutStatus).not.toHaveBeenCalled();
   });
 
   it("reports a cancelled payment as failed", () => {
