@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Building2, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, Building2, MessageCircle, ShieldCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { buildWhatsAppLink } from "@/features/public/whatsapp";
+import { getServerSession } from "@/lib/api/server";
 import { whatsappNumber } from "@/lib/env";
 
 export const metadata: Metadata = {
@@ -11,8 +12,16 @@ export const metadata: Metadata = {
   description: "Paket tes psikologi untuk instansi, rekrutmen, dan pengembangan karyawan.",
 };
 
-export default function UntukPerusahaanPage() {
-  const waLink = buildWhatsAppLink(whatsappNumber, "Halo, saya ingin informasi paket tes untuk perusahaan.");
+/**
+ * Pre-filled consultation text. The two bracketed parts are meant to be
+ * replaced by the sender inside WhatsApp, so the first reply already has the
+ * company name and the topic.
+ */
+const WA_TEMPLATE = "Saya dari [nama perusahaan] ingin mengkonsultasikan [topik].";
+
+export default async function UntukPerusahaanPage() {
+  const session = await getServerSession();
+  const waLink = buildWhatsAppLink(whatsappNumber, WA_TEMPLATE);
 
   const perks = [
     {
@@ -48,16 +57,18 @@ export default function UntukPerusahaanPage() {
           karyawan.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
-          <Button asChild size="lg" className="rounded-full">
-            <Link href="/daftar">Daftar Instansi</Link>
-          </Button>
-          {whatsappNumber ? (
-            <Button asChild size="lg" variant="outline" className="rounded-full">
-              <a href={waLink} target="_blank" rel="noopener noreferrer">
-                Chat via WhatsApp
-              </a>
+          {/* Signed-in visitors already have an account: registering again is noise. */}
+          {session ? null : (
+            <Button asChild size="lg" className="rounded-full">
+              <Link href="/daftar">Daftar Instansi</Link>
             </Button>
-          ) : null}
+          )}
+          <Button asChild size="lg" variant="outline" className="rounded-full">
+            <a href={waLink} target="_blank" rel="noopener noreferrer">
+              <MessageCircle className="size-4" aria-hidden />
+              Konsultasi via WhatsApp
+            </a>
+          </Button>
         </div>
       </section>
 
@@ -90,10 +101,29 @@ export default function UntukPerusahaanPage() {
             </li>
           ))}
         </ol>
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+        >
           Kembali ke beranda
           <ArrowRight className="size-4" aria-hidden />
         </Link>
+      </section>
+
+      <section className="rounded-2xl border bg-card p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
+        <div className="space-y-1">
+          <h2 className="font-semibold">Belum yakin paketnya?</h2>
+          <p className="text-sm text-muted-foreground">
+            Ceritakan kebutuhan tim Anda — jumlah peserta, jenis posisi, dan tenggatnya. Kami bantu
+            pilih paket yang paling pas.
+          </p>
+        </div>
+        <Button asChild className="mt-4 shrink-0 rounded-full sm:mt-0">
+          <a href={waLink} target="_blank" rel="noopener noreferrer">
+            <MessageCircle className="size-4" aria-hidden />
+            Konsultasi via WhatsApp
+          </a>
+        </Button>
       </section>
     </main>
   );
