@@ -1,16 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { ImageIcon, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { isApiError } from "@/lib/api/client";
 import type { AdminTest } from "@/lib/api/types";
-import { updateTest, uploadTestCover } from "../api";
-
-const MAX_BYTES = 2 * 1024 * 1024;
-const ALLOWED = ["image/png", "image/jpeg"];
+import { useCoverUpload } from "../hooks/use-cover-upload";
 
 interface CoverImageUploadProps {
   testId: string;
@@ -20,72 +15,13 @@ interface CoverImageUploadProps {
   onChanged: (updated: AdminTest) => void;
 }
 
-/**
- * Catalog cover. Uploads immediately (one request per file) and stores the
- * returned test, so the cover never depends on the settings form being saved.
- */
+/** Catalog cover picker — preview, upload and removal live in the hook. */
 export function CoverImageUpload({ testId, value, disabled, onChanged }: CoverImageUploadProps) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-
-  useEffect(() => {
-    return () => {
-      if (preview) URL.revokeObjectURL(preview);
-    };
-  }, [preview]);
-
+  const { inputRef, preview, error, pending, pick, clear } = useCoverUpload({
+    testId,
+    onChanged,
+  });
   const displayUrl = preview ?? value;
-
-  const pick = async (file: File | undefined) => {
-    setError(null);
-    if (!file) return;
-    if (!ALLOWED.includes(file.type)) {
-      setError("Format file tidak didukung (PNG/JPG).");
-      return;
-    }
-    if (file.size > MAX_BYTES) {
-      setError("Ukuran file terlalu besar (maks 2MB).");
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(file);
-    setPreview(objectUrl);
-    setPending(true);
-    try {
-      const { data } = await uploadTestCover(testId, file);
-      onChanged(data);
-      setPreview(null);
-      URL.revokeObjectURL(objectUrl);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal mengunggah gambar.");
-      setPreview(null);
-      URL.revokeObjectURL(objectUrl);
-    } finally {
-      setPending(false);
-      if (inputRef.current) inputRef.current.value = "";
-    }
-  };
-
-  const clear = async () => {
-    setError(null);
-    setPending(true);
-    try {
-      const { data } = await updateTest(testId, { imageUrl: null });
-      onChanged(data);
-    } catch (e) {
-      setError(
-        isApiError(e) && e.isNotFound
-          ? "Tes tidak ditemukan."
-          : e instanceof Error
-            ? e.message
-            : "Gagal menghapus gambar.",
-      );
-    } finally {
-      setPending(false);
-    }
-  };
 
   return (
     <Field data-invalid={Boolean(error)}>
