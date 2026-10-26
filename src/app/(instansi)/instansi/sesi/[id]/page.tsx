@@ -9,6 +9,7 @@ import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
 import { CloseInstansiSessionButton } from "@/features/instansi/sessions/components/close-instansi-session-button";
+import { InvoiceDialogButton } from "@/features/instansi/sessions/components/invoice-dialog-button";
 
 export const metadata: Metadata = { title: "Detail Sesi" };
 
@@ -36,6 +37,7 @@ export default async function InstansiSessionDetailPage({
       />
 
       <div className="flex flex-wrap items-center gap-3">
+        <InvoiceDialogButton sessionId={detail.session.id} initial={detail} />
         <CopyInviteButton token={detail.session.token} label="Salin Tautan Undangan" />
         {detail.session.status === "ACTIVE" && (
           <CloseInstansiSessionButton sessionId={detail.session.id} />
