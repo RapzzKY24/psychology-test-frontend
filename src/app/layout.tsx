@@ -20,6 +20,21 @@ export const metadata: Metadata = {
   },
   description:
     "Platform tes psikologi: katalog tes, pengerjaan online, verifikasi psikolog, dan laporan resmi.",
+  // The icon set lives in /public/logo-website (generated package): .ico for
+  // legacy tabs, PNGs for the sized slots, and the manifest for installs.
+  icons: {
+    icon: [
+      { url: "/logo-website/favicon.ico", sizes: "any" },
+      { url: "/logo-website/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/logo-website/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: {
+      url: "/logo-website/apple-touch-icon.png",
+      sizes: "180x180",
+      type: "image/png",
+    },
+  },
+  manifest: "/logo-website/site.webmanifest",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
