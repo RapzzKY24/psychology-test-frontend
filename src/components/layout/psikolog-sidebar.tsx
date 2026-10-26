@@ -1,9 +1,17 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
-import { Brain, ClipboardCheck, LayoutDashboard, LogOut, UserRound } from "lucide-react";
+import {
+  ClipboardCheck,
+  ExternalLink,
+  Globe,
+  LayoutDashboard,
+  LogOut,
+  UserRound,
+} from "lucide-react";
 import { useSignOut } from "@/features/auth/hooks/use-sign-out";
 import { cn } from "@/lib/utils";
 
@@ -30,17 +38,16 @@ function isActive(pathname: string, href: string): boolean {
 
 function BrandMark() {
   return (
-    <div className="flex items-center gap-2.5 px-3 py-4">
-      <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-        <Brain className="size-5" aria-hidden />
-      </span>
-      <div>
-        <p className="flex items-center gap-1.5 text-sm font-semibold leading-tight">
-          Psikotes
-          <span aria-hidden className="size-1.5 rounded-full bg-chart-3" />
-        </p>
-        <p className="text-xs text-muted-foreground leading-tight">Dasbor Psikolog</p>
-      </div>
+    <div className="px-3 py-4">
+      <Image
+        src="/logo/logopsikologi.jpeg"
+        alt="mypsikolog.id"
+        width={173}
+        height={50}
+        priority
+        className="h-8 w-auto"
+      />
+      <p className="mt-2 text-xs text-muted-foreground leading-tight">Dasbor Psikolog</p>
     </div>
   );
 }
@@ -60,13 +67,34 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
       <span
         className={cn(
           "flex size-7 shrink-0 items-center justify-center rounded-md",
-          active ? "bg-primary/15 text-primary" : "text-muted-foreground group-hover:text-foreground",
+          active
+            ? "bg-primary/15 text-primary"
+            : "text-muted-foreground group-hover:text-foreground",
         )}
       >
         <Icon className="size-4" aria-hidden />
       </span>
       {item.label}
     </Link>
+  );
+}
+
+function PublicSiteLink() {
+  return (
+    <div className="border-t pt-2">
+      <Link
+        href="/"
+        target="_blank"
+        rel="noreferrer"
+        className="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      >
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-md">
+          <Globe className="size-4" aria-hidden />
+        </span>
+        Website Publik
+        <ExternalLink className="ml-auto size-3.5 opacity-60" aria-hidden />
+      </Link>
+    </div>
   );
 }
 
@@ -85,6 +113,7 @@ function NavGroups({ pathname }: { pathname: string }) {
           </div>
         </div>
       ))}
+      <PublicSiteLink />
     </nav>
   );
 }
