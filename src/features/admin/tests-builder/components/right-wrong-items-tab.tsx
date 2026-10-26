@@ -42,12 +42,14 @@ export function RightWrongItemsTab({
   const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
   const watchedItems = form.watch("items");
   const active = Math.min(builder.activeItem, Math.max(watchedItems.length - 1, 0));
-  const activeContent = form.watch(`items.${active}.content`) as unknown as {
-    question?: string;
-    imageUrl?: string | null;
-    options?: string[];
-    correctIndex?: number;
-  } | undefined;
+  const activeContent = form.watch(`items.${active}.content`) as unknown as
+    | {
+        question?: string;
+        imageUrl?: string | null;
+        options?: string[];
+        correctIndex?: number;
+      }
+    | undefined;
 
   const move = (from: number, to: number) => {
     if (to < 0 || to >= watchedItems.length) return;
@@ -108,9 +110,12 @@ export function RightWrongItemsTab({
         </div>
         <ol className="max-h-[60vh] space-y-1 overflow-y-auto">
           {itemsArray.fields.map((field, idx) => {
-            const c = watchedItems[idx]?.content as unknown as { question?: string; options?: string[] } | undefined;
+            const c = watchedItems[idx]?.content as unknown as
+              { question?: string; options?: string[] } | undefined;
             const label = c?.question?.trim() || c?.options?.[0]?.trim() || "(kosong)";
-            const filled = Boolean(c?.question?.trim() || (c?.options && c.options.every((o) => o.trim())));
+            const filled = Boolean(
+              c?.question?.trim() || (c?.options && c.options.every((o) => o.trim())),
+            );
             return (
               <li key={field.id}>
                 <button
@@ -205,14 +210,22 @@ export function RightWrongItemsTab({
               testId={testId}
               value={activeContent?.imageUrl ?? null}
               onChange={(url) =>
-                form.setValue(`items.${active}.content.imageUrl`, url as never, { shouldDirty: true })
+                form.setValue(`items.${active}.content.imageUrl`, url as never, {
+                  shouldDirty: true,
+                })
               }
             />
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <FieldLabel>Pilihan jawaban (2–6)</FieldLabel>
-                <Button type="button" variant="outline" size="sm" disabled={locked || (activeContent?.options?.length ?? 0) >= 6} onClick={addOption}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={locked || (activeContent?.options?.length ?? 0) >= 6}
+                  onClick={addOption}
+                >
                   <Plus className="size-4" /> Tambah opsi
                 </Button>
               </div>
@@ -220,8 +233,11 @@ export function RightWrongItemsTab({
                 <Field
                   key={idx}
                   data-invalid={
-                    (form.formState.errors.items?.[active]?.content as unknown as { options?: unknown[] })
-                      ?.options?.[idx]
+                    (
+                      form.formState.errors.items?.[active]?.content as unknown as {
+                        options?: unknown[];
+                      }
+                    )?.options?.[idx]
                       ? true
                       : undefined
                   }
@@ -263,8 +279,11 @@ export function RightWrongItemsTab({
                     </Button>
                   </div>
                   {Boolean(
-                    (form.formState.errors.items?.[active]?.content as unknown as { options?: unknown[] })
-                      ?.options?.[idx],
+                    (
+                      form.formState.errors.items?.[active]?.content as unknown as {
+                        options?: unknown[];
+                      }
+                    )?.options?.[idx],
                   ) && (
                     <FieldError
                       errors={[
@@ -278,19 +297,24 @@ export function RightWrongItemsTab({
                   )}
                 </Field>
               ))}
-              <p className="text-xs text-muted-foreground">Pilih radio untuk kunci jawaban. Minimal 2 opsi, maksimal 6.</p>
+              <p className="text-xs text-muted-foreground">
+                Pilih radio untuk kunci jawaban. Minimal 2 opsi, maksimal 6.
+              </p>
             </div>
 
             {form.formState.errors.items?.[active]?.content && (
               <p className="text-sm text-destructive">
-                {(form.formState.errors.items[active]?.content as unknown as { message?: string })?.message ??
-                  "Periksa field yang bertanda merah."}
+                {(form.formState.errors.items[active]?.content as unknown as { message?: string })
+                  ?.message ?? "Periksa field yang bertanda merah."}
               </p>
             )}
           </>
         )}
 
-        <AlertDialog open={confirmRemove !== null} onOpenChange={(o) => !o && setConfirmRemove(null)}>
+        <AlertDialog
+          open={confirmRemove !== null}
+          onOpenChange={(o) => !o && setConfirmRemove(null)}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Hapus item #{(confirmRemove ?? 0) + 1}?</AlertDialogTitle>

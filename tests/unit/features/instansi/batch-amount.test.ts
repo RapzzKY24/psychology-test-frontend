@@ -8,6 +8,7 @@ function test(price: number, id = "t1"): InstansiTestOption {
     slug: id,
     name: `Tes ${id}`,
     description: "",
+    imageUrl: null,
     category: "PERSONALITY",
     price,
     estimatedDurationMin: 30,

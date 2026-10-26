@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -12,15 +13,18 @@ import { formatIdr } from "@/lib/format/format-idr";
  * price). Shared by the landing preview and the /tes catalog. The buy action is
  * injected so the catalog can wire it per-role without duplicating the card.
  */
-export function TestCard({
-  test,
-  buySlot,
-}: {
-  test: PublicTest;
-  buySlot?: ReactNode;
-}) {
+export function TestCard({ test, buySlot }: { test: PublicTest; buySlot?: ReactNode }) {
   return (
     <Card className="h-full rounded-2xl shadow-sm transition-shadow hover:shadow-md">
+      {test.imageUrl && (
+        <Image
+          src={test.imageUrl}
+          alt={test.name}
+          width={640}
+          height={360}
+          className="aspect-[16/9] w-full object-cover"
+        />
+      )}
       <CardHeader>
         <Badge variant="secondary" className="w-fit bg-primary/10 text-primary">
           {TEST_CATEGORY_LABELS[test.category]}

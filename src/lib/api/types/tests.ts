@@ -6,6 +6,8 @@ export interface PublicTest {
   slug: string;
   name: string;
   description: string;
+  /** Cover image path (`/uploads/test-covers/...`); null when not uploaded. */
+  imageUrl: string | null;
   category: TestCategory;
   price: number;
   estimatedDurationMin: number;

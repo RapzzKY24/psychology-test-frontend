@@ -109,7 +109,9 @@ export function ItemImageUpload({ testId, value, onChange }: ItemImageUploadProp
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed bg-white px-4 py-8 text-center">
             <ImageIcon className="size-8 text-muted-foreground" aria-hidden />
-            <p className="text-sm text-muted-foreground">Belum ada gambar. Unggah PNG/JPG maks 2MB.</p>
+            <p className="text-sm text-muted-foreground">
+              Belum ada gambar. Unggah PNG/JPG maks 2MB.
+            </p>
           </div>
         )}
         <div className="mt-3 flex gap-2">

@@ -30,6 +30,7 @@ import { qk } from "@/lib/api/query-keys";
 import type { AdminTest, AdminTestDetail, TestCategory } from "@/lib/api/types";
 import { updateTest } from "../api";
 import { TestSettingsSchema } from "../schemas";
+import { CoverImageUpload } from "./cover-image-upload";
 import type { TestSettingsInput } from "../schemas";
 
 const CATEGORY_LABEL: Record<TestCategory, string> = {
@@ -119,7 +120,12 @@ export function SettingsModal({ detail, locked, onSaved, children }: SettingsMod
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="settings-name">Nama tes</FieldLabel>
-                <Input {...field} id="settings-name" disabled={locked} aria-invalid={fieldState.invalid} />
+                <Input
+                  {...field}
+                  id="settings-name"
+                  disabled={locked}
+                  aria-invalid={fieldState.invalid}
+                />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
@@ -158,6 +164,18 @@ export function SettingsModal({ detail, locked, onSaved, children }: SettingsMod
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
+          />
+          <CoverImageUpload
+            testId={detail.id}
+            value={detail.imageUrl}
+            disabled={locked}
+            onChanged={(updated) => {
+              void queryClient.invalidateQueries({ queryKey: qk.admin.tests.all });
+              void queryClient.invalidateQueries({
+                queryKey: qk.admin.tests.detail(detail.id),
+              });
+              onSaved(updated);
+            }}
           />
           <div className="grid grid-cols-3 gap-4">
             <Controller

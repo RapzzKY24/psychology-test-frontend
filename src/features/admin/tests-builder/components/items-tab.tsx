@@ -71,8 +71,7 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
   const watchedItems = form.watch("items");
   const active = Math.min(builder.activeItem, Math.max(watchedItems.length - 1, 0));
   const activeContent = form.watch(`items.${active}.content`) as unknown as
-    | { words: string[]; mostMapping: string[]; leastMapping: string[] }
-    | undefined;
+    { words: string[]; mostMapping: string[]; leastMapping: string[] } | undefined;
 
   const move = (from: number, to: number) => {
     if (to < 0 || to >= watchedItems.length) return;
@@ -135,7 +134,9 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
                   >
                     {idx + 1}
                   </span>
-                  <span className="truncate">{words.filter(Boolean).join(" · ") || "(kosong)"}</span>
+                  <span className="truncate">
+                    {words.filter(Boolean).join(" · ") || "(kosong)"}
+                  </span>
                 </button>
               </li>
             );
@@ -209,10 +210,15 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
 
             <div className="space-y-4 rounded-lg border p-4">
               <p className="text-sm font-medium">
-                Mapping per kata <span className="text-muted-foreground">(D Dominance · I Influence · S Steadiness · C Compliance · * netral)</span>
+                Mapping per kata{" "}
+                <span className="text-muted-foreground">
+                  (D Dominance · I Influence · S Steadiness · C Compliance · * netral)
+                </span>
               </p>
               <div className="space-y-2">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Most</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Most
+                </p>
                 {[0, 1, 2, 3].map((wordIdx) => (
                   <div key={wordIdx} className="flex flex-wrap items-center gap-3">
                     <span className="w-20 text-sm text-muted-foreground">Kata {wordIdx + 1}</span>
@@ -222,9 +228,13 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
                       value={(activeContent?.mostMapping[wordIdx] ?? "D") as never}
                       disabled={locked}
                       onChange={(dim) =>
-                        form.setValue(`items.${active}.content.mostMapping.${wordIdx}`, dim as never, {
-                          shouldDirty: true,
-                        })
+                        form.setValue(
+                          `items.${active}.content.mostMapping.${wordIdx}`,
+                          dim as never,
+                          {
+                            shouldDirty: true,
+                          },
+                        )
                       }
                     />
                   </div>
@@ -232,7 +242,9 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Least</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Least
+                  </p>
                   <Button
                     type="button"
                     variant="ghost"
@@ -259,9 +271,13 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
                       value={(activeContent?.leastMapping[wordIdx] ?? "D") as never}
                       disabled={locked}
                       onChange={(dim) =>
-                        form.setValue(`items.${active}.content.leastMapping.${wordIdx}`, dim as never, {
-                          shouldDirty: true,
-                        })
+                        form.setValue(
+                          `items.${active}.content.leastMapping.${wordIdx}`,
+                          dim as never,
+                          {
+                            shouldDirty: true,
+                          },
+                        )
                       }
                     />
                   </div>
@@ -275,7 +291,10 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
           </>
         )}
 
-        <AlertDialog open={confirmRemove !== null} onOpenChange={(o) => !o && setConfirmRemove(null)}>
+        <AlertDialog
+          open={confirmRemove !== null}
+          onOpenChange={(o) => !o && setConfirmRemove(null)}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Hapus item #{(confirmRemove ?? 0) + 1}?</AlertDialogTitle>

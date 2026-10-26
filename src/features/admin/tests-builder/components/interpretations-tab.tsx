@@ -20,7 +20,8 @@ export function InterpretationsTab({
   const { form, interpretationsArray } = builder;
   const watched = form.watch("interpretations");
   // RIGHT_WRONG_NORM uses RAW_0..RAW_n, DISC uses 1..40 — pull count from builder
-  const scorerType = (builder as unknown as { scorerType?: string }).scorerType ?? "FORCED_CHOICE_DISC";
+  const scorerType =
+    (builder as unknown as { scorerType?: string }).scorerType ?? "FORCED_CHOICE_DISC";
   const itemCount = form.watch("items")?.length;
   const patternCodes = getPatternCodes(scorerType, itemCount);
   const stat = coverage(watched, scorerType, itemCount);
@@ -105,7 +106,11 @@ export function InterpretationsTab({
             <p className="text-sm text-muted-foreground">
               Belum ada interpretasi untuk pola {builder.activePattern}.
             </p>
-            <Button className="mt-3" disabled={locked} onClick={() => createRow(builder.activePattern)}>
+            <Button
+              className="mt-3"
+              disabled={locked}
+              onClick={() => createRow(builder.activePattern)}
+            >
               <Plus className="size-4" aria-hidden />
               Buat interpretasi
             </Button>

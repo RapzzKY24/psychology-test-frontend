@@ -12,6 +12,7 @@ const test: PublicTest = {
   slug: "disc",
   name: "Tes DISC",
   description: "Mengukur gaya kerja dan komunikasi.",
+  imageUrl: null,
   category: "WORK_STYLE",
   price: 150000,
   estimatedDurationMin: 15,
@@ -40,6 +41,19 @@ describe("TestCard", () => {
   it("renders an injected buy action", () => {
     render(<TestCard test={test} buySlot={<button type="button">Beli</button>} />);
     expect(screen.getByRole("button", { name: "Beli" })).toBeTruthy();
+  });
+
+  it("shows the cover when the test has one", () => {
+    render(<TestCard test={{ ...test, imageUrl: "/uploads/test-covers/disc.png" }} />);
+
+    const cover = screen.getByRole("img", { name: "Tes DISC" });
+    expect(cover.getAttribute("src")).toContain("test-covers");
+  });
+
+  it("renders no image area when the cover is empty", () => {
+    render(<TestCard test={test} />);
+
+    expect(screen.queryByRole("img", { name: "Tes DISC" })).toBeNull();
   });
 });
 

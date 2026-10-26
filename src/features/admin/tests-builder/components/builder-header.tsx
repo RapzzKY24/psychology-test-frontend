@@ -26,7 +26,12 @@ interface BuilderHeaderProps {
   onSettingsSaved: (updated: AdminTest) => void;
 }
 
-export function BuilderHeader({ detail, displayName, builder, onSettingsSaved }: BuilderHeaderProps) {
+export function BuilderHeader({
+  detail,
+  displayName,
+  builder,
+  onSettingsSaved,
+}: BuilderHeaderProps) {
   return (
     <header className="sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b bg-background/95 px-6 py-4 backdrop-blur">
       <Link

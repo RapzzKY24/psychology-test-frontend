@@ -152,9 +152,7 @@ export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
         await invalidate();
       } catch (error) {
         if (isApiError(error)) {
-          const missingDetail = error.details?.find((d) =>
-            d.startsWith("missing pattern codes:"),
-          );
+          const missingDetail = error.details?.find((d) => d.startsWith("missing pattern codes:"));
           if (missingDetail) {
             const codes = missingDetail
               .replace("missing pattern codes: ", "")

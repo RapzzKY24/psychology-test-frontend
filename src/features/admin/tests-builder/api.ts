@@ -1,10 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import type {
-  AdminTest,
-  AdminTestDetail,
-  TestCategory,
-  TestStatus,
-} from "@/lib/api/types";
+import type { AdminTest, AdminTestDetail, TestCategory, TestStatus } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { CreateTestInput } from "./schemas";
 
@@ -45,7 +40,10 @@ export function createTest(input: CreateTestInput): Promise<ApiSuccess<AdminTest
   return apiFetch<AdminTest>("/admin/tests", { method: "POST", body: input });
 }
 
-export type UpdateTestInput = Partial<Omit<CreateTestInput, "scorerType">>;
+export type UpdateTestInput = Partial<Omit<CreateTestInput, "scorerType">> & {
+  /** Cover path from the uploader; `null` clears it. */
+  imageUrl?: string | null;
+};
 
 export function updateTest(id: string, input: UpdateTestInput): Promise<ApiSuccess<AdminTest>> {
   return apiFetch<AdminTest>(`/admin/tests/${id}`, { method: "PATCH", body: input });
@@ -79,13 +77,11 @@ export function archiveTest(id: string): Promise<ApiSuccess<AdminTest>> {
   return apiFetch<AdminTest>(`/admin/tests/${id}/archive`, { method: "POST" });
 }
 
-export async function uploadItemImage(
-  testId: string,
-  file: File,
-): Promise<ApiSuccess<{ imageUrl: string }>> {
+/** Multipart POST — the JSON client cannot carry a File. */
+async function uploadImage<T>(url: string, file: File): Promise<ApiSuccess<T>> {
   const form = new FormData();
   form.append("file", file, file.name || "image.png");
-  const response = await fetch(`/api/v1/admin/tests/${testId}/items/image`, {
+  const response = await fetch(url, {
     method: "POST",
     body: form,
     credentials: "include",
@@ -97,5 +93,17 @@ export async function uploadItemImage(
     throw parseErrorResponse(response.status, payload);
   }
   const { unwrapEnvelope } = await import("@/lib/api/error");
-  return unwrapEnvelope<{ imageUrl: string }>(payload);
+  return unwrapEnvelope<T>(payload);
+}
+
+export function uploadItemImage(
+  testId: string,
+  file: File,
+): Promise<ApiSuccess<{ imageUrl: string }>> {
+  return uploadImage<{ imageUrl: string }>(`/api/v1/admin/tests/${testId}/items/image`, file);
+}
+
+/** Stores the catalog cover and returns the updated test. */
+export function uploadTestCover(testId: string, file: File): Promise<ApiSuccess<AdminTest>> {
+  return uploadImage<AdminTest>(`/api/v1/admin/tests/${testId}/cover`, file);
 }

@@ -15,6 +15,7 @@ const disc: InstansiTestOption = {
   slug: "disc-form-a",
   name: "DISC Form A",
   description: "Tes kepribadian",
+  imageUrl: null,
   category: "PERSONALITY",
   price: 75000,
   estimatedDurationMin: 30,

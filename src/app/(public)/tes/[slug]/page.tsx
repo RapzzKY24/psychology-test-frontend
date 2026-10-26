@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock } from "lucide-react";
@@ -40,9 +41,7 @@ const FAQ = [
   },
 ] as const;
 
-export async function generateMetadata({
-  params,
-}: PageProps<"/tes/[slug]">): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/tes/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   try {
     const { data } = await fetchPublicTestServer(slug);
@@ -89,6 +88,17 @@ export default async function TestDetailPage({ params }: PageProps<"/tes/[slug]"
             </p>
           </header>
 
+          {test.imageUrl && (
+            <Image
+              src={test.imageUrl}
+              alt={test.name}
+              width={960}
+              height={540}
+              priority
+              className="aspect-[16/9] w-full rounded-2xl border object-cover"
+            />
+          )}
+
           <Separator />
 
           <section className="space-y-4">
@@ -118,7 +128,10 @@ export default async function TestDetailPage({ params }: PageProps<"/tes/[slug]"
                   <summary className="cursor-pointer list-none font-medium marker:content-none">
                     <span className="flex items-center justify-between gap-4">
                       {item.q}
-                      <span className="text-primary transition-transform group-open:rotate-45" aria-hidden>
+                      <span
+                        className="text-primary transition-transform group-open:rotate-45"
+                        aria-hidden
+                      >
                         +
                       </span>
                     </span>
