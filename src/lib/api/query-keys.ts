@@ -91,10 +91,12 @@ export const qk = {
     },
     tests: {
       all: ["instansi", "tests"] as const,
-      list: (filters?: { page?: number }) =>
-        ["instansi", "tests", "list", filters ?? {}] as const,
+      list: (filters?: { page?: number }) => ["instansi", "tests", "list", filters ?? {}] as const,
     },
     invoices: {
+      all: ["instansi", "invoices"] as const,
+      list: (filters?: { page?: number }) =>
+        ["instansi", "invoices", "list", filters ?? {}] as const,
       detail: (id: string) => ["instansi", "invoices", "detail", id] as const,
     },
     results: {

@@ -16,5 +16,14 @@ export function bankLabel(code: string | null): string {
   return `VA ${BANK_CODE_LABEL[code] ?? code}`;
 }
 
+/**
+ * An UNPAID invoice past its `expiresAt` can no longer be paid — Snap rejects
+ * the transaction, so the list hides the pay action instead of failing later.
+ */
+export function isInvoiceExpired(expiresAt: string | null): boolean {
+  if (!expiresAt) return false;
+  return new Date(expiresAt).getTime() <= Date.now();
+}
+
 /** How often the checkout page re-checks the invoice while it is UNPAID. */
 export const INVOICE_POLL_MS = 4000;

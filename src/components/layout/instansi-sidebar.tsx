@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
-import { Brain, CalendarDays, FileText, LayoutDashboard, LogOut, Users } from "lucide-react";
+import {
+  Brain,
+  CalendarDays,
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { useSignOut } from "@/features/auth/hooks/use-sign-out";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +28,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
       { href: "/instansi", label: "Ringkasan", icon: LayoutDashboard },
       { href: "/instansi/pegawai", label: "Pegawai", icon: Users },
       { href: "/instansi/sesi", label: "Sesi", icon: CalendarDays },
+      { href: "/instansi/pembayaran", label: "Pembayaran", icon: Wallet },
       { href: "/instansi/buat-sesi", label: "Buat Sesi", icon: CalendarDays },
       { href: "/instansi/hasil", label: "Hasil", icon: FileText },
     ],

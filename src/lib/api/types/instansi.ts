@@ -35,6 +35,15 @@ export interface InstansiInvoice {
   expiresAt: string | null;
 }
 
+/**
+ * `GET /instansi/invoices` row — the invoice plus the batch it pays for
+ * (joined server-side, so the list needs no second request).
+ */
+export interface InstansiInvoiceListItem extends InstansiInvoice {
+  sessionTitle: string | null;
+  slotLimit: number | null;
+}
+
 /** `POST /instansi/sessions` → the created batch (session + its invoice). */
 export interface InstansiBatchCreateResult {
   session: SessionSummary;
