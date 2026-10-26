@@ -1,8 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { CheckCircle2, Clock } from "lucide-react";
+import { CheckCircle2, Clock, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CopyInviteButton } from "@/features/admin/sessions/components/copy-invite-button";
 import { fetchInstansiSessionDetail } from "@/features/instansi/sessions/api";
@@ -77,7 +78,19 @@ export function InvoiceIsland({ initial }: { initial: InstansiInvoice }) {
           </div>
         ) : (
           <div className="space-y-3 rounded-lg border bg-muted/40 p-4">
-            {invoice.vaNumber ? (
+            {invoice.paymentUrl ? (
+              <>
+                <p className="text-muted-foreground text-sm">
+                  Lanjutkan ke halaman pembayaran untuk memilih metode bayar.
+                </p>
+                <Button asChild className="w-full">
+                  <a href={invoice.paymentUrl} target="_blank" rel="noopener noreferrer">
+                    Bayar Sekarang
+                    <ExternalLink className="size-4" aria-hidden />
+                  </a>
+                </Button>
+              </>
+            ) : invoice.vaNumber ? (
               <>
                 <div>
                   <p className="text-muted-foreground text-xs uppercase">
@@ -95,7 +108,7 @@ export function InvoiceIsland({ initial }: { initial: InstansiInvoice }) {
               </>
             ) : (
               <p className="text-muted-foreground text-sm">
-                Nomor Virtual Account sedang dibuat — halaman ini akan memperbarui otomatis.
+                Tautan pembayaran sedang dibuat — halaman ini akan memperbarui otomatis.
               </p>
             )}
             {invoice.expiresAt && (

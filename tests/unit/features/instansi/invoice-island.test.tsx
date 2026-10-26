@@ -31,7 +31,18 @@ const unpaid: InstansiInvoice = {
   sessionId: "s1",
   vaNumber: "8801234567",
   vaBankCode: "014",
+  paymentUrl: null,
+  paymentToken: null,
   expiresAt: new Date(Date.now() + 3600_000).toISOString(),
+};
+
+/** Current provider shape: Snap hosted page, no VA fields. */
+const snap: InstansiInvoice = {
+  ...unpaid,
+  vaNumber: null,
+  vaBankCode: null,
+  paymentUrl: "https://app.sandbox.midtrans.com/snap/v4/redirection/abc-123",
+  paymentToken: "tok-snap",
 };
 
 const paid: InstansiInvoice = { ...unpaid, status: "PAID" };
@@ -50,6 +61,15 @@ describe("InvoiceIsland", () => {
     expect(screen.getByText(/VA BCA/)).toBeTruthy();
     expect(screen.getByRole("button", { name: /Salin Nomor VA/ })).toBeTruthy();
     expect(screen.queryByText(/Sesi aktif/)).toBeNull();
+  });
+
+  it("links to the Snap hosted page when paymentUrl is present", () => {
+    render(<InvoiceIsland initial={snap} />, { wrapper });
+
+    const pay = screen.getByRole("link", { name: /Bayar Sekarang/ });
+    expect(pay.getAttribute("href")).toBe(snap.paymentUrl);
+    expect(pay.getAttribute("target")).toBe("_blank");
+    expect(screen.queryByRole("button", { name: /Salin Nomor VA/ })).toBeNull();
   });
 
   it("hides the payment CTA and shares the invite link once PAID", async () => {

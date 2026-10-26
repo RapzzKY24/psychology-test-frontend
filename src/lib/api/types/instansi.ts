@@ -17,7 +17,8 @@ export interface Employee {
 
 /**
  * Session-linked invoice (`GET /instansi/invoices/:id`, verified 2026-10-18 —
- * toInstansiInvoice). `vaNumber` appears once the VA provider provisions it.
+ * toInstansiInvoice). `paymentUrl` is the Midtrans Snap hosted page;
+ * `vaNumber` only appears on historical rows from the retired VA provider.
  */
 export interface InstansiInvoice {
   id: string;
@@ -27,6 +28,10 @@ export interface InstansiInvoice {
   sessionId: string | null;
   vaNumber: string | null;
   vaBankCode: string | null;
+  /** Hosted payment page (Midtrans Snap); null for VA and manual providers. */
+  paymentUrl: string | null;
+  /** Snap token for the embedded popup; null for VA and manual providers. */
+  paymentToken: string | null;
   expiresAt: string | null;
 }
 

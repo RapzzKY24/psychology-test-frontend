@@ -1,4 +1,4 @@
-import type { OrderStatus } from "./enums";
+import type { OrderStatus, PaymentProvider } from "./enums";
 
 /** `POST /api/v1/orders` response — amount = basePrice + uniqueCode (3 digits). */
 export interface CreateOrderResult {
@@ -10,6 +10,15 @@ export interface CreateOrderResult {
   expiresAt: string;
   /** Admin-uploaded static QRIS image URL; null → placeholder + amount. */
   qrisImageUrl: string | null;
+  /** Which gateway produced the instructions below. */
+  paymentProvider: PaymentProvider;
+  /** Legacy VA number; null unless the order was created by the VA provider. */
+  vaNumber: string | null;
+  vaBankCode: string | null;
+  /** Hosted payment page (Midtrans Snap); null for VA and manual providers. */
+  paymentUrl: string | null;
+  /** Snap token for the embedded popup; null for VA and manual providers. */
+  paymentToken: string | null;
 }
 
 /** `GET /api/v1/orders/:id` — server-computed expiry; client clock is untrusted. */
@@ -23,6 +32,10 @@ export interface OrderDetail {
   /** Seconds left in the payment window, computed server-side on read. */
   secondsRemaining: number;
   userClaimedAt: string | null;
+  /** Hosted payment page (Midtrans Snap); null for VA and manual providers. */
+  paymentUrl: string | null;
+  /** Snap token for the embedded popup; null for VA and manual providers. */
+  paymentToken: string | null;
 }
 
 /** `POST /api/v1/orders/:id/claim` — idempotent. */
