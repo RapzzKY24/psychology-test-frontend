@@ -52,8 +52,11 @@ describe("InvoiceDialogButton", () => {
     render(<InvoiceDialogButton sessionId="s1" initial={detail("UNPAID")} />, { wrapper });
 
     expect(screen.queryByText("Tagihan INV-2026-0002")).toBeNull();
+    // Unpaid is the primary action; paid falls back to a quiet outline button.
+    const trigger = screen.getByRole("button", { name: /Pembayaran/ });
+    expect(trigger.getAttribute("data-variant")).toBe("default");
 
-    fireEvent.click(screen.getByRole("button", { name: /Pembayaran/ }));
+    fireEvent.click(trigger);
 
     expect(await screen.findByText("Tagihan INV-2026-0002")).toBeTruthy();
     expect(screen.getByText(/Rp\s?3\.750\.000/)).toBeTruthy();
@@ -65,11 +68,13 @@ describe("InvoiceDialogButton", () => {
   it("shows the paid state and links to the payment detail", async () => {
     render(<InvoiceDialogButton sessionId="s1" initial={detail("PAID")} />, { wrapper });
 
-    expect(screen.getByText("Dibayar")).toBeTruthy();
+    const trigger = screen.getByRole("button", { name: /Pembayaran/ });
+    expect(trigger.getAttribute("data-variant")).toBe("outline");
 
-    fireEvent.click(screen.getByRole("button", { name: /Pembayaran/ }));
+    fireEvent.click(trigger);
 
     expect(await screen.findByRole("link", { name: "Lihat detail pembayaran" })).toBeTruthy();
+    expect(screen.getByText("Dibayar")).toBeTruthy();
     expect(screen.queryByText(/Bayar sebelum/)).toBeNull();
   });
 });

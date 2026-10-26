@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { CopyInviteButton } from "@/components/shared/copy-invite-button";
 import { fetchInstansiSessionDetailServer } from "@/features/instansi/sessions/api.server";
@@ -29,22 +30,32 @@ export default async function InstansiSessionDetailPage({
     throw error;
   }
 
+  const isActive = detail.session.status === "ACTIVE";
+
   return (
     <main className="flex-1 space-y-6 p-6">
+      <Link
+        href="/instansi/sesi"
+        className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-sm transition-colors"
+      >
+        <ArrowLeft className="size-4" aria-hidden />
+        Kembali ke daftar sesi
+      </Link>
+
       <PageHeader
         title={detail.session.title}
         description={`Status: ${SESSION_STATUS_LABEL[detail.session.status]} · kedaluwarsa ${formatIdDate(detail.session.expiresAt)}`}
       />
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="bg-card flex flex-wrap items-center gap-2 rounded-xl border p-2 shadow-xs">
         <InvoiceDialogButton sessionId={detail.session.id} initial={detail} />
-        <CopyInviteButton token={detail.session.token} label="Salin Tautan Undangan" />
-        {detail.session.status === "ACTIVE" && (
-          <CloseInstansiSessionButton sessionId={detail.session.id} />
-        )}
-        <Link href="/instansi/sesi" className="text-sm text-muted-foreground hover:underline">
-          ← Kembali ke daftar sesi
-        </Link>
+        <CopyInviteButton
+          token={detail.session.token}
+          label="Salin Tautan Undangan"
+          disabled={!isActive}
+          disabledReason="Tautan undangan bisa dibagikan setelah pembayaran diterima."
+        />
+        {isActive && <CloseInstansiSessionButton sessionId={detail.session.id} />}
       </div>
 
       <InstansiSessionDetailIsland sessionId={detail.session.id} initial={detail} />

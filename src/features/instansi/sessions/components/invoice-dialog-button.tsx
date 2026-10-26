@@ -40,12 +40,9 @@ export function InvoiceDialogButton({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant={isPaid ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={isPaid ? "outline" : "default"} size="sm">
           <CreditCard className="size-4" aria-hidden />
           Pembayaran
-          <Badge variant={isPaid ? "secondary" : "outline"}>
-            {INVOICE_STATUS_LABEL[invoice.status]}
-          </Badge>
         </Button>
       </DialogTrigger>
       <DialogContent>
