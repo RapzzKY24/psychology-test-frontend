@@ -58,6 +58,29 @@ export interface Invoice {
   notes: string | null;
 }
 
+/** `GET /api/v1/admin/invoices/:id` — the popup behind a table row. */
+export interface AdminInvoiceDetail {
+  id: string;
+  number: string;
+  status: InvoiceStatus;
+  amount: number;
+  issuedAt: string;
+  dueDate: string | null;
+  expiresAt: string | null;
+  paidAt: string | null;
+  verifiedBySource: string | null;
+  paymentType: string | null;
+  notes: string | null;
+  institution: { id: string; name: string } | null;
+  session: {
+    id: string;
+    title: string;
+    slotLimit: number;
+    status: string;
+    testNames: string[];
+  } | null;
+}
+
 export interface CreateInvoiceInput {
   institutionId: string;
   amount: number;

@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import type { Invoice, InvoiceStatus } from "@/lib/api/types";
+import type { AdminInvoiceDetail, Invoice, InvoiceStatus } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { CreateInvoiceInput } from "./schemas";
 
@@ -20,6 +20,11 @@ function buildQuery(filters: InvoiceFilters): string {
 
 export function fetchInvoices(filters: InvoiceFilters = {}): Promise<ApiSuccess<Invoice[]>> {
   return apiFetch<Invoice[]>(`/admin/invoices${buildQuery(filters)}`);
+}
+
+/** `GET /admin/invoices/:id` — institution, tests, and payment trail. */
+export function fetchInvoiceDetail(id: string): Promise<ApiSuccess<AdminInvoiceDetail>> {
+  return apiFetch<AdminInvoiceDetail>(`/admin/invoices/${encodeURIComponent(id)}`);
 }
 
 export function createInvoice(input: CreateInvoiceInput): Promise<ApiSuccess<Invoice>> {

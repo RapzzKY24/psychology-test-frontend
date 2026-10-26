@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -14,6 +17,7 @@ import type { PaginationMeta } from "@/lib/api/types/pagination";
 import type { Invoice } from "@/lib/api/types";
 import { formatIdDate } from "@/lib/format/format-date";
 import { formatIdr } from "@/lib/format/format-idr";
+import { InvoiceDetailDialog } from "./invoice-detail-dialog";
 import { InvoiceStatusBadge } from "./invoice-status-badge";
 import { InvoiceStatusDialog } from "./invoice-status-dialog";
 import { SavingChip } from "@/components/admin/saving-chip";
@@ -34,6 +38,8 @@ export function InvoicesTable({
   institutionMap,
   status,
 }: InvoicesTableProps) {
+  const [openId, setOpenId] = useState<string | null>(null);
+
   if (rows.length === 0) {
     return (
       <TableEmpty
@@ -67,7 +73,24 @@ export function InvoicesTable({
           </TableHeader>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.id} className={cn(row._optimistic && "opacity-60")}>
+              <TableRow
+                key={row.id}
+                tabIndex={row._optimistic ? -1 : 0}
+                onClick={() => {
+                  if (!row._optimistic) setOpenId(row.id);
+                }}
+                onKeyDown={(event) => {
+                  if (row._optimistic) return;
+                  if (event.key !== "Enter" && event.key !== " ") return;
+                  event.preventDefault();
+                  setOpenId(row.id);
+                }}
+                className={cn(
+                  !row._optimistic && "cursor-pointer",
+                  "focus-visible:bg-muted/50 focus-visible:outline-none",
+                  row._optimistic && "opacity-60",
+                )}
+              >
                 <TableCell className="font-medium tabular-nums">{row.number}</TableCell>
                 <TableCell>{institutionMap[row.institutionId] ?? "—"}</TableCell>
                 <TableCell className="tabular-nums">{formatIdr(row.amount)}</TableCell>
@@ -76,7 +99,15 @@ export function InvoicesTable({
                   <InvoiceStatusBadge status={row.status} />
                 </TableCell>
                 <TableCell>
-                  {row._optimistic ? <SavingChip /> : <InvoiceStatusDialog listKey={listKey} invoice={row} />}
+                  {row._optimistic ? (
+                    <SavingChip />
+                  ) : (
+                    // The row opens the detail popup; the status button is its
+                    // own action and must not trigger it.
+                    <div onClick={(event) => event.stopPropagation()}>
+                      <InvoiceStatusDialog listKey={listKey} invoice={row} />
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -84,6 +115,7 @@ export function InvoicesTable({
         </Table>
       </div>
       <TablePagination meta={meta} pageHref={pageHref} />
+      <InvoiceDetailDialog invoiceId={openId} onClose={() => setOpenId(null)} />
     </div>
   );
 }
