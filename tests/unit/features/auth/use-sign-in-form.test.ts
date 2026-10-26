@@ -49,10 +49,10 @@ describe("useSignInForm", () => {
     return result;
   }
 
-  it("reads the role from a fresh session — INSTANSI lands on /instansi", async () => {
+  it("reads the role from a fresh session — INSTANSI stays on public page", async () => {
     await submitAs("INSTANSI");
     expect(getSession).toHaveBeenCalled();
-    expect(replace).toHaveBeenCalledWith("/instansi");
+    expect(replace).toHaveBeenCalledWith("/");
   });
 
   it("prefers a safe ?next= over the role home", async () => {

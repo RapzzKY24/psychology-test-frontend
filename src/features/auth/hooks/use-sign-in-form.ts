@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { authClient } from "@/lib/api/auth-client";
 import { USER_ROLES } from "@/lib/api/types";
 import type { UserRole } from "@/lib/api/types";
-import { betterAuthErrorMessage, postLoginTarget } from "../constants";
+import { betterAuthErrorMessage, postLoginTarget, resolveSafeNext } from "../constants";
 import { SignInSchema } from "../schemas";
 import type { SignInInput } from "../schemas";
 
@@ -37,7 +37,11 @@ export function useSignInForm(next?: string | null) {
           )
             ? (rawRole as UserRole)
             : undefined;
-          router.replace(postLoginTarget(next, role));
+          router.replace(
+            role === "INSTANSI"
+              ? resolveSafeNext(next) ?? "/"
+              : postLoginTarget(next, role),
+          );
           router.refresh();
         },
       },
