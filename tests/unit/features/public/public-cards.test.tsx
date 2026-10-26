@@ -50,10 +50,11 @@ describe("TestCard", () => {
     expect(cover.getAttribute("src")).toContain("test-covers");
   });
 
-  it("renders no image area when the cover is empty", () => {
+  it("keeps the media strip with a placeholder when the cover is empty", () => {
     render(<TestCard test={test} />);
 
     expect(screen.queryByRole("img", { name: "Tes DISC" })).toBeNull();
+    expect(screen.getByTestId("cover-placeholder")).toBeTruthy();
   });
 });
 
