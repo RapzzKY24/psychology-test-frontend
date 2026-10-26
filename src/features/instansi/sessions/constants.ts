@@ -1,6 +1,3 @@
-/** Slot count pre-filled at checkout before the operator edits it. */
-export const DEFAULT_SLOT_LIMIT = 50;
-
 /** Backend cap for one batch (CreateInstansiSessionSchema: max 1000). */
 export const MAX_SLOT_LIMIT = 1000;
 

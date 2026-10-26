@@ -10,7 +10,6 @@ import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import { createInstansiSession } from "../api";
 import type { InstansiTestOption } from "../api";
 import { computeBatchAmount } from "../compute-batch-amount";
-import { DEFAULT_SLOT_LIMIT } from "../constants";
 import { CreateBatchSchema, type CreateBatchInput } from "../schemas";
 
 /**
@@ -22,7 +21,8 @@ export function useSingleTestCheckout(test: InstansiTestOption) {
 
   const form = useForm<CreateBatchInput>({
     resolver: zodResolver(CreateBatchSchema),
-    defaultValues: { testIds: [test.id], slotLimit: DEFAULT_SLOT_LIMIT },
+    // The institution decides the seat count — no prefilled number.
+    defaultValues: { testIds: [test.id], slotLimit: undefined },
   });
 
   const slots = Math.max(0, Math.trunc(form.watch("slotLimit")) || 0);

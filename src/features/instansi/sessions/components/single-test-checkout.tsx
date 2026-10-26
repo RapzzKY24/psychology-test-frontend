@@ -110,6 +110,7 @@ function SingleTestCheckoutForm({ test }: { test: InstansiTestOption }) {
               inputMode="numeric"
               min={1}
               max={MAX_SLOT_LIMIT}
+              placeholder="Misal 20"
               aria-invalid={Boolean(slotError)}
               {...form.register("slotLimit", { valueAsNumber: true })}
             />
@@ -131,7 +132,7 @@ function SingleTestCheckoutForm({ test }: { test: InstansiTestOption }) {
             <div>
               <p className="text-muted-foreground text-xs uppercase">Total</p>
               <p className="text-muted-foreground text-xs">
-                {formatIdr(test.price)} × {slots} peserta
+                {formatIdr(test.price)} × {slots > 0 ? slots : "…"} peserta
               </p>
             </div>
             <p className="font-heading text-xl font-semibold tabular-nums">

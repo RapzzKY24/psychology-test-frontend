@@ -44,9 +44,7 @@ export function CloseInstansiSessionButton({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={() => mutation.mutate()}>
-            Ya, tutup
-          </AlertDialogAction>
+          <AlertDialogAction onClick={() => mutation.mutate()}>Ya, tutup</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

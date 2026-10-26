@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { SingleTestCheckout } from "@/features/instansi/sessions/components/single-test-checkout";
@@ -45,8 +45,24 @@ describe("SingleTestCheckout", () => {
 
     expect(screen.getByText("DISC Form A")).toBeTruthy();
     expect(screen.queryByText("CPMI")).toBeNull();
-    // 75.000 × 50 slots (DEFAULT_SLOT_LIMIT)
+  });
+
+  it("starts with an empty seat count and a disabled submit", () => {
+    render(<SingleTestCheckout testId="t-disc" initialTests={[disc]} />, { wrapper });
+
+    const slots = screen.getByLabelText("Jumlah slot") as HTMLInputElement;
+    expect(slots.value).toBe("");
+    expect(screen.getByText(/Rp\s?0$/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Buat Sesi/ }).hasAttribute("disabled")).toBe(true);
+  });
+
+  it("totals the price times the seats the institution typed", () => {
+    render(<SingleTestCheckout testId="t-disc" initialTests={[disc]} />, { wrapper });
+
+    fireEvent.change(screen.getByLabelText("Jumlah slot"), { target: { value: "50" } });
+
     expect(screen.getByText(/Rp\s?3\.750\.000/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Buat Sesi/ }).hasAttribute("disabled")).toBe(false);
   });
 
   it("explains when the test is not sellable instead of showing an empty form", () => {
