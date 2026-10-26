@@ -103,12 +103,15 @@ export function CheckoutResult({ initial, hint }: CheckoutResultProps) {
   return (
     <Card className="mx-auto max-w-md">
       <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
+        {/* The asset is a 3.4:1 wordmark, so it keeps its ratio: a square box
+            with object-cover would crop the mark and upscale it into a blur. */}
         <Image
           src="/logo/logopsikologi.jpeg"
-          alt="Psikologi"
-          width={64}
-          height={64}
-          className="size-16 rounded-full object-cover"
+          alt="Psikotes"
+          width={173}
+          height={50}
+          priority
+          className="h-10 w-auto"
         />
 
         <StatusIcon view={view} />
