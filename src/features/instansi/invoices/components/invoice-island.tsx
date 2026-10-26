@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { CheckCircle2, Clock, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,8 +30,19 @@ export function InvoiceIsland({ initial }: { initial: InstansiInvoice }) {
     refetchInterval: (query) => (query.state.data?.status === "UNPAID" ? INVOICE_POLL_MS : false),
   });
 
+  const router = useRouter();
   const invoice = invoiceQuery.data;
   const isPaid = invoice.status === "PAID";
+  const wasPaid = useRef(initial.status === "PAID");
+
+  // The Midtrans webhook flips the invoice to PAID; the poll sees it and the
+  // operator lands on the dashboard, where the roster is filled in.
+  useEffect(() => {
+    if (!isPaid || wasPaid.current) return;
+    wasPaid.current = true;
+    toast.success("Pembayaran diterima — sesi aktif.");
+    router.push("/instansi");
+  }, [isPaid, router]);
 
   const sessionQuery = useQuery({
     queryKey: qk.instansi.sessions.detail(invoice.sessionId ?? "none"),

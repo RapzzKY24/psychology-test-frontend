@@ -8,6 +8,11 @@ import { fetchInstansiInvoice } from "@/features/instansi/invoices/api";
 import { fetchInstansiSessionDetail } from "@/features/instansi/sessions/api";
 import type { InstansiInvoice } from "@/lib/api/types";
 
+const push = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push }),
+}));
+
 vi.mock("@/features/instansi/invoices/api", () => ({
   fetchInstansiInvoice: vi.fn(),
 }));
@@ -50,6 +55,7 @@ const paid: InstansiInvoice = { ...unpaid, status: "PAID" };
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  push.mockClear();
 });
 
 describe("InvoiceIsland", () => {
@@ -86,5 +92,11 @@ describe("InvoiceIsland", () => {
       expect(screen.getByRole("button", { name: /Salin Link Peserta/ })).toBeTruthy(),
     );
     expect(mockFetchSession).toHaveBeenCalledWith("s1");
+  });
+
+  it("does not redirect when the invoice was already PAID on arrival", () => {
+    render(<InvoiceIsland initial={paid} />, { wrapper });
+
+    expect(push).not.toHaveBeenCalled();
   });
 });

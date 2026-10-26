@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import type { InstansiTestOption } from "@/features/instansi/sessions/api";
 import { fetchPublishedTestsServer } from "@/features/instansi/sessions/api.server";
-import { CreateBatchForm } from "@/features/instansi/sessions/components/create-batch-form";
+import { SingleTestCheckout } from "@/features/instansi/sessions/components/single-test-checkout";
 
-export const metadata: Metadata = { title: "Buat Sesi" };
+export const metadata: Metadata = { title: "Checkout Sesi" };
 
 export default async function BuatSesiPage({
   searchParams,
@@ -12,7 +13,10 @@ export default async function BuatSesiPage({
   searchParams: Promise<{ testId?: string | string[] }>;
 }) {
   const sp = await searchParams;
-  const rawTestId = Array.isArray(sp.testId) ? sp.testId[0] : sp.testId;
+  const testId = Array.isArray(sp.testId) ? sp.testId[0] : sp.testId;
+
+  // The catalog is the only door: a checkout always starts from a test card.
+  if (!testId) redirect("/tes");
 
   // A failed fetch is not fatal: the island retries client-side.
   let tests: InstansiTestOption[] | undefined;
@@ -25,10 +29,10 @@ export default async function BuatSesiPage({
   return (
     <main className="flex-1 space-y-6 p-6">
       <PageHeader
-        title="Buat Sesi Baru"
-        description="Pilih tes dan tentukan jumlah peserta untuk sesi institusi."
+        title="Checkout Sesi"
+        description="Tentukan jumlah peserta, lalu bayar untuk mengaktifkan sesi."
       />
-      <CreateBatchForm initialTests={tests} initialTestId={rawTestId} />
+      <SingleTestCheckout testId={testId} initialTests={tests} />
     </main>
   );
 }
