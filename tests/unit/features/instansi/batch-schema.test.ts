@@ -37,4 +37,11 @@ describe("CreateBatchSchema", () => {
     expect(result.success).toBe(false);
     expect(result.error?.issues[0]?.message).toBe("Jumlah peserta harus berupa angka.");
   });
+
+  it("asks for a value when the field is left empty", () => {
+    // An empty <input type="number"> reaches RHF as NaN.
+    const result = CreateBatchSchema.safeParse({ ...valid, slotLimit: Number.NaN });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe("Jumlah peserta wajib diisi.");
+  });
 });
