@@ -21,10 +21,15 @@ export interface ServerFetchOptions {
 
 async function forwardCookieHeader(): Promise<string> {
   const cookieStore = await cookies();
-  return cookieStore
-    .getAll()
-    .map(({ name, value }) => `${name}=${value}`)
-    .join("; ");
+  const allCookies = cookieStore.getAll();
+  // Fallback: read from headers
+  const { headers } = await import("next/headers");
+  const headerStore = await headers();
+  const cookieHeader = headerStore.get("cookie");
+  if (allCookies.length === 0 && cookieHeader) {
+    return cookieHeader;
+  }
+  return allCookies.map(({ name, value }) => `${name}=${value}`).join("; ");
 }
 
 export async function apiFetchServer<T>(
