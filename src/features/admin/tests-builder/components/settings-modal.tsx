@@ -99,7 +99,7 @@ export function SettingsModal({ detail, locked, onSaved, children }: SettingsMod
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Pengaturan Tes</DialogTitle>
           <DialogDescription>
