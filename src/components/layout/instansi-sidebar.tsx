@@ -52,7 +52,6 @@ function BrandMark() {
         priority
         className="h-8 w-auto"
       />
-      <p className="mt-2 text-xs text-muted-foreground leading-tight">Dasbor Instansi</p>
     </div>
   );
 }
