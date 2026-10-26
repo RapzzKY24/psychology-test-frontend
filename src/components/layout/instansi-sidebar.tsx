@@ -20,6 +20,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
       { href: "/instansi", label: "Ringkasan", icon: LayoutDashboard },
       { href: "/instansi/pegawai", label: "Pegawai", icon: Users },
       { href: "/instansi/sesi", label: "Sesi", icon: CalendarDays },
+      { href: "/instansi/buat-sesi", label: "Buat Sesi", icon: CalendarDays },
       { href: "/instansi/hasil", label: "Hasil", icon: FileText },
     ],
   },

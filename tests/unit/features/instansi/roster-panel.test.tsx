@@ -77,7 +77,7 @@ describe("InstansiRosterPanel", () => {
     expect(screen.getAllByRole("button", { name: "Reset akses" })).toHaveLength(1);
   });
 
-  it("removes a participant through the mutation", async () => {
+  it("asks for confirmation before removing a participant", async () => {
     mockRemove.mockResolvedValue({ data: {} } as never);
 
     render(<InstansiRosterPanel sessionId="s1" participants={[unclaimed]} slotLimit={5} />, {
@@ -85,8 +85,23 @@ describe("InstansiRosterPanel", () => {
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Hapus" }));
+    expect(mockRemove).not.toHaveBeenCalled();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Ya, hapus" }));
 
     await waitFor(() => expect(mockRemove).toHaveBeenCalledWith("s1", "p2"));
+  });
+
+  it("keeps the participant when the confirmation is cancelled", async () => {
+    render(<InstansiRosterPanel sessionId="s1" participants={[unclaimed]} slotLimit={5} />, {
+      wrapper,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Hapus" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Batal" }));
+
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Ya, hapus" })).toBeNull());
+    expect(mockRemove).not.toHaveBeenCalled();
   });
 
   it("keeps reset available on a claimed seat even after payment", () => {

@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import type { SessionSummary } from "@/lib/api/types";
+import type { PublicTest, SessionSummary } from "@/lib/api/types";
 import type { InstansiInvoice, InstansiSessionDetail, ResetSeatResult } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 
@@ -8,9 +8,38 @@ export interface InstansiSessionFilters {
   limit?: number;
 }
 
-export interface PublishedTestOption {
-  id: string;
-  name: string;
+/**
+ * `GET /instansi/tests` returns the full public DTO (price included) — the
+ * backend only narrows the list to the CPMI whitelist, not the fields.
+ */
+export type InstansiTestOption = PublicTest;
+
+export interface CreateInstansiSessionInput {
+  testIds: string[];
+  slotLimit: number;
+  employeeIds?: string[];
+}
+
+export interface InstansiBatchCreateResult {
+  session: { id: string; title: string };
+  invoice: InstansiInvoice;
+}
+
+export function fetchPublishedTests(): Promise<ApiSuccess<InstansiTestOption[]>> {
+  return apiFetch<InstansiTestOption[]>("/instansi/tests");
+}
+
+export function createInstansiSession(
+  input: CreateInstansiSessionInput,
+): Promise<ApiSuccess<InstansiBatchCreateResult>> {
+  return apiFetch<InstansiBatchCreateResult>("/instansi/sessions", {
+    method: "POST",
+    body: {
+      testIds: input.testIds,
+      slotLimit: input.slotLimit,
+      employeeIds: input.employeeIds ?? [],
+    },
+  });
 }
 
 function buildQuery(filters: InstansiSessionFilters): string {

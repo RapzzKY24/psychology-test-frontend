@@ -2,7 +2,7 @@ import { apiFetchServer } from "@/lib/api/server";
 import type { SessionSummary } from "@/lib/api/types";
 import type { InstansiSessionDetail } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
-import type { InstansiSessionFilters, PublishedTestOption } from "./api";
+import type { InstansiSessionFilters, InstansiTestOption } from "./api";
 
 /** Server-only fetchers for the instansi sessions feature (RSC pages). */
 
@@ -26,7 +26,7 @@ export function fetchInstansiSessionDetailServer(
   return apiFetchServer<InstansiSessionDetail>(`/instansi/sessions/${id}`);
 }
 
-export function fetchPublishedTestsServer(): Promise<ApiSuccess<PublishedTestOption[]>> {
+export function fetchPublishedTestsServer(): Promise<ApiSuccess<InstansiTestOption[]>> {
   // Instansi only sees CPMI (WPT hidden) — BE whitelist via GET /instansi/tests
-  return apiFetchServer<PublishedTestOption[]>("/instansi/tests");
+  return apiFetchServer<InstansiTestOption[]>("/instansi/tests");
 }

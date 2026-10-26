@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { OverviewCards } from "@/features/instansi/monitor/components/overview-cards";
 import { fetchInstansiOverviewServer } from "@/features/instansi/monitor/api.server";
 import { fetchInstansiSessionsServer } from "@/features/instansi/sessions/api.server";
-import { CopyInviteButton } from "@/features/admin/sessions/components/copy-invite-button";
+import { CopyInviteButton } from "@/components/shared/copy-invite-button";
+import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
 
 export const metadata: Metadata = { title: "Ringkasan" };
 
@@ -21,7 +22,7 @@ interface QuickLink {
 
 const QUICK_LINKS: QuickLink[] = [
   { href: "/instansi/pegawai", title: "Kelola Pegawai", description: "Tambah dan kelola data pegawai.", icon: Users },
-  { href: "/instansi/sesi", title: "Buat Sesi", description: "Pilih tes dan peserta, bagikan tautan.", icon: CalendarDays },
+  { href: "/instansi/buat-sesi", title: "Buat Sesi", description: "Pilih tes dan peserta, bagikan tautan.", icon: CalendarDays },
 ];
 
 export default async function InstansiPage() {
@@ -47,7 +48,7 @@ export default async function InstansiPage() {
             {sessions.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 Belum ada sesi.{" "}
-                <Link href="/instansi/sesi" className="underline underline-offset-4">
+                <Link href="/instansi/buat-sesi" className="underline underline-offset-4">
                   Buat sesi pertama
                 </Link>
                 .
@@ -60,10 +61,16 @@ export default async function InstansiPage() {
                       {s.title}
                     </Link>
                     <p className="text-xs text-muted-foreground">
-                      {s.status === "ACTIVE" ? "Aktif" : "Ditutup"} · slot {s.slotLimit}
+                      {SESSION_STATUS_LABEL[s.status]} · slot {s.slotLimit}
                     </p>
                   </div>
-                  {s.token ? <CopyInviteButton token={s.token} /> : null}
+                  {s.status === "ACTIVE" ? (
+                    <CopyInviteButton token={s.token} />
+                  ) : s.status === "PENDING_PAYMENT" ? (
+                    <Button asChild size="sm">
+                      <Link href={`/instansi/sesi/${s.id}`}>Bayar</Link>
+                    </Button>
+                  ) : null}
                 </div>
               ))
             )}

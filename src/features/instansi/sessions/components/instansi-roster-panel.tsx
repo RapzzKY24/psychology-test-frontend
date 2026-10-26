@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Pencil, RotateCcw, Trash2, UserPlus, Users } from "lucide-react";
 import {
   AlertDialog,
@@ -17,9 +16,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchEmployees } from "@/features/instansi/employees/api";
 import type { SessionParticipantRow } from "@/lib/api/types";
-import { qk } from "@/lib/api/query-keys";
+import { useEmployeeOptions } from "../hooks/use-employee-options";
 import { useInstansiRosterMutations } from "../hooks/use-instansi-roster-mutations";
 import { EmployeePickerDialog } from "./employee-picker-dialog";
 
@@ -39,12 +37,7 @@ export function InstansiRosterPanel({
   const [addOpen, setAddOpen] = useState(false);
   const [swapTarget, setSwapTarget] = useState<SessionParticipantRow | null>(null);
 
-  const employeesQuery = useQuery({
-    queryKey: qk.instansi.employees.list({ page: 1 }),
-    queryFn: () => fetchEmployees({ page: 1, limit: 100 }).then((r) => r.data),
-    enabled: addOpen || swapTarget !== null,
-    staleTime: 30_000,
-  });
+  const employeesQuery = useEmployeeOptions(addOpen || swapTarget !== null);
 
   const linkedIds = participants.map((p) => p.employeeId).filter((id): id is string => id !== null);
   const isFull = participants.length >= slotLimit;
@@ -117,14 +110,29 @@ export function InstansiRosterPanel({
                     </AlertDialog>
                   )}
 
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => mutations.remove.mutate(participant.id)}
-                  >
-                    <Trash2 className="size-4" aria-hidden />
-                    <span className="sr-only">Hapus</span>
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="sm" disabled={mutations.remove.isPending}>
+                        <Trash2 className="size-4" aria-hidden />
+                        <span className="sr-only">Hapus</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Hapus {participant.name} dari sesi?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Seat ini dikosongkan dan bisa diisi pegawai lain. Jumlah tagihan tidak
+                          berubah karena slot sudah dibayar di muka.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => mutations.remove.mutate(participant.id)}>
+                          Ya, hapus
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </li>
             ))}

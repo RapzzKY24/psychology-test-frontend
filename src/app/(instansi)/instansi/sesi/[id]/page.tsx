@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
-import { CopyInviteButton } from "@/features/admin/sessions/components/copy-invite-button";
+import { CopyInviteButton } from "@/components/shared/copy-invite-button";
 import { fetchInstansiSessionDetailServer } from "@/features/instansi/sessions/api.server";
 import { InstansiSessionDetailIsland } from "@/features/instansi/sessions/components/instansi-session-detail-island";
 import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
-import { qk } from "@/lib/api/query-keys";
 import { CloseInstansiSessionButton } from "@/features/instansi/sessions/components/close-instansi-session-button";
 
 export const metadata: Metadata = { title: "Detail Sesi" };
@@ -39,10 +38,7 @@ export default async function InstansiSessionDetailPage({
       <div className="flex flex-wrap items-center gap-3">
         <CopyInviteButton token={detail.session.token} label="Salin Tautan Undangan" />
         {detail.session.status === "ACTIVE" && (
-          <CloseInstansiSessionButton
-            sessionId={detail.session.id}
-            listKey={qk.instansi.sessions.all}
-          />
+          <CloseInstansiSessionButton sessionId={detail.session.id} />
         )}
         <Link href="/instansi/sesi" className="text-sm text-muted-foreground hover:underline">
           ← Kembali ke daftar sesi

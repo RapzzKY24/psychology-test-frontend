@@ -85,6 +85,11 @@ export const qk = {
         ["instansi", "sessions", "list", filters ?? {}] as const,
       detail: (id: string) => ["instansi", "sessions", "detail", id] as const,
     },
+    tests: {
+      all: ["instansi", "tests"] as const,
+      list: (filters?: { page?: number }) =>
+        ["instansi", "tests", "list", filters ?? {}] as const,
+    },
     invoices: {
       detail: (id: string) => ["instansi", "invoices", "detail", id] as const,
     },

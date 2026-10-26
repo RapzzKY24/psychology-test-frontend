@@ -3,13 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TEST_CATEGORY_LABELS } from "@/lib/api/types";
 import { isApiError } from "@/lib/api/client";
 import { formatIdr } from "@/lib/format/format-idr";
 import { fetchPublicTestServer } from "@/features/public/api.server";
+import { TestBuyCta } from "@/features/public/components/test-buy-cta";
+import { getServerSession } from "@/lib/api/server";
 
 const STEPS = [
   { title: "Beli tes", body: "Pilih tes ini dan selesaikan pembayaran dengan aman." },
@@ -61,6 +62,8 @@ export default async function TestDetailPage({ params }: PageProps<"/tes/[slug]"
     if (isApiError(error) && error.isNotFound) notFound();
     throw error;
   }
+
+  const userRole = (await getServerSession())?.user?.role ?? null;
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 pb-28 sm:px-6 sm:py-12 md:pb-12">
@@ -134,9 +137,7 @@ export default async function TestDetailPage({ params }: PageProps<"/tes/[slug]"
                 <p className="text-sm text-muted-foreground">Harga</p>
                 <p className="text-2xl font-semibold">{formatIdr(test.price)}</p>
               </div>
-              <Button asChild className="w-full rounded-full" size="lg">
-                <Link href={`/masuk?next=/tes/${test.slug}`}>Beli Tes</Link>
-              </Button>
+              <TestBuyCta testId={test.id} role={userRole} className="w-full" />
               <p className="text-center text-xs text-muted-foreground">
                 Hasil diverifikasi psikolog dan dapat diverifikasi via QR.
               </p>
@@ -151,9 +152,7 @@ export default async function TestDetailPage({ params }: PageProps<"/tes/[slug]"
             <p className="text-xs text-muted-foreground">Harga</p>
             <p className="text-lg font-semibold">{formatIdr(test.price)}</p>
           </div>
-          <Button asChild className="rounded-full" size="lg">
-            <Link href={`/masuk?next=/tes/${test.slug}`}>Beli Tes</Link>
-          </Button>
+          <TestBuyCta testId={test.id} role={userRole} className="flex-shrink-0" />
         </div>
       </div>
     </main>

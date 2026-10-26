@@ -5,7 +5,7 @@ import { CheckCircle2, Clock, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CopyInviteButton } from "@/features/admin/sessions/components/copy-invite-button";
+import { CopyInviteButton } from "@/components/shared/copy-invite-button";
 import { fetchInstansiSessionDetail } from "@/features/instansi/sessions/api";
 import { formatIdr } from "@/lib/format/format-idr";
 import { qk } from "@/lib/api/query-keys";

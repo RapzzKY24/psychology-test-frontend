@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { InstansiSessionsIsland } from "@/features/instansi/sessions/components/instansi-sessions-island";
 import { fetchInstansiSessionsServer } from "@/features/instansi/sessions/api.server";
-import { qk } from "@/lib/api/query-keys";
 
 export const metadata: Metadata = { title: "Data Sesi" };
 
@@ -15,7 +14,6 @@ export default async function SesiPage({
   const page = Number(sp.page ?? "1") || 1;
 
   const { data } = await fetchInstansiSessionsServer({ page });
-  const listKey = qk.instansi.sessions.list({ page });
 
   return (
     <main className="flex-1 space-y-6 p-6">
@@ -23,7 +21,7 @@ export default async function SesiPage({
         title="Data Sesi"
         description="Sesi tes untuk pegawai — bagikan tautan undangan ke peserta."
       />
-      <InstansiSessionsIsland listKey={listKey} initial={{ data }} page={page} />
+      <InstansiSessionsIsland initial={{ data }} page={page} />
     </main>
   );
 }

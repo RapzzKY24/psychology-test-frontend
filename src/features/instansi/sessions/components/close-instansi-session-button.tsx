@@ -21,10 +21,11 @@ export function CloseInstansiSessionButton({
   listKey,
 }: {
   sessionId: string;
-  listKey: QueryKey;
+  /** Only needed when a rendered list shares this key (optimistic patch). */
+  listKey?: QueryKey;
 }) {
   const router = useRouter();
-  const mutation = useCloseInstansiSession(listKey, sessionId, () => router.refresh());
+  const mutation = useCloseInstansiSession(sessionId, () => router.refresh(), listKey);
 
   return (
     <AlertDialog>

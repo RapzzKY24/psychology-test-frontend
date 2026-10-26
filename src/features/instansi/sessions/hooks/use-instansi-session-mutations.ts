@@ -1,20 +1,26 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { QueryKey } from "@tanstack/react-query";
 import { asOptimistic, useOptimisticList } from "@/features/admin/hooks/use-optimistic-list";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
+import { qk } from "@/lib/api/query-keys";
 import type { SessionSummary } from "@/lib/api/types";
 import { closeInstansiSession } from "../api";
 
+/**
+ * Closes a batch session. Pass `listKey` only when a rendered list holds the
+ * same query key — the detail page has no list to patch, so it just refetches.
+ */
 export function useCloseInstansiSession(
-  listKey: QueryKey,
   sessionId: string,
   onClosed: () => void,
+  listKey?: QueryKey,
 ) {
-  const list = useOptimisticList<SessionSummary>(listKey);
+  const queryClient = useQueryClient();
+  const list = useOptimisticList<SessionSummary>(listKey ?? qk.instansi.sessions.all);
 
   return useMutation({
     mutationFn: async () => {
@@ -23,6 +29,7 @@ export function useCloseInstansiSession(
     },
     meta: { silentError: true },
     onMutate: async () => {
+      if (!listKey) return undefined;
       const rollback = list.begin();
       list.patch((rows) =>
         rows.map((row) =>
@@ -39,6 +46,6 @@ export function useCloseInstansiSession(
       toast.success("Sesi ditutup.");
       onClosed();
     },
-    onSettled: () => list.refetch(),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: qk.instansi.sessions.all }),
   });
 }

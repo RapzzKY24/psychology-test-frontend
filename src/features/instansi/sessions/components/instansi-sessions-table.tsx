@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { SavingChip } from "@/components/admin/saving-chip";
-import { CopyInviteButton } from "@/features/admin/sessions/components/copy-invite-button";
+import { CopyInviteButton } from "@/components/shared/copy-invite-button";
 import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
 import { cn } from "@/lib/utils";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
@@ -82,7 +82,13 @@ export function InstansiSessionsTable({ rows, meta, listKey }: InstansiSessionsT
                       <SavingChip />
                     ) : (
                       <>
-                        <CopyInviteButton token={row.token} />
+                        {row.status === "ACTIVE" ? (
+                          <CopyInviteButton token={row.token} />
+                        ) : row.status === "PENDING_PAYMENT" ? (
+                          <Button size="sm" asChild>
+                            <Link href={`/instansi/sesi/${row.id}`}>Bayar</Link>
+                          </Button>
+                        ) : null}
                         <CloseCell row={row} listKey={listKey} />
                         <Button variant="ghost" size="sm" asChild>
                           <Link href={`/instansi/sesi/${row.id}`}>Detail</Link>

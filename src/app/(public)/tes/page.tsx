@@ -3,8 +3,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { TEST_CATEGORIES, type TestCategory } from "@/lib/api/types";
 import { fetchPublicTestsServer } from "@/features/public/api.server";
+import { TestBuyCta } from "@/features/public/components/test-buy-cta";
 import { TestCard } from "@/features/public/components/test-card";
 import { TestCategoryFilters } from "@/features/public/components/test-category-filters";
+import { getServerSession } from "@/lib/api/server";
 
 export const metadata: Metadata = {
   title: "Katalog Tes",
@@ -33,6 +35,8 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
   const category = parseCategory(sp.category);
   const page = Math.max(1, Number(Array.isArray(sp.page) ? sp.page[0] : sp.page) || 1);
 
+  const role = (await getServerSession())?.user?.role ?? null;
+
   const result = await fetchPublicTestsServer({ limit: PAGE_SIZE, page, category }).catch(
     () => null,
   );
@@ -45,8 +49,8 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
       <header className="space-y-3">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Katalog Tes</h1>
         <p className="max-w-2xl text-muted-foreground">
-          Pilih tes yang ingin Anda kerjakan. Setiap tes dikerjakan online dan hasilnya
-          diverifikasi oleh psikolog.
+          Pilih tes yang ingin Anda kerjakan. Setiap tes dikerjakan online dan hasilnya diverifikasi
+          oleh psikolog.
         </p>
       </header>
 
@@ -58,11 +62,7 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
             <TestCard
               key={test.id}
               test={test}
-              buySlot={
-                <Button asChild className="flex-1 rounded-full">
-                  <Link href={`/masuk?next=/tes/${test.slug}`}>Beli</Link>
-                </Button>
-              }
+              buySlot={<TestBuyCta testId={test.id} role={role} className="flex-1" />}
             />
           ))}
         </div>

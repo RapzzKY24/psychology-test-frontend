@@ -9,7 +9,7 @@ import type { SessionSummary } from "@/lib/api/types";
 import { SavingChip } from "@/components/admin/saving-chip";
 import { cn } from "@/lib/utils";
 import { formatIdDate } from "@/lib/format/format-date";
-import { CopyInviteButton } from "./copy-invite-button";
+import { CopyInviteButton } from "@/components/shared/copy-invite-button";
 import { SESSION_STATUS_LABEL } from "../constants";
 
 interface SessionsTableProps {
