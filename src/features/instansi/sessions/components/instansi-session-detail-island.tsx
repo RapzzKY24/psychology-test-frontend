@@ -67,6 +67,7 @@ export function InstansiSessionDetailIsland({
         sessionId={sessionId}
         participants={participants}
         slotLimit={session.slotLimit}
+        status={session.status}
       />
     </div>
   );

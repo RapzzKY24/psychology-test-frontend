@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import { CalendarDays, Users } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
@@ -10,6 +11,7 @@ import { fetchInstansiOverviewServer } from "@/features/instansi/monitor/api.ser
 import { fetchInstansiSessionsServer } from "@/features/instansi/sessions/api.server";
 import { CopyInviteButton } from "@/components/shared/copy-invite-button";
 import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
+import { requireServerRole } from "@/lib/api/server";
 
 export const metadata: Metadata = { title: "Ringkasan" };
 
@@ -26,6 +28,11 @@ const QUICK_LINKS: QuickLink[] = [
 ];
 
 export default async function InstansiPage() {
+  // Next renders the layout and the page in parallel, so the layout's role
+  // guard alone would still let this fetch run (and log a 403) for admins.
+  const session = await requireServerRole("INSTANSI");
+  if (!session) notFound();
+
   const [{ data: overview }, { data: sessions }] = await Promise.all([
     fetchInstansiOverviewServer(),
     fetchInstansiSessionsServer({ limit: 5 }),

@@ -16,7 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { SessionParticipantRow } from "@/lib/api/types";
+import type { SessionParticipantRow, SessionStatus } from "@/lib/api/types";
 import { useEmployeeOptions } from "../hooks/use-employee-options";
 import { useInstansiRosterMutations } from "../hooks/use-instansi-roster-mutations";
 import { EmployeePickerDialog } from "./employee-picker-dialog";
@@ -25,13 +25,16 @@ interface InstansiRosterPanelProps {
   sessionId: string;
   participants: SessionParticipantRow[];
   slotLimit: number;
+  /** Roster edits need a paid batch (owner decision #2, amended 2026-10-26). */
+  status: SessionStatus;
 }
 
-/** Roster list with add/swap/remove + per-seat reset. Free to edit anytime. */
+/** Roster list with add/swap/remove + per-seat reset, editable once paid. */
 export function InstansiRosterPanel({
   sessionId,
   participants,
   slotLimit,
+  status,
 }: InstansiRosterPanelProps) {
   const mutations = useInstansiRosterMutations(sessionId);
   const [addOpen, setAddOpen] = useState(false);
@@ -41,23 +44,32 @@ export function InstansiRosterPanel({
 
   const linkedIds = participants.map((p) => p.employeeId).filter((id): id is string => id !== null);
   const isFull = participants.length >= slotLimit;
+  const canEdit = status !== "PENDING_PAYMENT";
 
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
+      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
         <CardTitle className="flex items-center gap-2 text-base">
           <Users className="size-4" aria-hidden />
           Daftar Peserta ({participants.length}/{slotLimit})
         </CardTitle>
-        <Button size="sm" disabled={isFull} onClick={() => setAddOpen(true)}>
+        <Button size="sm" disabled={!canEdit || isFull} onClick={() => setAddOpen(true)}>
           <UserPlus className="size-4" aria-hidden />
-          Tambah
+          Tambah peserta
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
+        {!canEdit && (
+          <p className="text-muted-foreground rounded-lg border border-dashed p-3 text-sm">
+            Sesi belum dibayar. Daftar peserta bisa diubah setelah pembayaran diterima.
+          </p>
+        )}
+
         {participants.length === 0 ? (
           <p className="text-muted-foreground py-6 text-center text-sm">
-            Belum ada peserta. Tambahkan dari daftar pegawai instansi.
+            {canEdit
+              ? "Belum ada peserta. Tambahkan dari daftar pegawai instansi."
+              : "Pembayaran belum diterima — peserta bisa ditambahkan setelah sesi aktif."}
           </p>
         ) : (
           <ul className="divide-y">
@@ -79,7 +91,12 @@ export function InstansiRosterPanel({
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => setSwapTarget(participant)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={!canEdit}
+                    onClick={() => setSwapTarget(participant)}
+                  >
                     <Pencil className="size-4" aria-hidden />
                     <span className="sr-only">Ganti</span>
                   </Button>
@@ -87,7 +104,11 @@ export function InstansiRosterPanel({
                   {participant.claimed && (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="sm" disabled={mutations.reset.isPending}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={!canEdit || mutations.reset.isPending}
+                        >
                           <RotateCcw className="size-4" aria-hidden />
                           <span className="sr-only">Reset akses</span>
                         </Button>
@@ -112,7 +133,11 @@ export function InstansiRosterPanel({
 
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="sm" disabled={mutations.remove.isPending}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={!canEdit || mutations.remove.isPending}
+                      >
                         <Trash2 className="size-4" aria-hidden />
                         <span className="sr-only">Hapus</span>
                       </Button>
