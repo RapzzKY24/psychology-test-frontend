@@ -13,6 +13,10 @@ export const qk = {
     all: ["orders"] as const,
     detail: (orderId: string) => ["orders", "detail", orderId] as const,
   },
+  checkout: {
+    all: ["checkout"] as const,
+    detail: (ref: string) => ["checkout", "detail", ref] as const,
+  },
   attempts: {
     all: ["attempts"] as const,
     detail: (attemptId: string) => ["attempts", "detail", attemptId] as const,
