@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Clock, FileText, Layers, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { TEST_CATEGORY_LABELS } from "@/lib/api/types";
 import { isApiError } from "@/lib/api/client";
 import { formatIdr } from "@/lib/format/format-idr";
@@ -41,6 +40,12 @@ const FAQ = [
   },
 ] as const;
 
+const INCLUDES = [
+  "Laporan hasil dalam format PDF",
+  "Diverifikasi psikolog berlisensi",
+  "QR verifikasi keaslian laporan",
+] as const;
+
 export async function generateMetadata({ params }: PageProps<"/tes/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   try {
@@ -49,6 +54,21 @@ export async function generateMetadata({ params }: PageProps<"/tes/[slug]">): Pr
   } catch {
     return { title: "Tes tidak ditemukan" };
   }
+}
+
+/** One fact in the summary strip under the title. */
+function Fact({ icon: Icon, label, value }: { icon: typeof Clock; label: string; value: string }) {
+  return (
+    <div className="bg-card flex items-center gap-3 p-4">
+      <span className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-lg">
+        <Icon className="size-4" aria-hidden />
+      </span>
+      <div className="min-w-0">
+        <p className="text-muted-foreground text-xs">{label}</p>
+        <p className="truncate text-sm font-medium">{value}</p>
+      </div>
+    </div>
+  );
 }
 
 export default async function TestDetailPage({ params }: PageProps<"/tes/[slug]">) {
@@ -65,27 +85,29 @@ export default async function TestDetailPage({ params }: PageProps<"/tes/[slug]"
   const userRole = (await getServerSession())?.user?.role ?? null;
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 pb-28 sm:px-6 sm:py-12 md:pb-12">
+    <main className="mx-auto w-full max-w-6xl px-4 py-8 pb-28 sm:px-6 sm:py-10 md:pb-14">
       <Link
         href="/tes"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
       >
         <ArrowLeft className="size-4" aria-hidden />
         Katalog Tes
       </Link>
 
-      <div className="mt-6 grid gap-8 md:grid-cols-[2fr_1fr]">
+      <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-8">
-          <header className="space-y-3">
-            <Badge variant="secondary" className="bg-primary/10 text-primary">
-              {TEST_CATEGORY_LABELS[test.category]}
-            </Badge>
+          <header className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="secondary" className="bg-primary/10 text-primary">
+                {TEST_CATEGORY_LABELS[test.category]}
+              </Badge>
+              <span className="text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium">
+                <Clock className="size-3.5" aria-hidden />
+                {test.estimatedDurationMin} menit
+              </span>
+            </div>
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{test.name}</h1>
-            <p className="text-muted-foreground">{test.description}</p>
-            <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Clock className="size-4" aria-hidden />
-              Estimasi {test.estimatedDurationMin} menit
-            </p>
+            <p className="text-muted-foreground max-w-2xl leading-relaxed">{test.description}</p>
           </header>
 
           {test.imageUrl && (
@@ -99,70 +121,89 @@ export default async function TestDetailPage({ params }: PageProps<"/tes/[slug]"
             />
           )}
 
-          <Separator />
+          <div className="bg-border grid grid-cols-2 gap-px overflow-hidden rounded-2xl border sm:grid-cols-3">
+            <Fact icon={Clock} label="Durasi" value={`${test.estimatedDurationMin} menit`} />
+            <Fact icon={Layers} label="Kategori" value={TEST_CATEGORY_LABELS[test.category]} />
+            <Fact icon={FileText} label="Hasil" value="Laporan PDF + QR" />
+          </div>
 
-          <section className="space-y-4">
-            <h2 className="text-lg font-semibold">Cara Kerja</h2>
-            <ol className="space-y-4">
+          <section aria-labelledby="cara-kerja" className="space-y-4">
+            <h2 id="cara-kerja" className="text-lg font-semibold">
+              Cara Kerja
+            </h2>
+            <ol className="grid gap-3 sm:grid-cols-3">
               {STEPS.map((step, index) => (
-                <li key={step.title} className="flex gap-4">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                <li key={step.title} className="bg-card rounded-2xl border p-5">
+                  <span className="bg-primary/10 text-primary flex size-7 items-center justify-center rounded-full text-sm font-semibold">
                     {index + 1}
                   </span>
-                  <div>
-                    <p className="font-medium">{step.title}</p>
-                    <p className="text-sm text-muted-foreground">{step.body}</p>
-                  </div>
+                  <p className="mt-3 font-medium">{step.title}</p>
+                  <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{step.body}</p>
                 </li>
               ))}
             </ol>
           </section>
 
-          <Separator />
-
-          <section className="space-y-3">
-            <h2 className="text-lg font-semibold">Pertanyaan Umum</h2>
-            <div className="divide-y rounded-2xl border bg-background">
+          <section aria-labelledby="faq" className="space-y-4">
+            <h2 id="faq" className="text-lg font-semibold">
+              Pertanyaan Umum
+            </h2>
+            <div className="bg-card divide-y overflow-hidden rounded-2xl border">
               {FAQ.map((item) => (
-                <details key={item.q} className="group px-4 py-3">
-                  <summary className="cursor-pointer list-none font-medium marker:content-none">
-                    <span className="flex items-center justify-between gap-4">
-                      {item.q}
-                      <span
-                        className="text-primary transition-transform group-open:rotate-45"
-                        aria-hidden
-                      >
-                        +
-                      </span>
-                    </span>
+                <details key={item.q} className="group">
+                  <summary className="hover:bg-muted/50 flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-medium transition-colors marker:content-none">
+                    {item.q}
+                    <ChevronDown
+                      className="text-muted-foreground size-4 shrink-0 transition-transform group-open:rotate-180"
+                      aria-hidden
+                    />
                   </summary>
-                  <p className="mt-2 text-sm text-muted-foreground">{item.a}</p>
+                  <p className="text-muted-foreground px-5 pb-4 text-sm leading-relaxed">
+                    {item.a}
+                  </p>
                 </details>
               ))}
             </div>
           </section>
         </div>
 
-        <aside className="hidden md:block">
-          <Card className="sticky top-24 rounded-2xl shadow-sm">
-            <CardContent className="space-y-4">
+        <aside className="hidden lg:block">
+          <Card className="sticky top-24 rounded-2xl">
+            <CardContent className="space-y-5">
               <div>
-                <p className="text-sm text-muted-foreground">Harga</p>
-                <p className="text-2xl font-semibold">{formatIdr(test.price)}</p>
+                <p className="text-muted-foreground text-sm">Harga</p>
+                <p className="font-heading text-3xl font-semibold tracking-tight">
+                  {formatIdr(test.price)}
+                </p>
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Sekali bayar, termasuk laporan hasil.
+                </p>
               </div>
+
               <TestBuyCta testId={test.id} role={userRole} className="w-full" />
-              <p className="text-center text-xs text-muted-foreground">
-                Hasil diverifikasi psikolog dan dapat diverifikasi via QR.
+
+              <ul className="space-y-2.5 border-t pt-4">
+                {INCLUDES.map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm">
+                    <Check className="text-primary mt-0.5 size-4 shrink-0" aria-hidden />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              <p className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                <ShieldCheck className="size-3.5 shrink-0" aria-hidden />
+                Hasil hanya bisa dibuka oleh Anda.
               </p>
             </CardContent>
           </Card>
         </aside>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 p-4 backdrop-blur md:hidden">
+      <div className="bg-background/95 fixed inset-x-0 bottom-0 z-30 border-t p-4 backdrop-blur md:hidden">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
           <div>
-            <p className="text-xs text-muted-foreground">Harga</p>
+            <p className="text-muted-foreground text-xs">Harga</p>
             <p className="text-lg font-semibold">{formatIdr(test.price)}</p>
           </div>
           <TestBuyCta testId={test.id} role={userRole} className="flex-shrink-0" />
