@@ -4,9 +4,15 @@ import { NextResponse, type NextRequest } from "next/server";
  * Next 16 proxy (ex-middleware). CHEAP gate only: cookie presence, never
  * validity/role — real role checks live in each route group's layout.tsx
  * via getServerSession (docs/frontend/00-architecture.md §3).
+ *
+ * Cookie names come from Better Auth: plain in dev, `__Secure-` prefixed when
+ * the API issues secure cookies in production.
  */
 
-const SESSION_COOKIES = ["better-auth.session_token", "__Secure-better-auth.session_token"];
+const SESSION_COOKIES = [
+  "better-auth.session_token",
+  "__Secure-better-auth.session_token",
+] as const;
 
 function hasSessionCookie(request: NextRequest): boolean {
   return SESSION_COOKIES.some((name) => request.cookies.has(name));
