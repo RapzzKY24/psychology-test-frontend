@@ -12,7 +12,8 @@ export function ArticleCard({ article }: { article: PublicArticleListItem }) {
   return (
     <Link href={`/artikel/${article.slug}`} className="group block h-full">
       <Card className="h-full overflow-hidden rounded-2xl pt-0 shadow-sm transition-shadow group-hover:shadow-md">
-        <div className="aspect-[16/9] w-full overflow-hidden bg-muted">
+        {/* Fixed strip: a cover image never changes the card's height. */}
+        <div className="h-40 w-full overflow-hidden bg-muted">
           {article.coverUrl ? (
             // Local upload URL — next/image processing is unnecessary here.
             // eslint-disable-next-line @next/next/no-img-element
