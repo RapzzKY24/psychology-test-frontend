@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
+import { downloadFile } from "@/lib/api/download";
 import type { AdminInvoiceDetail, Invoice, InvoiceStatus } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { CreateInvoiceInput } from "./schemas";
@@ -40,4 +41,10 @@ export function updateInvoiceStatus(
     method: "PATCH",
     body: { status, ...(notes ? { notes } : {}) },
   });
+}
+
+/** `GET /admin/invoices/:id/pdf` — the file the admin forwards to the institution. */
+export function downloadInvoicePdf(id: string, number: string): Promise<void> {
+  const fallback = `Invoice-${number.replace(/[^A-Za-z0-9._-]+/g, "-")}.pdf`;
+  return downloadFile(`/admin/invoices/${encodeURIComponent(id)}/pdf`, fallback);
 }

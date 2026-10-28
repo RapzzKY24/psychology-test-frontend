@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useInvoiceDetail } from "../hooks/use-invoice-detail";
+import { useDownloadInvoicePdf } from "../hooks/use-download-invoice-pdf";
 import { InvoiceDetailBody } from "./invoice-detail-body";
 import { InvoiceDetailSkeleton } from "./invoice-detail-skeleton";
 
@@ -25,6 +27,7 @@ export function InvoiceDetailDialog({
   onClose: () => void;
 }) {
   const { data, isPending, isError } = useInvoiceDetail(invoiceId);
+  const download = useDownloadInvoicePdf();
 
   return (
     <Dialog
@@ -56,6 +59,20 @@ export function InvoiceDetailDialog({
         ) : (
           <InvoiceDetailBody invoice={data} />
         )}
+
+        {data ? (
+          <Button
+            variant="secondary"
+            className="w-full"
+            disabled={download.isPending}
+            onClick={() =>
+              download.mutate({ id: data.id, number: data.number })
+            }
+          >
+            <Download className="size-4" aria-hidden />
+            {download.isPending ? "Menyiapkan PDF…" : "Unduh PDF"}
+          </Button>
+        ) : null}
       </DialogContent>
     </Dialog>
   );
