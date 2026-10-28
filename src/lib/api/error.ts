@@ -49,6 +49,7 @@ export const KNOWN_ERROR_CODES = [
   "duplicate_email",
   // Instansi batch payment
   "payment_gateway_unavailable",
+  "invoice_not_found",
   "invoice_not_payable",
   "session_unpaid",
   "seat_claimed",
@@ -90,6 +91,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   duplicate_email: "Email sudah terdaftar — silakan masuk.",
   payment_gateway_unavailable:
     "Pembayaran sedang tidak tersedia — hubungi admin atau coba lagi nanti.",
+  invoice_not_found: "Tagihan tidak ditemukan.",
   invoice_not_payable: "Tagihan ini tidak bisa dibayar lagi.",
   session_unpaid: "Sesi belum dibuka — selesaikan pembayaran terlebih dahulu.",
   seat_claimed: "Nama ini sudah dipakai di HP lain — hubungi petugas.",

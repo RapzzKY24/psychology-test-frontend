@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { apiFetchServer } from "@/lib/api/server";
+import { isApiError } from "@/lib/api/client";
 import type {
   PublicTest,
   PublicArticleListItem,
@@ -69,10 +70,28 @@ export const fetchPublicArticleServer = cache(
  * bisa berubah kapan saja dan halaman ini dipakai untuk membuktikan keadaan
  * saat ini.
  */
-export const fetchInvoiceVerificationServer = cache(
+const fetchInvoiceVerificationServer = cache(
   (token: string): Promise<ApiSuccess<InvoiceVerification>> =>
     apiFetchServer<InvoiceVerification>(
       `/invoices/verify/${encodeURIComponent(token)}`,
       { revalidate: false },
     ),
 );
+
+/**
+ * Versi yang dipakai halaman: token tidak dikenal (404) dan token yang
+ * bentuknya bukan UUID (422) sama-sama berarti "tidak ada dokumen", bukan
+ * kegagalan server.
+ */
+export async function findInvoiceVerificationServer(
+  token: string,
+): Promise<InvoiceVerification | null> {
+  try {
+    return (await fetchInvoiceVerificationServer(token)).data;
+  } catch (error) {
+    if (isApiError(error) && (error.isNotFound || error.statusCode === 422)) {
+      return null;
+    }
+    throw error;
+  }
+}

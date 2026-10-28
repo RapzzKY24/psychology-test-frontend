@@ -1,5 +1,5 @@
-import { apiFetchRaw } from "./client";
-import { parseErrorResponse } from "./error";
+import { apiFetchRaw } from "./api/client";
+import { parseErrorResponse } from "./api/error";
 
 /** Ambil nama file dari header; fallback ke nama yang dikirim pemanggil. */
 const FILENAME_PATTERN = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i;

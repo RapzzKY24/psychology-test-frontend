@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api/client";
-import { downloadFile } from "@/lib/api/download";
+import { downloadFile } from "@/lib/download";
+import { formatInvoiceFilename } from "@/lib/format/format-invoice-filename";
 import type { InstansiInvoice, InstansiInvoiceListItem } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 
@@ -33,6 +34,8 @@ export function downloadInstansiInvoicePdf(
   id: string,
   number: string,
 ): Promise<void> {
-  const fallback = `Invoice-${number.replace(/[^A-Za-z0-9._-]+/g, "-")}.pdf`;
-  return downloadFile(`/instansi/invoices/${encodeURIComponent(id)}/pdf`, fallback);
+  return downloadFile(
+    `/instansi/invoices/${encodeURIComponent(id)}/pdf`,
+    formatInvoiceFilename(number),
+  );
 }

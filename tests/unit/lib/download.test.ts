@@ -7,7 +7,7 @@ vi.mock("@/lib/api/client", () => ({
   apiFetchRaw: (path: string) => apiFetchRaw(path),
 }));
 
-import { downloadFile, filenameFromDisposition } from "@/lib/api/download";
+import { downloadFile, filenameFromDisposition } from "@/lib/download";
 
 function responseWith(init: {
   ok?: boolean;
