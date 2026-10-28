@@ -1,4 +1,5 @@
-import { ArticleBlock } from "@/lib/api/types/articles";
+import { cn } from "@/lib/utils";
+import type { ArticleBlock } from "@/lib/api/types/articles";
 
 /**
  * Safe rich-text renderer for article blocks. Blocks are a discriminated union
@@ -17,14 +18,22 @@ export function ArticleBlocks({ blocks }: { blocks: ArticleBlock[] }) {
             );
           case "paragraph":
             return <p key={index}>{block.text}</p>;
-          case "list":
+          case "list": {
+            const ListTag = block.ordered ? "ol" : "ul";
             return (
-              <ul key={index} className="list-disc space-y-2 pl-6 text-muted-foreground">
+              <ListTag
+                key={index}
+                className={cn(
+                  "space-y-2 pl-6 text-muted-foreground",
+                  block.ordered ? "list-decimal" : "list-disc",
+                )}
+              >
                 {block.items.map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
-              </ul>
+              </ListTag>
             );
+          }
           case "image":
             return (
               <figure key={index} className="space-y-2">
