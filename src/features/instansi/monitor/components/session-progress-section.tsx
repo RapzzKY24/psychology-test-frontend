@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SessionProgressChart } from "./session-progress-chart";
-import type { SessionProgressItem } from "../api";
+import type { SessionProgressItem } from "../types";
 
 export function SessionProgressSection({ sessions }: { sessions: SessionProgressItem[] }) {
   return (

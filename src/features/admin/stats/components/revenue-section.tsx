@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RevenueCards } from "./revenue-cards";
 import { RevenueChart } from "./revenue-chart";
-import type { AdminRevenueStats } from "../api";
+import type { AdminRevenueStats } from "../types";
 
 export function RevenueSection({ stats }: { stats: AdminRevenueStats }) {
   return (

@@ -1,7 +1,11 @@
 "use client";
 
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { formatDayShort } from "@/lib/format/format-day-short";
 import type { ReviewStatsPoint } from "../api";
@@ -20,9 +24,14 @@ export function ReviewIncomingChart({ incoming }: { incoming: ReviewStatsPoint[]
   }
 
   return (
-    <ChartContainer config={CHART_CONFIG} className="h-64">
+    <ChartContainer
+      config={CHART_CONFIG}
+      className="h-64 w-full"
+      role="img"
+      aria-label="Grafik batang jumlah hasil tes baru per hari selama empat belas hari terakhir"
+    >
       <BarChart data={incoming} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
-        <CartesianGrid vertical={false} stroke="var(--border)" />
+        <CartesianGrid vertical={false} />
         <XAxis
           dataKey="date"
           tickFormatter={formatDayShort}
@@ -31,16 +40,16 @@ export function ReviewIncomingChart({ incoming }: { incoming: ReviewStatsPoint[]
           tickMargin={8}
           interval="preserveStartEnd"
           minTickGap={16}
-          fontSize={12}
         />
-        <YAxis
-          allowDecimals={false}
-          tickLine={false}
-          axisLine={false}
-          width={32}
-          fontSize={12}
+        <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={32} />
+        <ChartTooltip
+          cursor={false}
+          content={
+            <ChartTooltipContent
+              labelFormatter={(value) => formatDayShort(String(value))}
+            />
+          }
         />
-        <ChartTooltip formatLabel={formatDayShort} />
         <Bar
           dataKey="count"
           name="Hasil masuk"

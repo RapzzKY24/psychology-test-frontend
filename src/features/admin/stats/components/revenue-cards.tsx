@@ -1,7 +1,7 @@
 import { ClipboardCheck, ReceiptText, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatIdr } from "@/lib/format/format-idr";
-import type { AdminRevenueStats } from "../api";
+import type { AdminRevenueStats } from "../types";
 
 export function RevenueCards({ stats }: { stats: AdminRevenueStats }) {
   const cards = [

@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { CalendarDays, ClipboardCheck, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { InstansiOverview } from "../api";
+import type { InstansiOverview } from "../types";
 
 function StatCard({
   label,

@@ -1,6 +1,6 @@
 import { apiFetchServer } from "@/lib/api/server";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
-import type { InstansiOverview, InstansiSessionProgress } from "./api";
+import type { InstansiOverview, InstansiSessionProgress } from "./types";
 
 /** Server-only fetchers for the instansi monitor feature (RSC pages). */
 export function fetchInstansiOverviewServer(): Promise<ApiSuccess<InstansiOverview>> {

@@ -1,9 +1,14 @@
 "use client";
 
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
-import type { SessionProgressItem } from "../api";
+import { truncateText } from "@/lib/format/truncate-text";
+import type { SessionProgressItem } from "../types";
 
 const CHART_CONFIG = {
   completed: { label: "Selesai", color: "var(--chart-1)" },
@@ -13,10 +18,6 @@ const CHART_CONFIG = {
 } satisfies ChartConfig;
 
 const TITLE_LIMIT = 22;
-
-function shortTitle(title: string): string {
-  return title.length > TITLE_LIMIT ? `${title.slice(0, TITLE_LIMIT)}…` : title;
-}
 
 export function SessionProgressChart({ sessions }: { sessions: SessionProgressItem[] }) {
   if (sessions.length === 0) {
@@ -29,21 +30,29 @@ export function SessionProgressChart({ sessions }: { sessions: SessionProgressIt
 
   const data = sessions.map((session) => ({
     ...session,
-    label: shortTitle(session.title),
+    label: truncateText(session.title, TITLE_LIMIT),
   }));
   const maxSlots = Math.max(...sessions.map((session) => session.slotLimit), 1);
 
   return (
-    <ChartContainer config={CHART_CONFIG} className="h-72">
-      <BarChart data={data} layout="vertical" margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-        <CartesianGrid horizontal={false} stroke="var(--border)" />
+    <ChartContainer
+      config={CHART_CONFIG}
+      className="h-72 w-full"
+      role="img"
+      aria-label="Grafik batang progres peserta per sesi: selesai, dikerjakan, belum mulai, dan slot kosong"
+    >
+      <BarChart
+        data={data}
+        layout="vertical"
+        margin={{ top: 4, right: 8, bottom: 0, left: 0 }}
+      >
+        <CartesianGrid horizontal={false} />
         <XAxis
           type="number"
           domain={[0, maxSlots]}
           allowDecimals={false}
           tickLine={false}
           axisLine={false}
-          fontSize={12}
         />
         <YAxis
           type="category"
@@ -51,9 +60,8 @@ export function SessionProgressChart({ sessions }: { sessions: SessionProgressIt
           width={148}
           tickLine={false}
           axisLine={false}
-          fontSize={12}
         />
-        <ChartTooltip />
+        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <Bar
           dataKey="completed"
           name="Selesai"
