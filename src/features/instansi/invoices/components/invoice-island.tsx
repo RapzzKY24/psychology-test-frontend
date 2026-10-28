@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CheckCircle2, Clock, ExternalLink } from "lucide-react";
+import { CheckCircle2, Clock, Download, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { formatIdr } from "@/lib/format/format-idr";
 import { qk } from "@/lib/api/query-keys";
 import type { InstansiInvoice } from "@/lib/api/types";
 import { fetchInstansiInvoice } from "../api";
+import { useDownloadInstansiInvoicePdf } from "../hooks/use-download-instansi-invoice-pdf";
 import { INVOICE_POLL_MS, INVOICE_STATUS_LABEL, bankLabel } from "../constants";
 import { CopyValueButton } from "./copy-value-button";
 import { InvoiceCountdown } from "./invoice-countdown";
@@ -31,6 +32,7 @@ export function InvoiceIsland({ initial }: { initial: InstansiInvoice }) {
   });
 
   const router = useRouter();
+  const download = useDownloadInstansiInvoicePdf();
   const invoice = invoiceQuery.data;
   const isPaid = invoice.status === "PAID";
   const wasPaid = useRef(initial.status === "PAID");
@@ -133,6 +135,18 @@ export function InvoiceIsland({ initial }: { initial: InstansiInvoice }) {
             )}
           </div>
         )}
+
+        <Button
+          variant="secondary"
+          className="w-full"
+          disabled={download.isPending}
+          onClick={() =>
+            download.mutate({ id: invoice.id, number: invoice.number })
+          }
+        >
+          <Download className="size-4" aria-hidden />
+          {download.isPending ? "Menyiapkan PDF…" : "Unduh PDF"}
+        </Button>
       </CardContent>
     </Card>
   );
