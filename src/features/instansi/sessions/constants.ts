@@ -4,6 +4,9 @@ export const MAX_SLOT_LIMIT = 1000;
 /** One page of the institution roster for the employee picker. */
 export const EMPLOYEE_PICKER_LIMIT = 100;
 
+/** Rows shown in the "Sesi terbaru" card on the institution dashboard. */
+export const RECENT_SESSIONS_LIMIT = 5;
+
 /** Poll cadence for a session detail whose batch invoice is still UNPAID. */
 export const SESSION_DETAIL_POLL_MS = 8000;
 

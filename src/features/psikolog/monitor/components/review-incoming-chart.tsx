@@ -3,22 +3,12 @@
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
+import { formatDayShort } from "@/lib/format/format-day-short";
 import type { ReviewStatsPoint } from "../api";
 
 const CHART_CONFIG = {
   count: { label: "Hasil masuk", color: "var(--chart-1)" },
 } satisfies ChartConfig;
-
-const DAY_FORMAT = new Intl.DateTimeFormat("id-ID", {
-  day: "numeric",
-  month: "short",
-});
-
-function formatDay(date: string): string {
-  const [year, month, day] = date.split("-").map(Number);
-  if (!year || !month || !day) return date;
-  return DAY_FORMAT.format(new Date(Date.UTC(year, month - 1, day)));
-}
 
 export function ReviewIncomingChart({ incoming }: { incoming: ReviewStatsPoint[] }) {
   if (incoming.every((point) => point.count === 0)) {
@@ -35,7 +25,7 @@ export function ReviewIncomingChart({ incoming }: { incoming: ReviewStatsPoint[]
         <CartesianGrid vertical={false} stroke="var(--border)" />
         <XAxis
           dataKey="date"
-          tickFormatter={formatDay}
+          tickFormatter={formatDayShort}
           tickLine={false}
           axisLine={false}
           tickMargin={8}
@@ -50,7 +40,7 @@ export function ReviewIncomingChart({ incoming }: { incoming: ReviewStatsPoint[]
           width={32}
           fontSize={12}
         />
-        <ChartTooltip formatLabel={formatDay} />
+        <ChartTooltip formatLabel={formatDayShort} />
         <Bar
           dataKey="count"
           name="Hasil masuk"
