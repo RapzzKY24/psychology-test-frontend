@@ -157,7 +157,7 @@ export function InstansiSidebar({ name, email }: { name: string; email: string }
   const pathname = usePathname();
 
   return (
-    <aside className="hidden h-svh w-60 shrink-0 flex-col overflow-hidden border-r bg-sidebar md:flex">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r bg-sidebar md:flex">
       <BrandMark />
       <NavGroups pathname={pathname} />
       <UserBlock name={name} email={email} />
