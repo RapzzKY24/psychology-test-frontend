@@ -1,6 +1,11 @@
 import { cache } from "react";
 import { apiFetchServer } from "@/lib/api/server";
-import type { PublicTest, PublicArticleListItem, PublicArticle } from "@/lib/api/types";
+import type {
+  PublicTest,
+  PublicArticleListItem,
+  PublicArticle,
+  InvoiceVerification,
+} from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 
 /**
@@ -57,4 +62,17 @@ export const fetchPublicArticleCategories = cache(async (): Promise<string[]> =>
 export const fetchPublicArticleServer = cache(
   (slug: string) =>
     apiFetchServer<PublicArticle>(`/articles/${slug}`, { revalidate: PUBLIC_REVALIDATE }),
+);
+
+/**
+ * Verifikasi invoice lewat token QR. Tidak boleh di-cache: status pembayaran
+ * bisa berubah kapan saja dan halaman ini dipakai untuk membuktikan keadaan
+ * saat ini.
+ */
+export const fetchInvoiceVerificationServer = cache(
+  (token: string): Promise<ApiSuccess<InvoiceVerification>> =>
+    apiFetchServer<InvoiceVerification>(
+      `/invoices/verify/${encodeURIComponent(token)}`,
+      { revalidate: false },
+    ),
 );
