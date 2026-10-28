@@ -7,7 +7,9 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { OverviewCards } from "@/features/instansi/monitor/components/overview-cards";
-import { fetchInstansiOverviewServer } from "@/features/instansi/monitor/api.server";
+import { fetchInstansiOverviewServer, fetchInstansiProgressServer } from "@/features/instansi/monitor/api.server";
+import { SessionProgressSection } from "@/features/instansi/monitor/components/session-progress-section";
+import { PROGRESS_SESSIONS_LIMIT } from "@/features/instansi/monitor/constants";
 import { fetchInstansiSessionsServer } from "@/features/instansi/sessions/api.server";
 import { CopyInviteButton } from "@/components/shared/copy-invite-button";
 import { SESSION_STATUS_LABEL } from "@/lib/constants/session-status";
@@ -33,9 +35,10 @@ export default async function InstansiPage() {
   const session = await requireServerRole("INSTANSI");
   if (!session) notFound();
 
-  const [{ data: overview }, { data: sessions }] = await Promise.all([
+  const [{ data: overview }, { data: sessions }, { data: progress }] = await Promise.all([
     fetchInstansiOverviewServer(),
     fetchInstansiSessionsServer({ limit: 5 }),
+    fetchInstansiProgressServer(PROGRESS_SESSIONS_LIMIT),
   ]);
 
   return (
@@ -45,6 +48,7 @@ export default async function InstansiPage() {
         description="Pantau pegawai, sesi, dan progres pengerjaan tes."
       />
       <OverviewCards overview={overview} />
+      <SessionProgressSection sessions={progress.sessions} />
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>

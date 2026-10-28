@@ -4,14 +4,21 @@ import { ClipboardCheck, TriangleAlert, UserRound } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchMyProfile, fetchReviewQueueCount } from "@/features/psikolog/monitor/api";
+import {
+  fetchMyProfile,
+  fetchReviewQueueCount,
+  fetchReviewStatsServer,
+} from "@/features/psikolog/monitor/api";
+import { ReviewStatsSection } from "@/features/psikolog/monitor/components/review-stats-section";
+import { REVIEW_STATS_DAYS } from "@/features/psikolog/monitor/constants";
 
 export const metadata: Metadata = { title: "Ringkasan" };
 
 export default async function PsikologPage() {
-  const [queueCount, profile] = await Promise.all([
+  const [queueCount, profile, reviewStats] = await Promise.all([
     fetchReviewQueueCount(),
     fetchMyProfile(),
+    fetchReviewStatsServer(REVIEW_STATS_DAYS),
   ]);
 
   return (
@@ -62,6 +69,7 @@ export default async function PsikologPage() {
           </CardContent>
         </Card>
       </div>
+      <ReviewStatsSection stats={reviewStats.data} />
     </main>
   );
 }
