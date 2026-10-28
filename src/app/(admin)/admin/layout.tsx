@@ -11,10 +11,10 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   if (!session) notFound();
 
   return (
-    <div className="flex h-svh flex-1 flex-col overflow-hidden md:flex-row">
+    <div className="flex min-h-svh flex-1 flex-col md:h-svh md:flex-row md:overflow-hidden">
       <AdminMobileBar name={session.user.name} />
       <AdminSidebar name={session.user.name} email={session.user.email} />
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">{children}</div>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col md:overflow-y-auto">{children}</div>
     </div>
   );
 }

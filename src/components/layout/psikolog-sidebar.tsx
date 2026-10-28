@@ -100,7 +100,7 @@ function PublicSiteLink() {
 
 function NavGroups({ pathname }: { pathname: string }) {
   return (
-    <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-2">
+    <nav className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-3 py-2">
       {NAV_GROUPS.map((group) => (
         <div key={group.label}>
           <p className="px-3 pb-1.5 pt-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
