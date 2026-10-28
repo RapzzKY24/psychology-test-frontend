@@ -12,10 +12,10 @@ export default async function PsikologLayout({ children }: LayoutProps<"/psikolo
   if (!session) notFound();
 
   return (
-    <div className="flex min-h-full flex-1 flex-col md:flex-row">
+    <div className="flex h-svh flex-1 flex-col overflow-hidden md:flex-row">
       <PsikologMobileBar name={session.user.name} />
       <PsikologSidebar name={session.user.name} email={session.user.email} />
-      <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">{children}</div>
     </div>
   );
 }
