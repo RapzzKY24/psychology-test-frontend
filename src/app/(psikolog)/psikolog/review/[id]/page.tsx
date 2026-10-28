@@ -1,28 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ResultStatusBadge } from "@/components/admin/result-status-badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { ApproveButton, ReturnDialog } from "@/features/psikolog/review/components/review-actions";
-import { ReviewCorrectionDialog } from "@/features/psikolog/review/components/review-correction-dialog";
-import { ReviewNotesDialog } from "@/features/psikolog/review/components/review-notes-dialog";
-import { RightWrongDetailTable } from "@/features/psikolog/review/components/right-wrong-detail-table";
+import { ReviewAnswerSection } from "@/features/psikolog/review/components/review-answer-section";
+import { ReviewDetailActions } from "@/features/psikolog/review/components/review-detail-actions";
+import { ReviewScoreCards } from "@/features/psikolog/review/components/review-score-cards";
 import { fetchReviewDetailServer } from "@/features/psikolog/review/api.server";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
@@ -38,16 +20,13 @@ export default async function ReviewDetailPage({
 
   let detail;
   try {
-    const response = await fetchReviewDetailServer(id);
-    detail = response.data;
+    detail = (await fetchReviewDetailServer(id)).data;
   } catch (error) {
     if (isApiError(error) && error.isNotFound) notFound();
     throw error;
   }
 
   const { result } = detail;
-  const isPending = result.status === "PENDING_REVIEW";
-  const isApproved = result.status === "APPROVED";
 
   return (
     <main className="flex-1 space-y-6 p-6">
@@ -56,91 +35,15 @@ export default async function ReviewDetailPage({
         description={`${detail.session.title} · selesai ${formatIdDate(detail.attempt.completedAt)}`}
       />
 
-      <div className="flex flex-wrap items-center gap-3">
-        <ResultStatusBadge status={result.status} />
-        {isApproved ? (
-          <>
-            <span className="rounded-lg border bg-amber-50 px-3 py-1.5 text-sm text-amber-800">
-              Hasil sudah disetujui — read-only
-            </span>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span tabIndex={0} title="Segera hadir — hold">
-                    <Button
-                      variant="outline"
-                      className="h-11"
-                      disabled
-                      aria-disabled={true}
-                      title="Segera hadir — hold"
-                    >
-                      Rilis Hasil
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>Segera hadir — hold</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </>
-        ) : (
-          <>
-            {isPending && (
-              <>
-                <ApproveButton resultId={result.id} />
-                <ReturnDialog resultId={result.id} />
-              </>
-            )}
-            <ReviewNotesDialog resultId={result.id} initialNotes={result.notes ?? null} />
-            <ReviewCorrectionDialog
-              resultId={result.id}
-              currentScores={result.correctedScores ?? result.scores}
-              currentPatternCode={result.correctedPatternCode ?? result.patternCode}
-            />
-          </>
-        )}
-        <Link href="/psikolog/review" className="text-sm text-muted-foreground hover:underline">
-          ← Kembali ke antrean
-        </Link>
-      </div>
+      <ReviewDetailActions result={result} />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Skor sistem</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-1 text-sm">
-            <p>
-              Pola: <span className="font-mono font-medium">{result.patternCode}</span>
-            </p>
-            <pre className="overflow-x-auto rounded-lg bg-muted/50 p-3 font-mono text-xs">
-              {JSON.stringify(result.scores, null, 2)}
-            </pre>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Koreksi psikolog</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-1 text-sm">
-            {result.correctedPatternCode ? (
-              <>
-                <p>
-                  Pola:{" "}
-                  <span className="font-mono font-medium">{result.correctedPatternCode}</span>
-                </p>
-                <pre className="overflow-x-auto rounded-lg bg-muted/50 p-3 font-mono text-xs">
-                  {JSON.stringify(result.correctedScores, null, 2)}
-                </pre>
-                {result.correctionReason && (
-                  <p className="text-muted-foreground">{result.correctionReason}</p>
-                )}
-              </>
-            ) : (
-              <p className="text-muted-foreground">Belum ada koreksi.</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <ReviewScoreCards
+        patternCode={result.patternCode}
+        scores={result.scores}
+        correctedPatternCode={result.correctedPatternCode}
+        correctedScores={result.correctedScores}
+        correctionReason={result.correctionReason}
+      />
 
       {detail.interpretation && (
         <Card>
@@ -153,58 +56,7 @@ export default async function ReviewDetailPage({
         </Card>
       )}
 
-      {(() => {
-        const firstContent = detail.items[0]?.content as unknown as { correctIndex?: number } | undefined;
-        const isRightWrong = typeof firstContent?.correctIndex === "number";
-        if (isRightWrong) {
-          return (
-            <RightWrongDetailTable
-              items={
-                detail.items as unknown as Array<{
-                  id: string;
-                  order: number;
-                  content: { question?: string | null; imageUrl?: string | null; options: string[]; correctIndex: number };
-                }>
-              }
-              responses={
-                detail.responses as unknown as Array<{ itemId: string; value: { chosen: number } }>
-              }
-              scores={result.scores as unknown as { raw: number; total: number; perItem: boolean[] } | undefined}
-            />
-          );
-        }
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Jawaban per soal</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-hidden rounded-lg border">
-                <Table>
-                  <TableHeader className="bg-muted/50">
-                    <TableRow>
-                      <TableHead className="w-16">No</TableHead>
-                      <TableHead>Kata</TableHead>
-                      <TableHead>Paling</TableHead>
-                      <TableHead>Kurang</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {detail.itemsDetailed.map((item) => (
-                      <TableRow key={item.itemOrder}>
-                        <TableCell className="tabular-nums">{item.itemOrder}</TableCell>
-                        <TableCell>{item.words.join(" · ")}</TableCell>
-                        <TableCell className="tabular-nums">{item.most ?? "—"}</TableCell>
-                        <TableCell className="tabular-nums">{item.least ?? "—"}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })()}
+      <ReviewAnswerSection detail={detail} scores={result.scores} />
     </main>
   );
 }

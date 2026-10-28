@@ -4,13 +4,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
-import type { OptimisticRow } from "@/features/admin/hooks/use-optimistic-list";
+import type { OptimisticRow } from "@/lib/hooks/use-optimistic-list";
 import type { SessionSummary } from "@/lib/api/types";
 import { SavingChip } from "@/components/admin/saving-chip";
 import { cn } from "@/lib/utils";
 import { formatIdDate } from "@/lib/format/format-date";
 import { CopyInviteButton } from "@/components/shared/copy-invite-button";
-import { SESSION_STATUS_LABEL } from "../constants";
+import { SESSION_STATUS_LABEL } from "@/lib/constants/session-status";
 
 interface SessionsTableProps {
   rows: OptimisticRow<SessionSummary>[];

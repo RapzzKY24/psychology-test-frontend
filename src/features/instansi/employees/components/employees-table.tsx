@@ -23,7 +23,7 @@ import { TablePagination } from "@/components/admin/table-pagination";
 import { SavingChip } from "@/components/admin/saving-chip";
 import { cn } from "@/lib/utils";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
-import type { OptimisticRow } from "@/features/admin/hooks/use-optimistic-list";
+import type { OptimisticRow } from "@/lib/hooks/use-optimistic-list";
 import type { Employee } from "@/lib/api/types";
 import type { QueryKey } from "@tanstack/react-query";
 import { toast } from "sonner";

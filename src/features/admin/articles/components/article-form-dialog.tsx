@@ -17,8 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import type { AdminArticleListItem } from "@/lib/api/types";
 import { qk } from "@/lib/api/query-keys";
 import { fetchAdminArticleDetail } from "../api";
@@ -31,7 +29,7 @@ import {
 } from "../schemas";
 import type { ArticleFormInput } from "../schemas";
 import { useCreateArticle, useUpdateArticle } from "../hooks/use-article-mutations";
-import { ArticleBlocksEditor } from "./article-blocks-editor";
+import { ArticleFormFields } from "./article-form-fields";
 
 interface ArticleFormDialogProps {
   mode: "create" | "edit";
@@ -83,9 +81,6 @@ export function ArticleFormDialog({ mode, listKey, article, trigger }: ArticleFo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, mode]);
 
-  const content = form.watch("content");
-  const contentError = form.formState.errors.content;
-
   const pickCover = (file: File | undefined) => {
     if (!file) return;
     setCoverFile(file);
@@ -100,9 +95,6 @@ export function ArticleFormDialog({ mode, listKey, article, trigger }: ArticleFo
   });
 
   const loadingDetail = mode === "edit" && detail.isLoading;
-  const titleError = form.formState.errors.title;
-  const slugError = form.formState.errors.slug;
-  const excerptError = form.formState.errors.excerpt;
 
   return (
     <Dialog
@@ -143,85 +135,13 @@ export function ArticleFormDialog({ mode, listKey, article, trigger }: ArticleFo
           </div>
         ) : (
           <form onSubmit={submit} noValidate className="grid gap-4">
-            <Field data-invalid={titleError ? true : undefined}>
-              <FieldLabel htmlFor="article-title">Judul</FieldLabel>
-              <Input
-                id="article-title"
-                disabled={mutation.isPending}
-                aria-invalid={titleError ? true : undefined}
-                {...form.register("title")}
-              />
-              {titleError && <FieldError errors={[titleError]} />}
-            </Field>
-
-            <Field data-invalid={slugError ? true : undefined}>
-              <FieldLabel htmlFor="article-slug">Slug</FieldLabel>
-              <Input
-                id="article-slug"
-                disabled={mutation.isPending}
-                aria-invalid={slugError ? true : undefined}
-                {...form.register("slug", { onChange: () => (autoSlug.current = false) })}
-              />
-              <FieldDescription>URL publik: /artikel/&lt;slug&gt;.</FieldDescription>
-              {slugError && <FieldError errors={[slugError]} />}
-            </Field>
-
-            <Field data-invalid={excerptError ? true : undefined}>
-              <FieldLabel htmlFor="article-excerpt">Ringkasan</FieldLabel>
-              <Input
-                id="article-excerpt"
-                disabled={mutation.isPending}
-                aria-invalid={excerptError ? true : undefined}
-                {...form.register("excerpt")}
-              />
-              {excerptError && <FieldError errors={[excerptError]} />}
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="article-category">Kategori (opsional)</FieldLabel>
-              <Input
-                id="article-category"
-                placeholder="mis. Kesehatan Mental"
-                disabled={mutation.isPending}
-                {...form.register("category")}
-              />
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="article-cover">Sampul (opsional)</FieldLabel>
-              {coverPreview ? (
-                // eslint-disable-next-line @next/next/no-img-element -- local upload URL
-                <img
-                  src={coverPreview}
-                  alt="Pratinjau sampul"
-                  className="mb-2 max-h-40 rounded-md border object-cover"
-                />
-              ) : null}
-              <Input
-                id="article-cover"
-                type="file"
-                accept="image/png,image/jpeg"
-                disabled={mutation.isPending}
-                onChange={(e) => {
-                  pickCover(e.target.files?.[0]);
-                  e.target.value = "";
-                }}
-              />
-              <FieldDescription>PNG/JPG, maksimal 2MB.</FieldDescription>
-            </Field>
-
-            <Field data-invalid={contentError ? true : undefined}>
-              <FieldLabel>Isi Artikel</FieldLabel>
-              <ArticleBlocksEditor
-                value={content}
-                invalid={Boolean(contentError)}
-                onChange={(blocks) =>
-                  form.setValue("content", blocks, { shouldValidate: true, shouldDirty: true })
-                }
-              />
-              {contentError && <FieldError errors={[contentError]} />}
-            </Field>
-
+            <ArticleFormFields
+              form={form}
+              disabled={mutation.isPending}
+              coverPreview={coverPreview}
+              onPickCover={pickCover}
+              onSlugEdited={() => (autoSlug.current = false)}
+            />
             <DialogFooter>
               <Button type="submit" disabled={mutation.isPending || loadingDetail}>
                 {mutation.isPending ? "Menyimpan..." : "Simpan Draf"}

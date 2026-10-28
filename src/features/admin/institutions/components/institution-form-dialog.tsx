@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { FORM_INVALID_TOAST } from "@/features/admin/copy";
+import { FORM_INVALID_TOAST } from "@/lib/copy";
 import type { QueryKey } from "@tanstack/react-query";
 import type { Institution } from "@/lib/api/types";
 import { useInstitutionForm } from "../hooks/use-institution-form";

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchMyProfile } from "@/features/psikolog/monitor/api.server";
+import { fetchMyProfile } from "@/features/psikolog/monitor/api";
 import { ProfileForm } from "./profile-form";
 import { SignatureSection } from "./signature-section";
 

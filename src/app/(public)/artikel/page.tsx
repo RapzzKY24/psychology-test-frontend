@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendarDays, Newspaper } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { fetchPublicArticleCategories, fetchPublicArticlesServer } from "@/features/public/api.server";
+import { fetchPublicArticleCategories, fetchPublicArticlesServer } from "@/features/public/api";
 import { ArticleCard } from "@/features/public/components/article-card";
 import { ArticleCategoryFilters } from "@/features/public/components/article-category-filters";
 import { ArticleSearchForm } from "@/features/public/components/article-search-form";

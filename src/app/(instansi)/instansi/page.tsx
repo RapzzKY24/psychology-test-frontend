@@ -10,7 +10,7 @@ import { OverviewCards } from "@/features/instansi/monitor/components/overview-c
 import { fetchInstansiOverviewServer } from "@/features/instansi/monitor/api.server";
 import { fetchInstansiSessionsServer } from "@/features/instansi/sessions/api.server";
 import { CopyInviteButton } from "@/components/shared/copy-invite-button";
-import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
+import { SESSION_STATUS_LABEL } from "@/lib/constants/session-status";
 import { requireServerRole } from "@/lib/api/server";
 
 export const metadata: Metadata = { title: "Ringkasan" };

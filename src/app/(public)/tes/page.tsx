@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { TEST_CATEGORIES, type TestCategory } from "@/lib/api/types";
-import { fetchPublicTestsServer } from "@/features/public/api.server";
+import { fetchPublicTestsServer } from "@/features/public/api";
 import { TestBuyCta } from "@/features/public/components/test-buy-cta";
 import { TestCard } from "@/features/public/components/test-card";
 import { TestCategoryFilters } from "@/features/public/components/test-category-filters";

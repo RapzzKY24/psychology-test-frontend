@@ -2,7 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import type { QueryKey } from "@tanstack/react-query";
-import { useOptimisticList } from "@/features/admin/hooks/use-optimistic-list";
+import { useOptimisticList } from "@/lib/hooks/use-optimistic-list";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import type { Employee } from "@/lib/api/types";

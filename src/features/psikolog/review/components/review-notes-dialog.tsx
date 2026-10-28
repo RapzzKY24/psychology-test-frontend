@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
-import { FORM_INVALID_TOAST } from "@/features/admin/copy";
+import { FORM_INVALID_TOAST } from "@/lib/copy";
 import { useSaveReviewNotes } from "../hooks/use-review-actions";
 import { ReviewNotesSchema } from "../schemas";
 import type { ReviewNotesInput } from "../schemas";

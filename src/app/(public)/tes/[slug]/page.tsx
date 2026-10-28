@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isApiError } from "@/lib/api/client";
-import { fetchPublicTestServer } from "@/features/public/api.server";
+import { fetchPublicTestServer } from "@/features/public/api";
 import { TestDetailView } from "@/features/public/components/test-detail-view";
 import { getServerSession } from "@/lib/api/server";
 

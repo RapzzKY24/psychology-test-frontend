@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { CopyInviteButton } from "@/components/shared/copy-invite-button";
 import { fetchInstansiSessionDetailServer } from "@/features/instansi/sessions/api.server";
 import { InstansiSessionDetailIsland } from "@/features/instansi/sessions/components/instansi-session-detail-island";
-import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
+import { SESSION_STATUS_LABEL } from "@/lib/constants/session-status";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
 import { CloseInstansiSessionButton } from "@/features/instansi/sessions/components/close-instansi-session-button";

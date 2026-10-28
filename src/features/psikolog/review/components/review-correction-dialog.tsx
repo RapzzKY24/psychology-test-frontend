@@ -20,7 +20,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { z } from "zod";
-import { FORM_INVALID_TOAST } from "@/features/admin/copy";
+import { FORM_INVALID_TOAST } from "@/lib/copy";
 import { useApplyCorrection } from "../hooks/use-review-actions";
 
 const CorrectionFormSchema = z.object({

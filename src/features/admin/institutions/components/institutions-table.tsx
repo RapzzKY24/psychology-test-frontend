@@ -9,7 +9,7 @@ import {
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
-import type { OptimisticRow } from "@/features/admin/hooks/use-optimistic-list";
+import type { OptimisticRow } from "@/lib/hooks/use-optimistic-list";
 import type { Institution } from "@/lib/api/types";
 import type { QueryKey } from "@tanstack/react-query";
 import { SavingChip } from "@/components/admin/saving-chip";

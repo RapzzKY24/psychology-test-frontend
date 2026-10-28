@@ -1,35 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import type { QueryKey } from "@tanstack/react-query";
-import { Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
 import { SavingChip } from "@/components/admin/saving-chip";
 import { formatIdDate } from "@/lib/format/format-date";
 import { cn } from "@/lib/utils";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
-import type { OptimisticRow } from "@/features/admin/hooks/use-optimistic-list";
+import type { OptimisticRow } from "@/lib/hooks/use-optimistic-list";
 import type { AdminArticleListItem } from "@/lib/api/types";
-import {
-  useDeleteArticle,
-  usePublishArticle,
-  useUnpublishArticle,
-} from "../hooks/use-article-mutations";
-import { ArticleFormDialog } from "./article-form-dialog";
+import { ArticleRowActions } from "./article-row-actions";
 
 interface ArticlesTableProps {
   rows: OptimisticRow<AdminArticleListItem>[];
@@ -100,71 +82,6 @@ export function ArticlesTable({ rows, meta, listKey }: ArticlesTableProps) {
         </Table>
       </div>
       <TablePagination meta={meta} pageHref={pageHref} />
-    </div>
-  );
-}
-
-function ArticleRowActions({
-  row,
-  listKey,
-}: {
-  row: AdminArticleListItem;
-  listKey: QueryKey;
-}) {
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const publish = usePublishArticle(listKey, row.id);
-  const unpublish = useUnpublishArticle(listKey, row.id);
-  const remove = useDeleteArticle(listKey, row.id);
-  const statusMutation = row.status === "PUBLISHED" ? unpublish : publish;
-
-  return (
-    <div className="flex items-center gap-2">
-      <ArticleFormDialog
-        mode="edit"
-        listKey={listKey}
-        article={row}
-        trigger={
-          <Button variant="outline" size="sm">
-            <Pencil className="size-4" aria-hidden />
-            Edit
-          </Button>
-        }
-      />
-      <Button
-        variant="outline"
-        size="sm"
-        disabled={statusMutation.isPending}
-        onClick={() => statusMutation.mutate()}
-      >
-        {row.status === "PUBLISHED" ? "Tarik" : "Terbitkan"}
-      </Button>
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label={`Hapus ${row.title}`}
-          onClick={() => setConfirmOpen(true)}
-        >
-          <Trash2 className="size-4 text-destructive" aria-hidden />
-        </Button>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hapus artikel ini?</AlertDialogTitle>
-            <AlertDialogDescription>
-              &ldquo;{row.title}&rdquo; akan dihapus permanen, termasuk gambar sampulnya.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => remove.mutate()}
-              className="bg-destructive text-white hover:bg-destructive/90"
-            >
-              Hapus
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

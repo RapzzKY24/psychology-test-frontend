@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FORM_INVALID_TOAST } from "@/features/admin/copy";
+import { FORM_INVALID_TOAST } from "@/lib/copy";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import { qk } from "@/lib/api/query-keys";

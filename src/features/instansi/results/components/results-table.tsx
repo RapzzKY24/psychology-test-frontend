@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
-import { safeRenderScores } from "@/features/psikolog/review/components/review-queue-table";
+import { safeRenderScores } from "@/lib/format/format-scores";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
 import type { InstansiResultItem } from "@/lib/api/types";
 import { formatIdDate } from "@/lib/format/format-date";

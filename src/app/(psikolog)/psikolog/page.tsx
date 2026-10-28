@@ -4,7 +4,7 @@ import { ClipboardCheck, TriangleAlert, UserRound } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchMyProfile, fetchReviewQueueCount } from "@/features/psikolog/monitor/api.server";
+import { fetchMyProfile, fetchReviewQueueCount } from "@/features/psikolog/monitor/api";
 
 export const metadata: Metadata = { title: "Ringkasan" };
 

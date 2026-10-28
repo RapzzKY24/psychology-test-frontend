@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
-import { fetchPublicArticleServer, fetchPublicArticlesServer } from "@/features/public/api.server";
+import { fetchPublicArticleServer, fetchPublicArticlesServer } from "@/features/public/api";
 import { ArticleBlocks } from "@/features/public/components/article-blocks";
 
 export async function generateMetadata({ params }: PageProps<"/artikel/[slug]">): Promise<Metadata> {

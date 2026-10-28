@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { FORM_INVALID_TOAST } from "@/features/admin/copy";
+import { FORM_INVALID_TOAST } from "@/lib/copy";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCreateSession } from "./use-session-mutations";
 import { CreateSessionSchema } from "../schemas";

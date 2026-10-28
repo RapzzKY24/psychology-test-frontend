@@ -10,7 +10,7 @@ import { RightWrongItemView } from "./components/right-wrong-item-view";
 export const ITEM_RENDERERS = {
   FORCED_CHOICE_DISC: DiscItemView,
   RIGHT_WRONG_NORM: RightWrongItemView,
-} as const satisfies Record<ScorerType, React.ComponentType<any>>; // eslint-disable-line @typescript-eslint/no-explicit-any
+} as const satisfies Record<ScorerType, React.ElementType>;
 
 export type RendererScorerType = keyof typeof ITEM_RENDERERS;
 

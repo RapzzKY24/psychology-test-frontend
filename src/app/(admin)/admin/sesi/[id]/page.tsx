@@ -9,7 +9,7 @@ import { SessionStats } from "@/components/shared/session-stats";
 import { SessionParticipantsTable } from "@/features/admin/sessions/components/session-participants-table";
 import { fetchSessionDetailServer } from "@/features/admin/sessions/api.server";
 import { qk } from "@/lib/api/query-keys";
-import { SESSION_STATUS_LABEL } from "@/features/admin/sessions/constants";
+import { SESSION_STATUS_LABEL } from "@/lib/constants/session-status";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
 
