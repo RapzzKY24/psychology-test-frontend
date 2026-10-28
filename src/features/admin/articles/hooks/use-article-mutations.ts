@@ -11,6 +11,7 @@ import {
   createArticle,
   deleteArticle,
   publishArticle,
+  revalidatePublicArticlePages,
   unpublishArticle,
   updateArticle,
   uploadArticleCover,
@@ -101,6 +102,7 @@ export function useUpdateArticle(
     onSuccess: () => {
       toast.success("Artikel diperbarui.");
       void queryClient.invalidateQueries({ queryKey: qk.admin.articles.detail(articleId) });
+      void revalidatePublicArticlePages();
       onSaved();
     },
     onSettled: () => list.refetch(),
@@ -130,7 +132,10 @@ function useStatusMutation(
       context?.rollback();
       toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
     },
-    onSuccess: () => toast.success(successMessage),
+    onSuccess: () => {
+      toast.success(successMessage);
+      void revalidatePublicArticlePages();
+    },
     onSettled: () => list.refetch(),
   });
 }
@@ -170,7 +175,10 @@ export function useDeleteArticle(listKey: QueryKey, articleId: string) {
       context?.rollback();
       toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
     },
-    onSuccess: () => toast.success("Artikel dihapus."),
+    onSuccess: () => {
+      toast.success("Artikel dihapus.");
+      void revalidatePublicArticlePages();
+    },
     onSettled: () => list.refetch(),
   });
 }

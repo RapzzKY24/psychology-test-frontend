@@ -8,6 +8,25 @@ import type { ApiSuccess } from "@/lib/api/types/pagination";
  * All routes are role-gated ADMIN by the backend.
  */
 
+/** Public pages that render articles and must be purged after an edit. */
+const PUBLIC_ARTICLE_PATHS = [
+  { path: "/" },
+  { path: "/artikel" },
+  { path: "/artikel/[slug]", type: "page" as const },
+];
+
+/**
+ * Public article pages are ISR (5 minutes). Purging them keeps "publish" and
+ * "unpublish" immediate; if the call fails the ISR window still catches up.
+ */
+export async function revalidatePublicArticlePages(): Promise<void> {
+  await fetch("/api/revalidate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ paths: PUBLIC_ARTICLE_PATHS }),
+  }).catch(() => undefined);
+}
+
 export interface ArticleFilters {
   page?: number;
   limit?: number;
