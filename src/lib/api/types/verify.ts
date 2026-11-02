@@ -13,6 +13,23 @@ export interface InvoiceVerification {
   payment: { bank: string; vaNumber: string } | null;
 }
 
+/**
+ * `GET /api/v1/public/reports/verify/:code` — QR on the report PDF. The holder
+ * name is masked and a revoked report never carries its recommendation.
+ */
+export interface ReportVerification {
+  valid: boolean;
+  number?: string;
+  revision?: number;
+  status?: "ACTIVE" | "REVOKED";
+  holderName?: string;
+  sessionTitle?: string;
+  issuedAt?: string;
+  recommendation?: "LAYAK" | "BELUM_LAYAK" | "TIDAK_LAYAK";
+  revokedAt?: string;
+  revokeReason?: string;
+}
+
 /** `GET /api/v1/public/verify/:code` — 200 with `valid` either way; never any scores. */
 export interface VerifyCodeResult {
   valid: boolean;
