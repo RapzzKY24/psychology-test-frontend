@@ -12,7 +12,7 @@ import { TableEmpty } from "@/components/admin/table-empty";
 import { TablePagination } from "@/components/admin/table-pagination";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
 import type { ReportListItem } from "@/lib/api/types";
-import { ReportStatusBadge } from "./report-status-badge";
+import { ReportStatusBadge } from "@/components/shared/report-status-badge";
 import { ReportDownloadButton } from "./report-download-button";
 
 interface ReportsTableProps {

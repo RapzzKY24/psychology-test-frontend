@@ -15,6 +15,7 @@ const VARIANT: Record<ReportStatus, "default" | "secondary" | "outline" | "destr
   REVOKED: "destructive",
 };
 
+/** Shared by the psychologist list and the institution report tab. */
 export function ReportStatusBadge({ status }: { status: ReportStatus }) {
   return <Badge variant={VARIANT[status]}>{LABEL[status]}</Badge>;
 }

@@ -79,6 +79,24 @@ export interface InstansiResultItem {
   approvedAt: string | null;
 }
 
+/**
+ * `GET /instansi/reports` — issued reports for the caller's institution.
+ * Only ACTIVE and REVOKED rows are returned; drafts stay with the psychologist.
+ */
+export interface InstansiReportItem {
+  id: string;
+  participantId: string;
+  participantName: string;
+  sessionId: string;
+  sessionTitle: string;
+  number: string | null;
+  revision: number | null;
+  status: "DRAFT" | "ACTIVE" | "SUPERSEDED" | "REVOKED";
+  issuedAt: string | null;
+  testsApproved: number;
+  testsTotal: number;
+}
+
 export interface EmployeeInput {
   name: string;
   destinationCountry: string;

@@ -7,6 +7,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   CalendarDays,
   ExternalLink,
+  FileCheck2,
   FileText,
   Globe,
   LayoutDashboard,
@@ -33,6 +34,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
       { href: "/instansi/pembayaran", label: "Pembayaran", icon: Wallet },
       { href: "/instansi/buat-sesi", label: "Buat Sesi", icon: CalendarDays },
       { href: "/instansi/hasil", label: "Hasil", icon: FileText },
+      { href: "/instansi/laporan", label: "Laporan", icon: FileCheck2 },
     ],
   },
 ];

@@ -105,6 +105,11 @@ export const qk = {
       list: (filters?: { page?: number }) =>
         ["instansi", "results", "list", filters ?? {}] as const,
     },
+    reports: {
+      all: ["instansi", "reports"] as const,
+      list: (filters?: { page?: number; sessionId?: string }) =>
+        ["instansi", "reports", "list", filters ?? {}] as const,
+    },
   },
   psikolog: {
     profile: ["psikolog", "profile"] as const,
