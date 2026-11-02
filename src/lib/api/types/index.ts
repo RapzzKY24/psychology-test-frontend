@@ -10,5 +10,6 @@ export * from "./reviews";
 export * from "./admin";
 export * from "./instansi";
 export * from "./psikolog";
+export * from "./reports";
 export * from "./verify";
 export * from "./checkout";

@@ -7,6 +7,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   ClipboardCheck,
   ExternalLink,
+  FileText,
   Globe,
   LayoutDashboard,
   LogOut,
@@ -27,6 +28,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { href: "/psikolog", label: "Ringkasan", icon: LayoutDashboard },
       { href: "/psikolog/review", label: "Review Hasil", icon: ClipboardCheck },
+      { href: "/psikolog/laporan", label: "Laporan", icon: FileText },
       { href: "/psikolog/profil", label: "Profil & TTD", icon: UserRound },
     ],
   },

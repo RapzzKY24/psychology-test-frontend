@@ -114,5 +114,13 @@ export const qk = {
         ["psikolog", "reviews", "list", filters ?? {}] as const,
       detail: (id: string) => ["psikolog", "reviews", "detail", id] as const,
     },
+    reports: {
+      all: ["psikolog", "reports"] as const,
+      list: (filters?: { page?: number; status?: string }) =>
+        ["psikolog", "reports", "list", filters ?? {}] as const,
+      pending: (filters?: { page?: number }) =>
+        ["psikolog", "reports", "pending", filters ?? {}] as const,
+      detail: (participantId: string) => ["psikolog", "reports", "detail", participantId] as const,
+    },
   },
 } as const;
