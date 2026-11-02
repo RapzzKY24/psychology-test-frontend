@@ -21,6 +21,11 @@ interface ReportsTableProps {
   pageHref: (page: number) => string;
 }
 
+/** Only DRAFT and ACTIVE can be opened — the form endpoint creates a draft otherwise. */
+function isOpenable(status: ReportListItem["status"]): boolean {
+  return status === "DRAFT" || status === "ACTIVE";
+}
+
 export function ReportsTable({ rows, meta, pageHref }: ReportsTableProps) {
   if (rows.length === 0) {
     return (
@@ -48,10 +53,15 @@ export function ReportsTable({ rows, meta, pageHref }: ReportsTableProps) {
             {rows.map((row) => (
               <TableRow key={row.id}>
                 <TableCell className="whitespace-nowrap font-medium">
-                  {row.number ? (
-                    <span className="tabular-nums">{row.number}</span>
+                  {isOpenable(row.status) ? (
+                    <Link
+                      href={`/psikolog/laporan/${row.participantId}`}
+                      className="tabular-nums hover:underline"
+                    >
+                      {row.number ?? "Belum bernomor"}
+                    </Link>
                   ) : (
-                    <span className="text-muted-foreground">Belum bernomor</span>
+                    <span className="tabular-nums">{row.number ?? "Belum bernomor"}</span>
                   )}
                   {row.revision !== null && row.revision > 1 && (
                     <span className="ml-1 text-xs text-muted-foreground">rev. {row.revision}</span>

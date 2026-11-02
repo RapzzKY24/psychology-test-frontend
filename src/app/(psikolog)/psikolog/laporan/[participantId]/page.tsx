@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { ReportForm } from "@/features/psikolog/reports/components/report-form";
 import { IssuedReportPanel } from "@/features/psikolog/reports/components/issued-report-panel";
+import { ReportReadOnly } from "@/features/psikolog/reports/components/report-readonly-view";
 import { fetchReportFormServer } from "@/features/psikolog/reports/api.server";
 import { isApiError } from "@/lib/api/client";
 
@@ -39,7 +40,14 @@ export default async function ReportFormPage({
 
       <PageHeader title={`Laporan ${form.participant.name}`} description={form.session.title} />
 
-      {isActive ? <IssuedReportPanel form={form} /> : <ReportForm form={form} />}
+      {isActive ? (
+        <div className="space-y-6">
+          <IssuedReportPanel form={form} />
+          <ReportReadOnly form={form} />
+        </div>
+      ) : (
+        <ReportForm form={form} />
+      )}
     </main>
   );
 }
