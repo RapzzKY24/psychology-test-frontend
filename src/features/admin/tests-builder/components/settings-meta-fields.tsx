@@ -133,6 +133,31 @@ export function SettingsMetaFields({
             </Field>
           )}
         />
+
+        <Controller
+          name="timeLimitMin"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="settings-time-limit">Batas waktu (menit)</FieldLabel>
+              <Input
+                {...field}
+                id="settings-time-limit"
+                type="number"
+                min={0}
+                max={240}
+                disabled={locked}
+                onChange={(e) => field.onChange(Number(e.target.value))}
+                aria-invalid={fieldState.invalid}
+              />
+              <p className="text-xs text-muted-foreground">
+                Isi 0 kalau tes tidak dibatasi waktu. Batas waktu dihitung di server sejak peserta
+                mulai, dan jawaban otomatis dikirim saat waktu habis.
+              </p>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
       </div>
     </div>
   );

@@ -16,7 +16,9 @@ import { parseRightWrongImport } from "../parse-import";
 import type { RightWrongItemContentInput } from "../schemas";
 
 const PLACEHOLDER = `2 + 3 = ? | 4 | 5 | 6 | 7 | B
-Lawan kata "Besar" | Kecil | Luas | Tinggi | Lebar | A`;
+Dua dari peribahasa ini sama artinya | Peribahasa A | Peribahasa B | Peribahasa C | A,C
+Berapa harga ½ lusin? | 20
+Angka selanjutnya dari 1 .5 .25 .125 ? | 0,0625; 1/16`;
 
 /**
  * Paste-to-items for a right/wrong test: one line per question, pipe separated.
@@ -53,8 +55,10 @@ export function ImportItemsDialog({
         <DialogHeader>
           <DialogTitle>Import soal</DialogTitle>
           <DialogDescription>
-            Satu soal per baris: pertanyaan, opsi, lalu kunci — dipisah tanda <code>|</code>. Kunci
-            boleh huruf opsi (A–F) atau teks opsinya langsung.
+            Satu soal per baris, dipisah tanda <code>|</code>. Dua kolom = isian singkat (
+            <code>pertanyaan | jawaban</code>; titik koma memisahkan varian). Tiga kolom atau lebih
+            = pilihan ganda (<code>pertanyaan | opsi… | kunci</code>); kunci boleh huruf opsi, nomor
+            opsi, atau teks opsinya, dan <code>A,C</code> untuk kunci ganda.
           </DialogDescription>
         </DialogHeader>
 

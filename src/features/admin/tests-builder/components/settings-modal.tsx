@@ -46,6 +46,7 @@ export function SettingsModal({ detail, locked, onSaved, children }: SettingsMod
       scorerType: detail.scorerType,
       price: detail.price,
       estimatedDurationMin: detail.estimatedDurationMin,
+      timeLimitMin: detail.timeLimitMin ?? 0,
     },
   });
 
@@ -59,12 +60,16 @@ export function SettingsModal({ detail, locked, onSaved, children }: SettingsMod
       scorerType: detail.scorerType,
       price: detail.price,
       estimatedDurationMin: detail.estimatedDurationMin,
+      timeLimitMin: detail.timeLimitMin ?? 0,
     });
   }, [detail, form]);
 
   const mutation = useMutation({
-    mutationFn: async (values: TestSettingsInput) => {
-      const { data } = await updateTest(detail.id, values);
+    mutationFn: async ({ timeLimitMin, ...values }: TestSettingsInput) => {
+      const { data } = await updateTest(detail.id, {
+        ...values,
+        timeLimitMin: timeLimitMin > 0 ? timeLimitMin : null,
+      });
       return data;
     },
     meta: { silentError: true },

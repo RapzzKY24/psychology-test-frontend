@@ -43,6 +43,8 @@ export function createTest(input: CreateTestInput): Promise<ApiSuccess<AdminTest
 export type UpdateTestInput = Partial<Omit<CreateTestInput, "scorerType">> & {
   /** Cover path from the uploader; `null` clears it. */
   imageUrl?: string | null;
+  /** Hard limit in minutes enforced from `startedAt`; `null` removes it. */
+  timeLimitMin?: number | null;
 };
 
 export function updateTest(id: string, input: UpdateTestInput): Promise<ApiSuccess<AdminTest>> {

@@ -17,16 +17,29 @@ export interface PublicTest {
 export interface AdminTest extends PublicTest {
   status: TestStatus;
   scorerType: ScorerType;
+  /** Hard limit enforced from `startedAt`; null = untimed. */
+  timeLimitMin: number | null;
   createdAt?: string;
   updatedAt?: string;
 }
 
+/**
+ * Right/wrong item content (RightWrongItemContentSchema). One scorer, two answer
+ * shapes: `choice` keeps the key in `correctIndexes` (1 = radio, >1 = checkbox)
+ * and `short` keeps a list of accepted variants. The participant never receives
+ * either key — `sanitize` strips them.
+ */
 export interface RightWrongItemContent {
+  answerMode: "choice" | "short";
   question?: string;
   imageUrl?: string | null;
-  options: string[];
-  correctIndex: number;
   subtest?: string;
+  /** choice only */
+  options?: string[];
+  /** choice only — the answer key */
+  correctIndexes?: number[];
+  /** short only — accepted variants, never sent to the participant */
+  accepted?: string[];
 }
 
 /** Builder payload (`GET /api/v1/admin/tests/:id` — merged 2026-09-05, PR #6). */

@@ -20,24 +20,18 @@ interface ReviewAnswerSectionProps {
  * word/most/least table built from `itemsDetailed`.
  */
 export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps) {
-  const firstContent = detail.items[0]?.content as unknown as { correctIndex?: number } | undefined;
+  // DISC items carry `words`; every right/wrong item carries options or an
+  // accepted-answer list, so the key field is not a reliable marker any more.
+  const firstContent = detail.items[0]?.content as unknown as { words?: unknown } | undefined;
+  const isDisc = Array.isArray(firstContent?.words);
 
-  if (typeof firstContent?.correctIndex === "number") {
+  if (detail.items.length > 0 && !isDisc) {
     return (
       <RightWrongDetailTable
-        items={
-          detail.items as unknown as Array<{
-            id: string;
-            order: number;
-            content: {
-              question?: string | null;
-              imageUrl?: string | null;
-              options: string[];
-              correctIndex: number;
-            };
-          }>
+        items={detail.items as unknown as Parameters<typeof RightWrongDetailTable>[0]["items"]}
+        responses={
+          detail.responses as unknown as Parameters<typeof RightWrongDetailTable>[0]["responses"]
         }
-        responses={detail.responses as unknown as Array<{ itemId: string; value: { chosen: number } }>}
         scores={scores as unknown as { raw: number; total: number; perItem: boolean[] } | undefined}
       />
     );

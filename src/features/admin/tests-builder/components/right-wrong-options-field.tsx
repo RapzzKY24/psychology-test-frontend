@@ -10,30 +10,39 @@ interface RightWrongOptionsFieldProps {
   builder: BuilderController;
   active: number;
   options: string[];
-  correctIndex: number;
+  correctIndexes: number[];
   locked: boolean;
 }
 
 type OptionError = { message?: string };
 
-/** Answer options with the single-choice key radio, 2–6 rows. */
+/**
+ * Answer options with a checkbox key: one tick renders radios for the
+ * participant, several ticks render checkboxes. Options are positional, so
+ * removing one has to drag the ticks with it.
+ */
 export function RightWrongOptionsField({
   builder,
   active,
   options,
-  correctIndex,
+  correctIndexes,
   locked,
 }: RightWrongOptionsFieldProps) {
   const { form } = builder;
 
   const contentErrors = form.formState.errors.items?.[active]?.content as unknown as
-    { options?: OptionError[]; correctIndex?: OptionError } | undefined;
+    { options?: OptionError[]; correctIndexes?: OptionError } | undefined;
 
   const optionError = (idx: number): OptionError | undefined => contentErrors?.options?.[idx];
-  const keyError = contentErrors?.correctIndex;
+  const keyError = contentErrors?.correctIndexes;
 
   const setOptions = (next: string[]) =>
     form.setValue(`items.${active}.content.options`, next as never, { shouldDirty: true });
+
+  const setKeys = (next: number[]) =>
+    form.setValue(`items.${active}.content.correctIndexes`, next as never, {
+      shouldDirty: true,
+    });
 
   const updateOption = (idx: number, value: string) => {
     const next = [...options];
@@ -46,20 +55,22 @@ export function RightWrongOptionsField({
     setOptions([...options, ""]);
   };
 
+  const toggleKey = (idx: number) => {
+    setKeys(
+      correctIndexes.includes(idx)
+        ? correctIndexes.filter((key) => key !== idx)
+        : [...correctIndexes, idx].sort((a, b) => a - b),
+    );
+  };
+
   const removeOption = (idx: number) => {
     if (options.length <= 2) return;
     const next = [...options];
     next.splice(idx, 1);
     setOptions(next);
-    // The key is positional, so deleting an earlier option has to drag it down
-    // with the rest — otherwise the key silently jumps to the next answer.
-    const shifted = idx < correctIndex ? correctIndex - 1 : correctIndex;
-    const clamped = Math.min(shifted, next.length - 1);
-    if (clamped !== correctIndex) {
-      form.setValue(`items.${active}.content.correctIndex`, clamped as never, {
-        shouldDirty: true,
-      });
-    }
+    // Positional keys shift down with the options — otherwise the key silently
+    // jumps to the next answer.
+    setKeys(correctIndexes.filter((key) => key !== idx).map((key) => (key > idx ? key - 1 : key)));
   };
 
   return (
@@ -84,15 +95,10 @@ export function RightWrongOptionsField({
             <div className="flex gap-2">
               <div className="flex items-center gap-2">
                 <input
-                  type="radio"
-                  name={`correct-${active}`}
-                  checked={correctIndex === idx}
+                  type="checkbox"
+                  checked={correctIndexes.includes(idx)}
                   disabled={locked}
-                  onChange={() =>
-                    form.setValue(`items.${active}.content.correctIndex`, idx as never, {
-                      shouldDirty: true,
-                    })
-                  }
+                  onChange={() => toggleKey(idx)}
                   className="size-4"
                   aria-label={`Kunci opsi ${idx + 1}`}
                 />
@@ -125,7 +131,8 @@ export function RightWrongOptionsField({
       {keyError && <FieldError errors={[keyError as never]} />}
 
       <p className="text-xs text-muted-foreground">
-        Pilih radio untuk kunci jawaban. Minimal 2 opsi, maksimal 6.
+        Centang jawaban yang benar. Satu centang = peserta memilih satu, lebih dari satu = peserta
+        memilih beberapa.
       </p>
     </div>
   );

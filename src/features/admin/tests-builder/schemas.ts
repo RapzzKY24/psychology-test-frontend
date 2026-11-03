@@ -16,7 +16,10 @@ export const CreateTestSchema = z.object({
  * The settings tab edits the same fields. The backend refuses a scorer change
  * once the test has items or is published, so the UI only enables it there.
  */
-export const TestSettingsSchema = CreateTestSchema;
+export const TestSettingsSchema = CreateTestSchema.extend({
+  /** 0 = untimed; the API wants `null`, so the modal converts on submit. */
+  timeLimitMin: z.number().int().min(0).max(240),
+});
 
 export type TestSettingsInput = z.infer<typeof TestSettingsSchema>;
 
@@ -30,14 +33,31 @@ export const DiscItemContentSchema = z.object({
 
 export type DiscItemContentInput = z.infer<typeof DiscItemContentSchema>;
 
+const itemBase = {
+  question: z.string().trim().max(2000).optional(),
+  imageUrl: z.string().trim().max(2048).optional().nullable(),
+  subtest: z.string().trim().max(100).optional(),
+};
+
+/** Radio (one key) or checkbox (several keys) — same field, different length. */
+export const RightWrongChoiceContentSchema = z.object({
+  answerMode: z.literal("choice"),
+  ...itemBase,
+  options: z.array(z.string().trim().min(1, "Opsi wajib diisi.").max(500)).min(2).max(6),
+  correctIndexes: z.array(z.number().int().min(0)).min(1, "Tandai minimal satu kunci."),
+});
+
+/** Typed answer matched against every listed variant. */
+export const RightWrongShortContentSchema = z.object({
+  answerMode: z.literal("short"),
+  ...itemBase,
+  accepted: z
+    .array(z.string().trim().min(1, "Jawaban wajib diisi.").max(100))
+    .min(1, "Isi minimal satu jawaban benar."),
+});
+
 export const RightWrongItemContentSchema = z
-  .object({
-    question: z.string().trim().max(2000).optional(),
-    imageUrl: z.string().trim().max(2048).optional().nullable(),
-    options: z.array(z.string().trim().min(1, "Opsi wajib diisi.").max(500)).min(2).max(6),
-    correctIndex: z.number().int().min(0),
-    subtest: z.string().trim().max(100).optional(),
-  })
+  .discriminatedUnion("answerMode", [RightWrongChoiceContentSchema, RightWrongShortContentSchema])
   .superRefine((data, ctx) => {
     const hasQuestion = Boolean(data.question && data.question.trim().length > 0);
     const hasImage = Boolean(data.imageUrl && data.imageUrl.trim().length > 0);
@@ -48,13 +68,6 @@ export const RightWrongItemContentSchema = z
         path: ["question"],
       });
     }
-    if (data.correctIndex >= data.options.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Kunci harus salah satu opsi.",
-        path: ["correctIndex"],
-      });
-    }
     if (data.imageUrl && !/^\/uploads\/test-items\/[a-f0-9-]+\.(png|jpg)$/.test(data.imageUrl)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -62,9 +75,53 @@ export const RightWrongItemContentSchema = z
         path: ["imageUrl"],
       });
     }
+    if (data.answerMode === "choice" && data.correctIndexes.some((i) => i >= data.options.length)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Kunci harus salah satu opsi.",
+        path: ["correctIndexes"],
+      });
+    }
   });
 
 export type RightWrongItemContentInput = z.infer<typeof RightWrongItemContentSchema>;
+
+/**
+ * Server rows can predate `answerMode` (they only carry `correctIndex`). The
+ * form needs one concrete shape, so legacy rows are lifted on load and never
+ * written back in the old form.
+ */
+export function normalizeItemContent(content: unknown): RightWrongItemContentInput {
+  const raw = (content ?? {}) as {
+    answerMode?: "choice" | "short";
+    question?: string;
+    imageUrl?: string | null;
+    subtest?: string;
+    options?: string[];
+    correctIndexes?: number[];
+    correctIndex?: number;
+    accepted?: string[];
+  };
+  const shared = {
+    question: raw.question ?? "",
+    imageUrl: raw.imageUrl ?? null,
+    ...(raw.subtest ? { subtest: raw.subtest } : {}),
+  };
+  if (raw.answerMode === "short") {
+    return {
+      answerMode: "short",
+      ...shared,
+      accepted: raw.accepted?.length ? raw.accepted : [""],
+    };
+  }
+  const keys = raw.correctIndexes ?? (raw.correctIndex !== undefined ? [raw.correctIndex] : [0]);
+  return {
+    answerMode: "choice",
+    ...shared,
+    options: raw.options?.length ? raw.options : ["", ""],
+    correctIndexes: keys,
+  };
+}
 
 /** "DISC Form A" → "disc-form-a" (mirrors the backend slug regex). */
 export function slugify(name: string): string {

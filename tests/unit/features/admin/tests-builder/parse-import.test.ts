@@ -2,19 +2,57 @@ import { describe, expect, it } from "vitest";
 import { parseRightWrongImport } from "@/features/admin/tests-builder/parse-import";
 
 describe("parseRightWrongImport", () => {
-  it("turns one line into one item", () => {
+  it("turns one line into one choice item", () => {
     const { items, errors } = parseRightWrongImport("2 + 3 = ? | 4 | 5 | 6 | 7 | B");
 
     expect(errors).toEqual([]);
     expect(items).toEqual([
-      { question: "2 + 3 = ?", options: ["4", "5", "6", "7"], correctIndex: 1 },
+      {
+        answerMode: "choice",
+        question: "2 + 3 = ?",
+        imageUrl: null,
+        options: ["4", "5", "6", "7"],
+        correctIndexes: [1],
+      },
     ]);
   });
 
   it("accepts the option text as the key", () => {
     const { items } = parseRightWrongImport("Lawan kata besar | Kecil | Luas | Kecil");
 
-    expect(items[0].correctIndex).toBe(0);
+    expect(items[0]).toMatchObject({ correctIndexes: [0] });
+  });
+
+  it("reads two columns as a short-answer item", () => {
+    const { items, errors } = parseRightWrongImport("Berapa harga ½ lusin? | 20");
+
+    expect(errors).toEqual([]);
+    expect(items).toEqual([
+      {
+        answerMode: "short",
+        question: "Berapa harga ½ lusin?",
+        imageUrl: null,
+        accepted: ["20"],
+      },
+    ]);
+  });
+
+  it("splits short-answer variants on semicolons", () => {
+    const { items } = parseRightWrongImport("Angka selanjutnya | 0,0625; 1/16");
+
+    expect(items[0]).toMatchObject({ accepted: ["0,0625", "1/16"] });
+  });
+
+  it("reads a multi key", () => {
+    const { items } = parseRightWrongImport("Dua peribahasa | A | B | C | A,C");
+
+    expect(items[0]).toMatchObject({ correctIndexes: [0, 2] });
+  });
+
+  it("reads a numeric key as a one-based option number", () => {
+    const { items } = parseRightWrongImport("Bulan lalu | Januari | Maret | Juli | 3");
+
+    expect(items[0]).toMatchObject({ correctIndexes: [2] });
   });
 
   it("skips blank lines and keeps the rest", () => {
@@ -28,7 +66,9 @@ describe("parseRightWrongImport", () => {
     const { items, errors } = parseRightWrongImport("A? | 1 | A");
 
     expect(items).toEqual([]);
-    expect(errors).toEqual(["Baris 1: butuh pertanyaan, minimal 2 opsi, dan kunci."]);
+    expect(errors).toEqual([
+      "Baris 1: butuh pertanyaan, minimal 2 opsi, dan kunci — atau 2 kolom untuk isian singkat.",
+    ]);
   });
 
   it("rejects an empty option", () => {
@@ -53,6 +93,8 @@ describe("parseRightWrongImport", () => {
     const { items, errors } = parseRightWrongImport("A? | 1 | 2 | A\nrusak\nB? | 1 | 2 | B");
 
     expect(items).toHaveLength(2);
-    expect(errors).toEqual(["Baris 2: butuh pertanyaan, minimal 2 opsi, dan kunci."]);
+    expect(errors).toEqual([
+      "Baris 2: butuh pertanyaan, minimal 2 opsi, dan kunci — atau 2 kolom untuk isian singkat.",
+    ]);
   });
 });

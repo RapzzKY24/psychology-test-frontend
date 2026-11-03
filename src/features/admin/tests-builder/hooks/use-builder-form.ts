@@ -15,6 +15,7 @@ import { partitionInterpretations } from "../coverage";
 import {
   DiscItemContentSchema,
   RightWrongItemContentSchema,
+  normalizeItemContent,
   type DiscItemContentInput,
   type RightWrongItemContentInput,
 } from "../schemas";
@@ -55,7 +56,12 @@ export type BuilderTab = "soal" | "interpretasi";
 
 function toFormValues(detail: AdminTestDetail): BuilderFormValues {
   return {
-    items: detail.items.map((item) => ({ content: item.content })),
+    items: detail.items.map((item) => ({
+      content:
+        detail.scorerType === "RIGHT_WRONG_NORM"
+          ? normalizeItemContent(item.content)
+          : (item.content as DiscItemContentInput),
+    })),
     interpretations: detail.interpretations.map((row) => ({
       patternCode: row.patternCode,
       title: row.title,

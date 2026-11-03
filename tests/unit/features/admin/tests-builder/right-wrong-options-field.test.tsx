@@ -6,20 +6,20 @@ import { RightWrongOptionsField } from "@/features/admin/tests-builder/component
 import type { BuilderController } from "@/features/admin/tests-builder/hooks/use-builder-form";
 
 interface Values {
-  items: { content: { question?: string; options: string[]; correctIndex: number } }[];
+  items: { content: { question?: string; options: string[]; correctIndexes: number[] } }[];
 }
 
 function Harness({
   options,
-  correctIndex,
+  correctIndexes,
   onForm,
 }: {
   options: string[];
-  correctIndex: number;
+  correctIndexes: number[];
   onForm: (form: ReturnType<typeof useForm<Values>>) => void;
 }) {
   const form = useForm<Values>({
-    defaultValues: { items: [{ content: { options, correctIndex } }] },
+    defaultValues: { items: [{ content: { options, correctIndexes } }] },
   });
   onForm(form);
   const content = form.watch("items.0.content");
@@ -29,17 +29,17 @@ function Harness({
       builder={{ form } as unknown as BuilderController}
       active={0}
       options={content.options}
-      correctIndex={content.correctIndex}
+      correctIndexes={content.correctIndexes}
       locked={false}
     />
   );
 }
 
-function setup(options: string[], correctIndex: number) {
+function setup(options: string[], correctIndexes: number[]) {
   let form!: ReturnType<typeof useForm<Values>>;
-  render(<Harness options={options} correctIndex={correctIndex} onForm={(f) => (form = f)} />);
+  render(<Harness options={options} correctIndexes={correctIndexes} onForm={(f) => (form = f)} />);
   return {
-    key: () => form.getValues("items.0.content.correctIndex"),
+    keys: () => form.getValues("items.0.content.correctIndexes"),
     options: () => form.getValues("items.0.content.options"),
   };
 }
@@ -48,32 +48,50 @@ afterEach(cleanup);
 
 describe("RightWrongOptionsField", () => {
   it("drags the answer key down when an earlier option is deleted", () => {
-    const state = setup(["A", "B", "C"], 1);
+    const state = setup(["A", "B", "C"], [1]);
 
     fireEvent.click(screen.getByLabelText("Hapus opsi 1"));
 
     expect(state.options()).toEqual(["B", "C"]);
-    expect(state.key()).toBe(0);
+    expect(state.keys()).toEqual([0]);
   });
 
   it("keeps the answer key when a later option is deleted", () => {
-    const state = setup(["A", "B", "C"], 0);
+    const state = setup(["A", "B", "C"], [0]);
 
     fireEvent.click(screen.getByLabelText("Hapus opsi 3"));
 
-    expect(state.key()).toBe(0);
+    expect(state.keys()).toEqual([0]);
   });
 
-  it("never leaves the key pointing past the last option", () => {
-    const state = setup(["A", "B", "C"], 2);
+  it("keeps a trailing key inside the remaining options", () => {
+    const state = setup(["A", "B", "C"], [2]);
 
-    fireEvent.click(screen.getByLabelText("Hapus opsi 3"));
+    fireEvent.click(screen.getByLabelText("Hapus opsi 1"));
 
-    expect(state.key()).toBe(1);
+    expect(state.keys()).toEqual([1]);
+  });
+
+  it("drops the key when its own option is deleted", () => {
+    const state = setup(["A", "B", "C"], [1]);
+
+    fireEvent.click(screen.getByLabelText("Hapus opsi 2"));
+
+    expect(state.keys()).toEqual([]);
+  });
+
+  it("adds and removes keys for a multi-answer item", () => {
+    const state = setup(["A", "B", "C", "D"], [0]);
+
+    fireEvent.click(screen.getByLabelText("Kunci opsi 3"));
+    expect(state.keys()).toEqual([0, 2]);
+
+    fireEvent.click(screen.getByLabelText("Kunci opsi 1"));
+    expect(state.keys()).toEqual([2]);
   });
 
   it("refuses to go below two options", () => {
-    setup(["A", "B"], 0);
+    setup(["A", "B"], [0]);
 
     expect(screen.getByLabelText("Hapus opsi 1")).toHaveProperty("disabled", true);
     expect(screen.getByLabelText("Hapus opsi 2")).toHaveProperty("disabled", true);

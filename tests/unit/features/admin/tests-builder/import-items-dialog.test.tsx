@@ -25,7 +25,29 @@ describe("ImportItemsDialog", () => {
     fireEvent.click(screen.getByText("Import 1 soal"));
 
     expect(onImport).toHaveBeenCalledWith([
-      { question: "2 + 3 = ?", options: ["4", "5", "6", "7"], correctIndex: 1 },
+      {
+        answerMode: "choice",
+        question: "2 + 3 = ?",
+        imageUrl: null,
+        options: ["4", "5", "6", "7"],
+        correctIndexes: [1],
+      },
+    ]);
+  });
+
+  it("imports a short-answer line from two columns", () => {
+    const { onImport, box } = setup();
+
+    fireEvent.change(box, { target: { value: "Harga ½ lusin? | 20" } });
+    fireEvent.click(screen.getByText("Import 1 soal"));
+
+    expect(onImport).toHaveBeenCalledWith([
+      {
+        answerMode: "short",
+        question: "Harga ½ lusin?",
+        imageUrl: null,
+        accepted: ["20"],
+      },
     ]);
   });
 
@@ -34,7 +56,11 @@ describe("ImportItemsDialog", () => {
 
     fireEvent.change(box, { target: { value: "2 + 3 = ? | 4 | B" } });
 
-    expect(screen.getByText("Baris 1: butuh pertanyaan, minimal 2 opsi, dan kunci.")).toBeTruthy();
+    expect(
+      screen.getByText(
+        "Baris 1: butuh pertanyaan, minimal 2 opsi, dan kunci — atau 2 kolom untuk isian singkat.",
+      ),
+    ).toBeTruthy();
     expect(screen.getByRole("button", { name: "Import soal" })).toHaveProperty("disabled", true);
     expect(onImport).not.toHaveBeenCalled();
   });

@@ -21,10 +21,11 @@ import { RightWrongItemList } from "./right-wrong-item-list";
 
 const EMPTY_RIGHT_WRONG = {
   content: {
+    answerMode: "choice" as const,
     question: "",
     imageUrl: null as string | null,
     options: ["", ""],
-    correctIndex: 0,
+    correctIndexes: [0],
   },
 };
 
