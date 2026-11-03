@@ -38,6 +38,11 @@ export interface RightWrongItemContent {
   options?: string[];
   /** choice only — the answer key */
   correctIndexes?: number[];
+  /**
+   * Legacy single key, still present on rows written before 2026-11.
+   * @deprecated read `correctIndexes`; this only exists for old rows.
+   */
+  correctIndex?: number;
   /** short only — accepted variants, never sent to the participant */
   accepted?: string[];
 }

@@ -34,10 +34,8 @@ export interface AttemptRead {
   completedAt: string | null;
   /** Hard limit in minutes; null = untimed. */
   timeLimitMin: number | null;
-  /** `startedAt + timeLimitMin` — the server clock owns the countdown. */
-  deadlineAt: string | null;
-  /** Server time at read, so the client can correct for clock drift. */
-  serverNow: string;
+  /** Seconds left, computed by the server from `startedAt + timeLimitMin`. */
+  remainingSeconds: number | null;
   items: Array<{ id: string; order: number; content: Record<string, unknown> }>;
   responses: Array<{ itemId: string; value: unknown }>;
 }

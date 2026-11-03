@@ -23,8 +23,7 @@ function discAttempt(responses: AttemptRead["responses"] = [], itemCount = 3): A
     startedAt: "2026-01-01T00:00:00.000Z",
     completedAt: null,
     timeLimitMin: null,
-    deadlineAt: null,
-    serverNow: new Date().toISOString(),
+    remainingSeconds: null,
     items: Array.from({ length: itemCount }, (_, i) => ({
       id: `item-${i + 1}`,
       order: i + 1,
@@ -94,13 +93,11 @@ function shortAttempt(): AttemptRead {
   };
 }
 
-function timedAttempt(secondsFromNow: number): AttemptRead {
-  const now = Date.now();
+function timedAttempt(remainingSeconds: number): AttemptRead {
   return {
     ...rightWrongAttempt(),
     timeLimitMin: 12,
-    deadlineAt: new Date(now + secondsFromNow * 1000).toISOString(),
-    serverNow: new Date(now).toISOString(),
+    remainingSeconds,
   };
 }
 

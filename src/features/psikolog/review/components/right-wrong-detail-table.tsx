@@ -1,58 +1,27 @@
 "use client";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-type AnswerMode = "choice" | "short";
+import type { RightWrongItemContent } from "@/lib/api/types";
+import { isShortItem, keyLabel, responseLabel } from "../lib/answer-labels";
 
 interface RightWrongItem {
   id: string;
   order: number;
-  content: {
-    answerMode?: AnswerMode;
-    question?: string | null;
-    imageUrl?: string | null;
-    options?: string[];
-    correctIndexes?: number[];
-    /** Legacy single key, still present on rows written before 2026-11. */
-    correctIndex?: number;
-    accepted?: string[];
-  };
+  content: RightWrongItemContent;
 }
 
-interface RightWrongResponse {
-  /** Array for the current shape, bare number for legacy rows. */
-  chosen?: number | number[];
-  text?: string;
+interface RightWrongScores {
+  raw: number;
+  total: number;
+  perItem: boolean[];
+  iq?: number;
 }
 
 interface RightWrongDetailTableProps {
   items: RightWrongItem[];
-  responses: Array<{ itemId: string; value: RightWrongResponse }>;
-  scores?: { raw: number; total: number; perItem: boolean[] };
-}
-
-function chosenIndexes(value: RightWrongResponse | undefined): number[] {
-  if (!value) return [];
-  if (typeof value.chosen === "number") return [value.chosen];
-  return value.chosen ?? [];
-}
-
-function keysOf(item: RightWrongItem): number[] {
-  if (item.content.correctIndexes) return item.content.correctIndexes;
-  if (typeof item.content.correctIndex === "number") return [item.content.correctIndex];
-  return [];
-}
-
-function isShort(item: RightWrongItem): boolean {
-  return item.content.answerMode === "short";
+  responses: Array<{ itemId: string; value: unknown }>;
+  scores?: RightWrongScores;
 }
 
 export function RightWrongDetailTable({ items, responses, scores }: RightWrongDetailTableProps) {
@@ -64,11 +33,8 @@ export function RightWrongDetailTable({ items, responses, scores }: RightWrongDe
         <CardTitle className="text-base">Jawaban per soal</CardTitle>
         {scores && (
           <p className="text-sm text-muted-foreground">
-            {scores.raw} dari {scores.total} benar ({Math.round((scores.raw / scores.total) * 100)}
-            %)
-            {typeof (scores as { iq?: number }).iq === "number" && (
-              <> · IQ {(scores as { iq?: number }).iq}</>
-            )}
+            {scores.raw} dari {scores.total} benar ({Math.round((scores.raw / scores.total) * 100)}%)
+            {typeof scores.iq === "number" && <> · IQ {scores.iq}</>}
           </p>
         )}
       </CardHeader>
@@ -86,33 +52,9 @@ export function RightWrongDetailTable({ items, responses, scores }: RightWrongDe
             </TableHeader>
             <TableBody>
               {items.map((item, index) => {
-                const response = responseMap.get(item.id);
-                const short = isShort(item);
-                const options = item.content.options ?? [];
-                const keys = keysOf(item);
-
-                const chosenLabel = short
-                  ? response?.text?.trim() || "—"
-                  : chosenIndexes(response)
-                      .map((idx) =>
-                        options[idx]
-                          ? `${String.fromCharCode(65 + idx)}. ${options[idx]}`
-                          : String.fromCharCode(65 + idx),
-                      )
-                      .join(", ") || "—";
-
-                const correctLabel = short
-                  ? item.content.accepted?.join(" / ") || "—"
-                  : keys
-                      .map((idx) =>
-                        options[idx]
-                          ? `${String.fromCharCode(65 + idx)}. ${options[idx]}`
-                          : String.fromCharCode(65 + idx),
-                      )
-                      .join(", ") || "—";
-
-                // The scorer already decided, and it knows the matching rules
-                // (set order, comma decimals) — never re-derive it here.
+                const short = isShortItem(item.content);
+                // The scorer already decided, and it owns the matching rules
+                // (set order, comma decimals) — never re-derive correctness here.
                 const isCorrect = scores?.perItem?.[index] ?? false;
 
                 return (
@@ -131,17 +73,19 @@ export function RightWrongDetailTable({ items, responses, scores }: RightWrongDe
                             className="max-h-32 rounded border object-contain"
                           />
                         )}
-                        {!short && options.length > 0 && (
+                        {!short && (item.content.options?.length ?? 0) > 0 && (
                           <p className="text-xs text-muted-foreground">
-                            {options
-                              .map((o, i) => `${String.fromCharCode(65 + i)}. ${o}`)
+                            {item.content.options
+                              ?.map((option, i) => `${String.fromCharCode(65 + i)}. ${option}`)
                               .join(" · ")}
                           </p>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm">{chosenLabel}</TableCell>
-                    <TableCell className="text-sm font-medium">{correctLabel}</TableCell>
+                    <TableCell className="text-sm">
+                      {responseLabel(item.content, responseMap.get(item.id))}
+                    </TableCell>
+                    <TableCell className="text-sm font-medium">{keyLabel(item.content)}</TableCell>
                     <TableCell>
                       <span
                         className={

@@ -7,8 +7,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { ReviewDetail } from "@/lib/api/types";
+import type { ReviewDetail, RightWrongItemContent } from "@/lib/api/types";
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
+
+/** The table takes the item/response slices it renders, not the whole review. */
+interface RightWrongItem {
+  id: string;
+  order: number;
+  content: RightWrongItemContent;
+}
+
+interface RightWrongResponseRow {
+  itemId: string;
+  value: unknown;
+}
 
 interface ReviewAnswerSectionProps {
   detail: ReviewDetail;
@@ -28,11 +40,11 @@ export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps
   if (detail.items.length > 0 && !isDisc) {
     return (
       <RightWrongDetailTable
-        items={detail.items as unknown as Parameters<typeof RightWrongDetailTable>[0]["items"]}
-        responses={
-          detail.responses as unknown as Parameters<typeof RightWrongDetailTable>[0]["responses"]
+        items={detail.items as unknown as RightWrongItem[]}
+        responses={detail.responses as unknown as RightWrongResponseRow[]}
+        scores={
+          scores as unknown as { raw: number; total: number; perItem: boolean[] } | undefined
         }
-        scores={scores as unknown as { raw: number; total: number; perItem: boolean[] } | undefined}
       />
     );
   }

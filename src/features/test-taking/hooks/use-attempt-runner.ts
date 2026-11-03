@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAttemptAnswers } from "./use-attempt-answers";
+import { useRemainingSeconds } from "./use-remaining-seconds";
 import type { AttemptRead, ScorerType } from "@/lib/api/types";
 import type { DiscResponse } from "../schemas";
 
@@ -78,15 +79,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
       : isAnsweredDisc(answers.answers[it.id]),
   );
 
-  // Server-owned countdown: the deadline is startedAt + timeLimitMin, and the
-  // only thing the browser adds is a one-off drift correction vs serverNow.
-  const deadlineMs = useMemo(() => {
-    if (!attempt.deadlineAt) return null;
-    const drift = new Date(attempt.serverNow).getTime() - Date.now();
-    return new Date(attempt.deadlineAt).getTime() - drift;
-  }, [attempt.deadlineAt, attempt.serverNow]);
-
-  const remainingSeconds = useRemainingSeconds(deadlineMs);
+  const remainingSeconds = useRemainingSeconds(attempt.remainingSeconds);
   const timeUp = remainingSeconds !== null && remainingSeconds <= 0;
   const submittedRef = useRef(false);
 
@@ -213,25 +206,4 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     finish,
     goTo,
   };
-}
-
-/** Ticks once a second; null when the test has no deadline. */
-function useRemainingSeconds(deadlineMs: number | null): number | null {
-  const compute = useCallback(
-    () => (deadlineMs === null ? null : Math.max(0, Math.round((deadlineMs - Date.now()) / 1000))),
-    [deadlineMs],
-  );
-  const [remaining, setRemaining] = useState<number | null>(compute);
-
-  useEffect(() => {
-    if (deadlineMs === null) {
-      setRemaining(null);
-      return;
-    }
-    setRemaining(compute());
-    const id = window.setInterval(() => setRemaining(compute()), 1000);
-    return () => window.clearInterval(id);
-  }, [compute, deadlineMs]);
-
-  return remaining;
 }
