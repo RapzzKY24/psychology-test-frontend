@@ -7,12 +7,17 @@ import type { ScorerType } from "@/lib/api/types";
 const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
   FORCED_CHOICE_DISC: (
     <>
-      Pilih satu kata yang <span className="font-medium text-foreground">paling sesuai</span>{" "}
-      dan satu yang <span className="font-medium text-foreground">paling tidak sesuai</span>{" "}
-      dengan diri Anda. Jawaban tersimpan otomatis — boleh kembali ke soal sebelumnya.
+      Pilih satu kata yang <span className="font-medium text-foreground">paling sesuai</span> dan
+      satu yang <span className="font-medium text-foreground">paling tidak sesuai</span> dengan diri
+      Anda. Jawaban tersimpan otomatis — boleh kembali ke soal sebelumnya.
     </>
   ),
-  RIGHT_WRONG_NORM: <>Pilih satu jawaban untuk setiap soal. Jawaban tersimpan otomatis.</>,
+  RIGHT_WRONG_NORM: (
+    <>
+      Jawab tiap soal sesuai petunjuknya — pilih opsi atau tulis jawaban singkat. Jawaban tersimpan
+      otomatis; soal yang dilewati dihitung salah.
+    </>
+  ),
 };
 
 interface RunnerHeaderProps {
@@ -21,6 +26,7 @@ interface RunnerHeaderProps {
   total: number;
   scorerType: ScorerType;
   running: boolean;
+  remainingSeconds?: number | null;
 }
 
 /** Test name, progress bar and the family-specific instruction line. */
@@ -30,6 +36,7 @@ export function RunnerHeader({
   total,
   scorerType,
   running,
+  remainingSeconds,
 }: RunnerHeaderProps) {
   return (
     <div className="space-y-2">
@@ -40,7 +47,7 @@ export function RunnerHeader({
             {answeredCount} dari {total} terjawab
           </span>
           <span className="lg:hidden">
-            <ElapsedTimer running={running} />
+            <ElapsedTimer running={running} remainingSeconds={remainingSeconds} />
           </span>
         </div>
       </div>

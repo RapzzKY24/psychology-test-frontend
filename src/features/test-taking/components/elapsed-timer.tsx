@@ -3,27 +3,45 @@
 import { useEffect, useState } from "react";
 import { Timer } from "lucide-react";
 import { formatElapsed } from "@/lib/format/format-elapsed";
+import { cn } from "@/lib/utils";
+
+interface ElapsedTimerProps {
+  running: boolean;
+  /**
+   * Seconds left when the test has a hard limit. The value is computed by the
+   * runner from the server deadline — this component only renders it.
+   */
+  remainingSeconds?: number | null;
+}
 
 /**
- * Informative stopwatch (DISC has no time limit) — starts when the runner
- * mounts, stops when the attempt completes.
+ * Informative stopwatch for untimed tests, countdown for timed ones. A timed
+ * test never trusts the local clock: `remainingSeconds` already carries the
+ * server's deadline, corrected for drift at mount.
  */
-export function ElapsedTimer({ running }: { running: boolean }) {
+export function ElapsedTimer({ running, remainingSeconds }: ElapsedTimerProps) {
   const [elapsed, setElapsed] = useState(0);
+  const timed = typeof remainingSeconds === "number";
 
   useEffect(() => {
-    if (!running) return;
+    if (!running || timed) return;
     const id = setInterval(() => setElapsed((seconds) => seconds + 1), 1000);
     return () => clearInterval(id);
-  }, [running]);
+  }, [running, timed]);
+
+  const seconds = timed ? Math.max(0, remainingSeconds ?? 0) : elapsed;
+  const urgent = timed && seconds <= 60;
 
   return (
     <span
-      className="flex items-center gap-1.5 text-sm text-muted-foreground tabular-nums"
-      aria-label={`Waktu berjalan ${formatElapsed(elapsed)}`}
+      className={cn(
+        "flex items-center gap-1.5 text-sm tabular-nums",
+        urgent ? "font-medium text-destructive" : "text-muted-foreground",
+      )}
+      aria-label={`${timed ? "Sisa waktu" : "Waktu berjalan"} ${formatElapsed(seconds)}`}
     >
       <Timer className="size-4" aria-hidden />
-      {formatElapsed(elapsed)}
+      {formatElapsed(seconds)}
     </span>
   );
 }

@@ -27,6 +27,8 @@ export const KNOWN_ERROR_CODES = [
   "session_closed",
   "test_archived",
   // Attempts / Results
+  "attempt_not_in_progress",
+  "attempt_time_expired",
   "result_not_released",
   "result_not_approved",
   "result_already_approved",
@@ -86,6 +88,8 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   session_expired: "Sesi sudah kedaluwarsa.",
   session_closed: "Sesi sudah ditutup.",
   test_archived: "Tes ini sudah diarsipkan.",
+  attempt_not_in_progress: "Pengerjaan ini sudah selesai atau ditutup.",
+  attempt_time_expired: "Waktu pengerjaan sudah habis — jawaban tidak bisa diubah lagi.",
   result_not_released: "Hasil belum dirilis — menunggu review psikolog.",
   result_not_approved: "Hasil belum disetujui psikolog.",
   result_already_approved: "Hasil sudah disetujui sebelumnya.",

@@ -15,6 +15,7 @@ interface RunnerNavPanelProps {
   currentAnswered: boolean;
   allAnswered: boolean;
   completing: boolean;
+  remainingSeconds?: number | null;
   onSelect: (index: number) => void;
   onPrev: () => void;
   onNext: () => void;
@@ -32,6 +33,7 @@ export function RunnerNavPanel({
   currentAnswered,
   allAnswered,
   completing,
+  remainingSeconds,
   onSelect,
   onPrev,
   onNext,
@@ -44,7 +46,7 @@ export function RunnerNavPanel({
     >
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-muted-foreground">Waktu</span>
-        <ElapsedTimer running={running} />
+        <ElapsedTimer running={running} remainingSeconds={remainingSeconds} />
       </div>
       <Separator />
       <div className="space-y-1">

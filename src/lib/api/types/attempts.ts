@@ -7,13 +7,19 @@ export interface DiscResponse {
   least: number;
 }
 
+/** Right/wrong answer: `chosen` for choice items (1 index = radio), `text` for short items. */
+export interface RightWrongResponse {
+  chosen?: number[];
+  text?: string;
+}
+
 /**
  * Body of `PUT /api/v1/public/attempts/:id/responses` (PutResponseSchema).
- * `value` is scorer-specific — for FORCED_CHOICE_DISC it is a DiscResponse.
+ * `value` is scorer-specific.
  */
 export interface PutResponseInput {
   itemId: string;
-  value: DiscResponse;
+  value: DiscResponse | RightWrongResponse;
 }
 
 /** `GET /api/v1/public/attempts/:id` (AttemptReadDto, verified). Items arrive sanitized: content only — never `mapping`/`correctIndex`. */
@@ -26,6 +32,12 @@ export interface AttemptRead {
   status: AttemptStatus;
   startedAt: string;
   completedAt: string | null;
+  /** Hard limit in minutes; null = untimed. */
+  timeLimitMin: number | null;
+  /** `startedAt + timeLimitMin` — the server clock owns the countdown. */
+  deadlineAt: string | null;
+  /** Server time at read, so the client can correct for clock drift. */
+  serverNow: string;
   items: Array<{ id: string; order: number; content: Record<string, unknown> }>;
   responses: Array<{ itemId: string; value: unknown }>;
 }

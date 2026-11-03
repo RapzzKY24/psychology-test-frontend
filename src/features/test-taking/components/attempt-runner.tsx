@@ -53,6 +53,7 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
           total={runner.total}
           scorerType={scorerType}
           running={!runner.completed}
+          remainingSeconds={runner.remainingSeconds}
         />
 
         {runner.isRightWrong ? (
@@ -61,9 +62,13 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
             question={(runner.content.question as string | null) ?? null}
             imageUrl={(runner.content.imageUrl as string | null) ?? null}
             options={(runner.content.options as string[]) ?? []}
-            value={runner.chosen}
-            disabled={false}
-            onSelect={runner.selectRightWrong}
+            mode={runner.mode}
+            multi={runner.multi}
+            chosen={runner.chosen}
+            text={runner.text}
+            disabled={runner.timeUp}
+            onChoose={runner.chooseRightWrong}
+            onText={runner.typeRightWrong}
           />
         ) : (
           <DiscItemView
@@ -71,13 +76,18 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
             words={(runner.content.words as string[]) ?? []}
             value={runner.discValue}
             duplicateWarning={runner.duplicateWarning}
-            disabled={false}
+            disabled={runner.timeUp}
             onSelect={runner.selectDisc}
           />
         )}
       </div>
 
-      <RunnerNavPanel {...navProps} running={!runner.completed} allAnswered={runner.allAnswered} />
+      <RunnerNavPanel
+        {...navProps}
+        running={!runner.completed}
+        allAnswered={runner.allAnswered}
+        remainingSeconds={runner.remainingSeconds}
+      />
     </main>
   );
 }

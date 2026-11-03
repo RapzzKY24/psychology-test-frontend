@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAttemptAnswers } from "./use-attempt-answers";
 import type { AttemptRead, ScorerType } from "@/lib/api/types";
 import type { DiscResponse } from "../schemas";
@@ -28,6 +28,23 @@ function toDiscDraft(value: unknown): DiscResponse {
   };
 }
 
+/** Legacy rows stored a bare number; the runner always works with an array. */
+function toChosen(value: unknown): number[] {
+  const v = value as { chosen?: number | number[] } | undefined;
+  if (Array.isArray(v?.chosen)) return v.chosen;
+  if (typeof v?.chosen === "number") return [v.chosen];
+  return [];
+}
+
+function toText(value: unknown): string {
+  const v = value as { text?: string } | undefined;
+  return typeof v?.text === "string" ? v.text : "";
+}
+
+function isAnsweredRightWrong(value: unknown): boolean {
+  return toChosen(value).length > 0 || toText(value).trim().length > 0;
+}
+
 interface UseAttemptRunnerInput {
   attempt: AttemptRead;
   participantToken: string | null;
@@ -36,14 +53,10 @@ interface UseAttemptRunnerInput {
 
 /**
  * All runner behaviour in one place: which item is on screen, what counts as
- * answered for each scorer family, the DISC most !== least rule, and the
- * auto-advance timer. Components below it only render.
+ * answered for each scorer family, the DISC most !== least rule, the
+ * auto-advance timer, and the server-owned countdown.
  */
-export function useAttemptRunner({
-  attempt,
-  participantToken,
-  scorerType,
-}: UseAttemptRunnerInput) {
+export function useAttemptRunner({ attempt, participantToken, scorerType }: UseAttemptRunnerInput) {
   const answers = useAttemptAnswers(attempt, participantToken, scorerType, () => {});
   const [index, setIndex] = useState(0);
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
@@ -54,18 +67,34 @@ export function useAttemptRunner({
   const safeIndex = Math.min(index, Math.max(total - 1, 0));
   const item = attempt.items[safeIndex];
   const rawValue = item ? answers.answers[item.id] : undefined;
-  const currentAnswered = isRightWrong
-    ? (rawValue as { chosen?: unknown } | undefined)?.chosen !== undefined
-    : isAnsweredDisc(rawValue);
+  const currentAnswered = isRightWrong ? isAnsweredRightWrong(rawValue) : isAnsweredDisc(rawValue);
   const isLast = safeIndex === total - 1;
   const allAnswered = answers.answeredCount === total;
   const content = (item?.content ?? {}) as Record<string, unknown>;
 
   const answered = attempt.items.map((it) =>
     isRightWrong
-      ? (answers.answers[it.id] as { chosen?: unknown } | undefined)?.chosen !== undefined
+      ? isAnsweredRightWrong(answers.answers[it.id])
       : isAnsweredDisc(answers.answers[it.id]),
   );
+
+  // Server-owned countdown: the deadline is startedAt + timeLimitMin, and the
+  // only thing the browser adds is a one-off drift correction vs serverNow.
+  const deadlineMs = useMemo(() => {
+    if (!attempt.deadlineAt) return null;
+    const drift = new Date(attempt.serverNow).getTime() - Date.now();
+    return new Date(attempt.deadlineAt).getTime() - drift;
+  }, [attempt.deadlineAt, attempt.serverNow]);
+
+  const remainingSeconds = useRemainingSeconds(deadlineMs);
+  const timeUp = remainingSeconds !== null && remainingSeconds <= 0;
+  const submittedRef = useRef(false);
+
+  useEffect(() => {
+    if (!timeUp || submittedRef.current) return;
+    submittedRef.current = true;
+    void answers.submit();
+  }, [timeUp, answers]);
 
   const cancelAdvance = useCallback(() => {
     if (advanceTimer.current !== null) {
@@ -103,13 +132,25 @@ export function useAttemptRunner({
     [advance, answers, isLast, item, rawValue],
   );
 
-  const selectRightWrong = useCallback(
-    (chosen: number) => {
+  /**
+   * A multi-key item keeps the participant on the question until they move on
+   * themselves — advancing after every tick would cut the second pick off.
+   */
+  const chooseRightWrong = useCallback(
+    (chosen: number[]) => {
       if (!item) return;
       answers.answer(item.id, { chosen });
-      if (!isLast) advance();
+      if (content.multi !== true && !isLast) advance();
     },
-    [advance, answers, isLast, item],
+    [advance, answers, content.multi, isLast, item],
+  );
+
+  const typeRightWrong = useCallback(
+    (text: string) => {
+      if (!item) return;
+      answers.answerText(item.id, text);
+    },
+    [answers, item],
   );
 
   const goNext = useCallback(() => {
@@ -142,7 +183,6 @@ export function useAttemptRunner({
   // Partial DISC picks must still render on return, so the raw value goes
   // through as-is; the view already treats a missing half as "not picked".
   const discValue = isRightWrong ? undefined : (rawValue as DiscResponse | undefined);
-  const chosen = (rawValue as { chosen?: number } | undefined)?.chosen;
 
   return {
     isRightWrong,
@@ -150,7 +190,10 @@ export function useAttemptRunner({
     safeIndex,
     item,
     discValue,
-    chosen,
+    chosen: toChosen(rawValue),
+    text: toText(rawValue),
+    mode: content.answerMode === "short" ? ("short" as const) : ("choice" as const),
+    multi: content.multi === true,
     content,
     currentAnswered,
     isLast,
@@ -160,11 +203,35 @@ export function useAttemptRunner({
     completed: answers.completed,
     completing: answers.completing,
     answeredCount: answers.answeredCount,
+    remainingSeconds,
+    timeUp,
     selectDisc,
-    selectRightWrong,
+    chooseRightWrong,
+    typeRightWrong,
     goNext,
     goPrev,
     finish,
     goTo,
   };
+}
+
+/** Ticks once a second; null when the test has no deadline. */
+function useRemainingSeconds(deadlineMs: number | null): number | null {
+  const compute = useCallback(
+    () => (deadlineMs === null ? null : Math.max(0, Math.round((deadlineMs - Date.now()) / 1000))),
+    [deadlineMs],
+  );
+  const [remaining, setRemaining] = useState<number | null>(compute);
+
+  useEffect(() => {
+    if (deadlineMs === null) {
+      setRemaining(null);
+      return;
+    }
+    setRemaining(compute());
+    const id = window.setInterval(() => setRemaining(compute()), 1000);
+    return () => window.clearInterval(id);
+  }, [compute, deadlineMs]);
+
+  return remaining;
 }
