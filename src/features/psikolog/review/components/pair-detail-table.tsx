@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface PairItem {
+export interface PairItem {
   id: string;
   order: number;
   content: {
@@ -18,7 +18,7 @@ interface PairItem {
   };
 }
 
-interface PairResponseRow {
+export interface PairResponseRow {
   itemId: string;
   value: unknown;
 }

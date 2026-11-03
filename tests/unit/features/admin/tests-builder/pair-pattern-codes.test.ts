@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getPatternCodes, pairPatternCodes } from "@/features/admin/tests-builder/constants";
+import { getPatternCodes, pairPatternCodes } from "@/features/admin/tests-builder/coverage";
 
 const item = (left: string, right: string) => ({
   question: "Pilih",

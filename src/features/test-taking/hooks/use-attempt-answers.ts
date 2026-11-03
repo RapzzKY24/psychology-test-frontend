@@ -6,25 +6,13 @@ import { toast } from "sonner";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import type { AttemptRead, ScorerType } from "@/lib/api/types";
-import type { DiscResponse } from "../schemas";
+import { isAnsweredValue } from "../lib/answer-state";
 import { completeAttempt, putResponse } from "../api";
 
 export type AnswerValue = Record<string, unknown>;
 
 /** Typing a short answer would fire one PUT per keystroke without this. */
 const TEXT_SAVE_DEBOUNCE_MS = 500;
-
-function isAnsweredValue(scorerType: ScorerType, value: unknown): boolean {
-  if (value === undefined || value === null) return false;
-  if (scorerType === "FORCED_CHOICE_DISC") {
-    const v = value as DiscResponse;
-    return v.most >= 0 && v.least >= 0;
-  }
-  const v = value as { chosen?: number | number[]; text?: string };
-  if (Array.isArray(v.chosen)) return v.chosen.length > 0;
-  if (typeof v.chosen === "number") return true;
-  return Boolean(v.text && v.text.trim().length > 0);
-}
 
 /**
  * Generic answer state for the runner: one upsert PUT per answered item

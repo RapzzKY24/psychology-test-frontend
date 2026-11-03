@@ -1,9 +1,59 @@
-import { getPatternCodes } from "./constants";
+import { DEFAULT_RAW_ITEM_COUNT, PATTERN_CODES } from "./constants";
 
 export interface InterpretationDraft {
   patternCode: string;
   title: string;
   body: string;
+}
+
+/**
+ * Pattern codes of a pair instrument are assembled from its dimensions, so they
+ * can only be known once the items exist. Mirror of the backend
+ * `pairPatternCodes`: dimensions in first-appearance order, cartesian product.
+ */
+export function pairPatternCodes(contents: unknown[]): readonly string[] {
+  const dimensions: [string, string][] = [];
+  const seen = new Set<string>();
+  for (const content of contents) {
+    const mapping = (content as { mapping?: unknown } | undefined)?.mapping;
+    if (!Array.isArray(mapping) || mapping.length !== 2) continue;
+    const left = String(mapping[0] ?? "").trim().toUpperCase();
+    const right = String(mapping[1] ?? "").trim().toUpperCase();
+    if (!left || !right) continue;
+    const key = [left, right].sort().join("");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    dimensions.push([left, right]);
+  }
+
+  if (dimensions.length === 0) return [];
+
+  let codes = [""];
+  for (const [left, right] of dimensions) {
+    const next: string[] = [];
+    for (const code of codes) {
+      for (const pole of [left, right]) next.push(code + pole);
+    }
+    codes = next;
+  }
+  return codes;
+}
+
+/**
+ * Codes a test must cover before publish: a raw score uses every RAW_n, DISC
+ * uses 1..40, a pair instrument derives them from its item mappings.
+ */
+export function getPatternCodes(
+  scorerType: string,
+  itemCount?: number,
+  itemContents?: unknown[],
+): readonly string[] {
+  if (scorerType === "RIGHT_WRONG_NORM") {
+    const total = typeof itemCount === "number" && itemCount > 0 ? itemCount : DEFAULT_RAW_ITEM_COUNT;
+    return Array.from({ length: total + 1 }, (_, i) => `RAW_${i}`);
+  }
+  if (scorerType === "FORCED_CHOICE_PAIR") return pairPatternCodes(itemContents ?? []);
+  return PATTERN_CODES;
 }
 
 /** A row counts as filled only when both title and body have content. */

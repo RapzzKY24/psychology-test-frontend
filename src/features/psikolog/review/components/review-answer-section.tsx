@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ReviewDetail, RightWrongItemContent } from "@/lib/api/types";
-import { PairDetailTable } from "./pair-detail-table";
+import { PairDetailTable, type PairItem, type PairResponseRow } from "./pair-detail-table";
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
 
 /** The table takes the item/response slices it renders, not the whole review. */
@@ -42,8 +42,8 @@ export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps
   if (detail.items.length > 0 && Array.isArray(firstContent?.statements)) {
     return (
       <PairDetailTable
-        items={detail.items as unknown as Parameters<typeof PairDetailTable>[0]["items"]}
-        responses={detail.responses as unknown as Parameters<typeof PairDetailTable>[0]["responses"]}
+        items={detail.items as unknown as PairItem[]}
+        responses={detail.responses as unknown as PairResponseRow[]}
       />
     );
   }

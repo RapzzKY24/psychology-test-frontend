@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAttemptAnswers } from "./use-attempt-answers";
 import { useRemainingSeconds } from "./use-remaining-seconds";
+import { isAnsweredValue, toChosen, toPairChoice, toText } from "../lib/answer-state";
 import type { AttemptRead, ScorerType } from "@/lib/api/types";
 import type { DiscResponse } from "../schemas";
 
@@ -12,11 +13,6 @@ const AUTO_ADVANCE_MS = {
   FORCED_CHOICE_PAIR: 350,
   RIGHT_WRONG_NORM: 300,
 } as const;
-
-function isAnsweredDisc(value: unknown): value is DiscResponse {
-  const v = value as DiscResponse | undefined;
-  return v !== undefined && v.most >= 0 && v.least >= 0;
-}
 
 /**
  * Half-filled picks must survive navigation, so a partial answer is read back
@@ -28,29 +24,6 @@ function toDiscDraft(value: unknown): DiscResponse {
     most: typeof v?.most === "number" ? v.most : -1,
     least: typeof v?.least === "number" ? v.least : -1,
   };
-}
-
-/** Legacy rows stored a bare number; the runner always works with an array. */
-function toChosen(value: unknown): number[] {
-  const v = value as { chosen?: number | number[] } | undefined;
-  if (Array.isArray(v?.chosen)) return v.chosen;
-  if (typeof v?.chosen === "number") return [v.chosen];
-  return [];
-}
-
-function toText(value: unknown): string {
-  const v = value as { text?: string } | undefined;
-  return typeof v?.text === "string" ? v.text : "";
-}
-
-/** Pair answers store the picked statement index (0 or 1); anything else is blank. */
-function toPairChoice(value: unknown): number | null {
-  const v = value as { chosen?: number } | undefined;
-  return typeof v?.chosen === "number" && v.chosen >= 0 && v.chosen <= 1 ? v.chosen : null;
-}
-
-function isAnsweredRightWrong(value: unknown): boolean {
-  return toChosen(value).length > 0 || toText(value).trim().length > 0;
 }
 
 interface UseAttemptRunnerInput {
@@ -72,13 +45,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
 
   const isRightWrong = scorerType === "RIGHT_WRONG_NORM";
   const isPair = scorerType === "FORCED_CHOICE_PAIR";
-  /** One definition of "answered" for the progress rail and the finish guard. */
-  const isAnswered = (value: unknown): boolean =>
-    isRightWrong
-      ? isAnsweredRightWrong(value)
-      : isPair
-        ? toPairChoice(value) !== null
-        : isAnsweredDisc(value);
+  const isAnswered = (value: unknown) => isAnsweredValue(scorerType, value);
   const total = attempt.items.length;
   const safeIndex = Math.min(index, Math.max(total - 1, 0));
   const item = attempt.items[safeIndex];
