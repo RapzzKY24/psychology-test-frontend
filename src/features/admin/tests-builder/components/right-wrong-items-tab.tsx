@@ -55,13 +55,16 @@ export function RightWrongItemsTab({
     setConfirmRemove(null);
   };
 
+  // Read the live length, not the render snapshot: two fast clicks would both
+  // land on the same index and leave the second new item unselected.
   const add = () => {
+    const index = builder.form.getValues("items").length;
     itemsArray.append(EMPTY_RIGHT_WRONG as never);
-    builder.setActiveItem(watchedItems.length);
+    builder.setActiveItem(index);
   };
 
   const importItems = (items: RightWrongItemContentInput[]) => {
-    const start = watchedItems.length;
+    const start = builder.form.getValues("items").length;
     itemsArray.append(items.map((content) => ({ content })) as never);
     builder.setActiveItem(start);
   };

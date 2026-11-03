@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAttemptAnswers } from "./use-attempt-answers";
 import type { AttemptRead, ScorerType } from "@/lib/api/types";
 import type { DiscResponse } from "../schemas";
@@ -47,6 +47,7 @@ export function useAttemptRunner({
   const answers = useAttemptAnswers(attempt, participantToken, scorerType, () => {});
   const [index, setIndex] = useState(0);
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
+  const advanceTimer = useRef<number | null>(null);
 
   const isRightWrong = scorerType === "RIGHT_WRONG_NORM";
   const total = attempt.items.length;
@@ -66,12 +67,24 @@ export function useAttemptRunner({
       : isAnsweredDisc(answers.answers[it.id]),
   );
 
+  const cancelAdvance = useCallback(() => {
+    if (advanceTimer.current !== null) {
+      window.clearTimeout(advanceTimer.current);
+      advanceTimer.current = null;
+    }
+  }, []);
+
+  // A pending auto-advance must never fire after a manual move: answering twice
+  // in quick succession would otherwise skip two items.
   const advance = useCallback(() => {
-    window.setTimeout(
-      () => setIndex((current) => Math.min(current + 1, Math.max(total - 1, 0))),
-      AUTO_ADVANCE_MS[scorerType],
-    );
-  }, [scorerType, total]);
+    cancelAdvance();
+    advanceTimer.current = window.setTimeout(() => {
+      advanceTimer.current = null;
+      setIndex((current) => Math.min(current + 1, Math.max(total - 1, 0)));
+    }, AUTO_ADVANCE_MS[scorerType]);
+  }, [cancelAdvance, scorerType, total]);
+
+  useEffect(() => cancelAdvance, [cancelAdvance]);
 
   const selectDisc = useCallback(
     (part: "most" | "least", wordIndex: number) => {
@@ -100,14 +113,24 @@ export function useAttemptRunner({
   );
 
   const goNext = useCallback(() => {
+    cancelAdvance();
     setDuplicateWarning(null);
     setIndex((current) => Math.min(current + 1, Math.max(total - 1, 0)));
-  }, [total]);
+  }, [cancelAdvance, total]);
 
   const goPrev = useCallback(() => {
+    cancelAdvance();
     setDuplicateWarning(null);
     setIndex((current) => Math.max(current - 1, 0));
-  }, []);
+  }, [cancelAdvance]);
+
+  const goTo = useCallback(
+    (next: number) => {
+      cancelAdvance();
+      setIndex(next);
+    },
+    [cancelAdvance],
+  );
 
   const finish = useCallback(() => {
     const missing = answers.tryComplete();
@@ -142,6 +165,6 @@ export function useAttemptRunner({
     goNext,
     goPrev,
     finish,
-    goTo: setIndex,
+    goTo,
   };
 }

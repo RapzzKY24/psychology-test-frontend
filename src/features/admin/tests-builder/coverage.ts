@@ -11,6 +11,24 @@ export function isFilled(row: InterpretationDraft): boolean {
   return row.title.trim().length > 0 && row.body.trim().length > 0;
 }
 
+/**
+ * The backend rejects a row whose title or body is empty, so a half-typed row
+ * can never be stored. Splitting them out keeps the caller from silently
+ * throwing that typing away.
+ */
+export function partitionInterpretations(rows: InterpretationDraft[]): {
+  complete: InterpretationDraft[];
+  partial: InterpretationDraft[];
+} {
+  const complete: InterpretationDraft[] = [];
+  const partial: InterpretationDraft[] = [];
+  for (const row of rows) {
+    if (isFilled(row)) complete.push(row);
+    else if (row.title.trim().length > 0 || row.body.trim().length > 0) partial.push(row);
+  }
+  return { complete, partial };
+}
+
 /** Unfilled codes in natural order — matches the publish 422 payload. */
 export function missingPatternCodes(
   interpretations: InterpretationDraft[],

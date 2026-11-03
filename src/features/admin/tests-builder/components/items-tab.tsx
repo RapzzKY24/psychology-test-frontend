@@ -50,9 +50,11 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
     setConfirmRemove(null);
   };
 
+  // Live length, not the render snapshot — see RightWrongItemsTab.
   const add = () => {
+    const index = form.getValues("items").length;
     itemsArray.append(EMPTY_ITEM);
-    builder.setActiveItem(watchedItems.length);
+    builder.setActiveItem(index);
   };
 
   const duplicate = () => {

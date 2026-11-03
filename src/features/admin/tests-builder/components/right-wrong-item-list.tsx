@@ -3,9 +3,10 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { isRightWrongItemReady } from "../item-readiness";
 
 interface RightWrongItemListProps {
-  items: Array<{ content?: { question?: string; options?: string[] } }>;
+  items: Array<{ content?: { question?: string; imageUrl?: string | null; options?: string[] } }>;
   active: number;
   locked: boolean;
   onSelect: (index: number) => void;
@@ -40,10 +41,10 @@ export function RightWrongItemList({
       <ol className="max-h-[60vh] space-y-1 overflow-y-auto">
         {items.map((item, idx) => {
           const c = item?.content;
-          const label = c?.question?.trim() || c?.options?.[0]?.trim() || "(kosong)";
-          const filled = Boolean(
-            c?.question?.trim() || (c?.options && c.options.every((o) => o.trim())),
-          );
+          const label =
+            c?.question?.trim() ||
+            (c?.imageUrl ? "Soal bergambar" : c?.options?.[0]?.trim() || "(kosong)");
+          const filled = isRightWrongItemReady(c);
           return (
             <li key={idx}>
               <button

@@ -123,8 +123,14 @@ export function ItemImageUpload({ testId, value, serverError, onChange }: ItemIm
             type="file"
             accept="image/png,image/jpeg"
             disabled={pending}
-            onChange={(e) => void pick(e.target.files?.[0])}
-            className="h-11"
+            // Cleared after every pick so choosing the same file twice still
+            // fires a change event.
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              void pick(file);
+            }}
+            className="hidden"
           />
           <Button
             type="button"

@@ -30,7 +30,13 @@ export function InterpretationsTab({
   const isMissing = builder.missingCodes.includes(builder.activePattern);
 
   const createRow = (code: string) => {
-    interpretationsArray.append({ patternCode: code, title: "", body: "" });
+    // Read the live values, not the render snapshot: two quick clicks on an
+    // empty chip would otherwise append the same patternCode twice, and the
+    // unique index on (testId, patternCode) would reject the save.
+    const exists = form.getValues("interpretations").some((row) => row.patternCode === code);
+    if (!exists) {
+      interpretationsArray.append({ patternCode: code, title: "", body: "" });
+    }
     builder.setActivePattern(code);
   };
 

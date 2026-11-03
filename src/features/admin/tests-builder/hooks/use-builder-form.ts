@@ -11,6 +11,7 @@ import { isApiError } from "@/lib/api/client";
 import { qk } from "@/lib/api/query-keys";
 import type { AdminTestDetail } from "@/lib/api/types";
 import { archiveTest, publishTest, putInterpretations, putTestItems } from "../api";
+import { partitionInterpretations } from "../coverage";
 import {
   DiscItemContentSchema,
   RightWrongItemContentSchema,
@@ -119,20 +120,30 @@ export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
     await queryClient.invalidateQueries({ queryKey: qk.admin.tests.all });
   }, [queryClient]);
 
-  const persistSlices = useCallback(async () => {
+  /**
+   * Saves both slices and returns how many interpretation rows stayed behind.
+   * A row with a title but no body (or the reverse) cannot be stored — the
+   * backend requires both — so it is re-appended to the form, still dirty,
+   * instead of disappearing on the next reload.
+   */
+  const persistSlices = useCallback(async (): Promise<number> => {
     const values = form.getValues();
+    const { complete, partial } = partitionInterpretations(values.interpretations);
+
     await putTestItems(
       testId,
       values.items.map((item) => ({ content: item.content })),
     );
-    await putInterpretations(
-      testId,
-      values.interpretations.filter((row) => row.title.trim() && row.body.trim()),
-    );
+    await putInterpretations(testId, complete);
     await invalidate();
-    // Current values are now server-accepted: reset dirty tracking.
-    form.reset(form.getValues());
-  }, [form, testId, invalidate]);
+
+    // Everything just sent is server-accepted: reset dirty tracking, then put
+    // the unfinished rows back so the admin can finish them.
+    form.reset({ items: values.items, interpretations: complete });
+    partial.forEach((row) => interpretationsArray.append(row, { shouldFocus: false }));
+
+    return partial.length;
+  }, [form, testId, invalidate, interpretationsArray]);
 
   const handleApiError = useCallback((error: unknown) => {
     if (isApiError(error)) {
@@ -148,8 +159,14 @@ export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
     async () => {
       setSaving(true);
       try {
-        await persistSlices();
-        toast.success("Perubahan tersimpan.");
+        const leftover = await persistSlices();
+        if (leftover > 0) {
+          toast.warning(
+            `Tersimpan, tapi ${leftover} interpretasi belum lengkap dan belum disimpan.`,
+          );
+        } else {
+          toast.success("Perubahan tersimpan.");
+        }
       } catch (error) {
         handleApiError(error);
       } finally {

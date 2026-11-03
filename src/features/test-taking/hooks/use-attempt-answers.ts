@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { isApiError } from "@/lib/api/client";
@@ -38,22 +38,24 @@ export function useAttemptAnswers(
   );
   const [completed, setCompleted] = useState(false);
 
-  const save = useMutation({
-    mutationFn: async (input: { itemId: string; value: unknown }) => {
-      await putResponse(attempt.id, input.itemId, input.value, participantToken ?? undefined);
-    },
-    meta: { silentError: true },
-    onError: (error) => {
-      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
-    },
-  });
+  /**
+   * Answers are queued one request at a time. DISC writes most and least as two
+   * separate clicks; firing them in parallel lets the second land first and the
+   * upsert overwrite the first pick.
+   */
+  const saveQueue = useRef<Promise<void>>(Promise.resolve());
 
   const answer = useCallback(
     (itemId: string, value: unknown) => {
       setAnswers((prev) => ({ ...prev, [itemId]: value }));
-      save.mutate({ itemId, value });
+      saveQueue.current = saveQueue.current
+        .then(() => putResponse(attempt.id, itemId, value, participantToken ?? undefined))
+        .then(() => undefined)
+        .catch((error: unknown) => {
+          toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
+        });
     },
-    [save],
+    [attempt.id, participantToken],
   );
 
   const items = attempt.items;
