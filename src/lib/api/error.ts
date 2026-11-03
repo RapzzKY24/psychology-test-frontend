@@ -62,6 +62,7 @@ export const KNOWN_ERROR_CODES = [
   // Instansi
   "duplicate_email",
   // Instansi batch payment
+  "payment_gateway_failed",
   "payment_gateway_unavailable",
   "invoice_not_found",
   "invoice_not_payable",
@@ -116,6 +117,8 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   cannot_change_own_role: "Anda tidak bisa mengubah role akun sendiri.",
   duplicate_id_number: "Nomor identitas sudah terdaftar di institusi ini.",
   duplicate_email: "Email sudah terdaftar — silakan masuk.",
+  payment_gateway_failed:
+    "Penyedia pembayaran menolak permintaan ini — coba lagi beberapa saat lagi.",
   payment_gateway_unavailable:
     "Pembayaran sedang tidak tersedia — hubungi admin atau coba lagi nanti.",
   invoice_not_found: "Tagihan tidak ditemukan.",

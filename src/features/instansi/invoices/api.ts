@@ -22,6 +22,20 @@ function buildQuery(filters: InstansiInvoiceFilters): string {
   return qs ? `?${qs}` : "";
 }
 
+/**
+ * `POST /instansi/invoices/:id/payment` — re-issue a payment link whose
+ * provisioning failed. Idempotent: an invoice that already has a link comes
+ * back unchanged.
+ */
+export function retryInstansiInvoicePayment(
+  id: string,
+): Promise<ApiSuccess<InstansiInvoice>> {
+  return apiFetch<InstansiInvoice>(
+    `/instansi/invoices/${encodeURIComponent(id)}/payment`,
+    { method: "POST" },
+  );
+}
+
 /** `GET /instansi/invoices` — every batch invoice, unpaid first. */
 export function fetchInstansiInvoices(
   filters: InstansiInvoiceFilters = {},

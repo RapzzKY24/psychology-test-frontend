@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CheckCircle2, Clock, Download, ExternalLink } from "lucide-react";
+import { CheckCircle2, Clock, Download, ExternalLink, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +15,14 @@ import { qk } from "@/lib/api/query-keys";
 import type { InstansiInvoice } from "@/lib/api/types";
 import { fetchInstansiInvoice } from "../api";
 import { useDownloadInstansiInvoicePdf } from "../hooks/use-download-instansi-invoice-pdf";
-import { INVOICE_POLL_MS, INVOICE_STATUS_LABEL, bankLabel } from "../constants";
+import { useRetryInvoicePayment } from "../hooks/use-retry-invoice-payment";
+import { useShowAfterMs } from "../hooks/use-show-after-ms";
+import {
+  INVOICE_POLL_MS,
+  INVOICE_RETRY_AFTER_MS,
+  INVOICE_STATUS_LABEL,
+  bankLabel,
+} from "../constants";
 import { CopyValueButton } from "./copy-value-button";
 import { InvoiceCountdown } from "./invoice-countdown";
 
@@ -36,6 +43,13 @@ export function InvoiceIsland({ initial }: { initial: InstansiInvoice }) {
   const invoice = invoiceQuery.data;
   const isPaid = invoice.status === "PAID";
   const wasPaid = useRef(initial.status === "PAID");
+  const retry = useRetryInvoicePayment(invoice.id);
+
+  // No link yet and nothing else to pay with: either provisioning is still
+  // running, or it failed. Offer the manual retry only after a full poll cycle.
+  const awaitingLink =
+    !isPaid && !invoice.paymentUrl && !invoice.vaNumber;
+  const showRetry = useShowAfterMs(awaitingLink, INVOICE_RETRY_AFTER_MS);
 
   // The Midtrans webhook flips the invoice to PAID; the poll sees it and the
   // operator lands on the dashboard, where the roster is filled in.
@@ -123,9 +137,27 @@ export function InvoiceIsland({ initial }: { initial: InstansiInvoice }) {
                 />
               </>
             ) : (
-              <p className="text-muted-foreground text-sm">
-                Tautan pembayaran sedang dibuat — halaman ini akan memperbarui otomatis.
-              </p>
+              <div className="space-y-2">
+                <p className="text-muted-foreground text-sm">
+                  {showRetry
+                    ? "Tautan pembayaran belum bisa dibuat. Coba lagi, atau tunggu — sistem juga mencoba ulang otomatis."
+                    : "Tautan pembayaran sedang dibuat — halaman ini akan memperbarui otomatis."}
+                </p>
+                {showRetry && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={retry.isPending}
+                    onClick={() => retry.mutate()}
+                  >
+                    <RefreshCw
+                      className={retry.isPending ? "size-4 animate-spin" : "size-4"}
+                      aria-hidden
+                    />
+                    {retry.isPending ? "Mencoba…" : "Coba lagi"}
+                  </Button>
+                )}
+              </div>
             )}
             {invoice.expiresAt && (
               <p className="flex items-center gap-1 text-sm text-muted-foreground">

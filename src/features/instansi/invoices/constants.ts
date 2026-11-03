@@ -27,3 +27,10 @@ export function isInvoiceExpired(expiresAt: string | null): boolean {
 
 /** How often the checkout page re-checks the invoice while it is UNPAID. */
 export const INVOICE_POLL_MS = 4000;
+
+/**
+ * How long the page waits for a payment link before offering a manual retry.
+ * Two poll cycles: long enough that "still working" is not mistaken for
+ * "failed", short enough that a real failure is not a dead end.
+ */
+export const INVOICE_RETRY_AFTER_MS = INVOICE_POLL_MS * 2;
