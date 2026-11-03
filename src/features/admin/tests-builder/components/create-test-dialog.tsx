@@ -21,6 +21,7 @@ import { isApiError } from "@/lib/api/client";
 import { qk } from "@/lib/api/query-keys";
 import { createTest } from "../api";
 import { CreateTestSchema, slugify } from "../schemas";
+import { DEFAULT_SCORER_BY_CATEGORY } from "../scorers";
 import type { CreateTestInput } from "../schemas";
 import { CreateTestFields } from "./create-test-fields";
 
@@ -29,6 +30,7 @@ export function CreateTestButton() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [slugEdited, setSlugEdited] = useState(false);
+  const [scorerEdited, setScorerEdited] = useState(false);
 
   const form = useForm<CreateTestInput>({
     resolver: zodResolver(CreateTestSchema),
@@ -44,11 +46,19 @@ export function CreateTestButton() {
   });
 
   const name = form.watch("name");
+  const category = form.watch("category");
   useEffect(() => {
     if (!slugEdited) {
       form.setValue("slug", slugify(name), { shouldDirty: true });
     }
   }, [name, slugEdited, form]);
+
+  // Category only suggests a scorer type; a deliberate pick is never overridden.
+  useEffect(() => {
+    if (!scorerEdited) {
+      form.setValue("scorerType", DEFAULT_SCORER_BY_CATEGORY[category]);
+    }
+  }, [category, scorerEdited, form]);
 
   const mutation = useMutation({
     mutationFn: async (values: CreateTestInput) => {
@@ -62,6 +72,7 @@ export function CreateTestButton() {
       setOpen(false);
       form.reset();
       setSlugEdited(false);
+      setScorerEdited(false);
       router.push(`/admin/tes/${created.id}`);
     },
     onError: (error) => {
@@ -81,6 +92,7 @@ export function CreateTestButton() {
         if (!next) {
           form.reset();
           setSlugEdited(false);
+          setScorerEdited(false);
         }
       }}
     >
@@ -102,7 +114,11 @@ export function CreateTestButton() {
           noValidate
           className="grid gap-4"
         >
-          <CreateTestFields form={form} onSlugTyped={() => setSlugEdited(true)} />
+          <CreateTestFields
+            form={form}
+            onSlugTyped={() => setSlugEdited(true)}
+            onScorerTyped={() => setScorerEdited(true)}
+          />
           <DialogFooter>
             <Button type="submit" disabled={mutation.isPending}>
               {mutation.isPending ? "Menyimpan..." : "Buat Tes"}

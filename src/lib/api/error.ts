@@ -19,6 +19,7 @@ export const KNOWN_ERROR_CODES = [
   // Tests
   "validation_failed",
   "edit_locked",
+  "scorer_type_locked",
   // Sessions
   "invalid_pin",
   "session_full",
@@ -78,6 +79,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   forbidden: "Anda tidak memiliki akses ke halaman ini.",
   too_many_requests: "Terlalu banyak percobaan. Coba lagi sebentar lagi.",
   validation_failed: "Data yang dikirim tidak valid.",
+  scorer_type_locked: "Tipe soal tidak bisa diubah — tes sudah punya soal atau sudah dipublish.",
   edit_locked: "Data sedang dikunci karena ada peserta yang masih mengerjakan tes.",
   invalid_pin: "PIN salah.",
   session_full: "Kuota sesi sudah penuh.",

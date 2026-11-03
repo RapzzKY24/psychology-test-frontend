@@ -6,6 +6,7 @@ import { ItemsTab } from "./items-tab";
 import { RightWrongItemsTab } from "./right-wrong-items-tab";
 import { InterpretationsTab } from "./interpretations-tab";
 import { useBuilderForm } from "../hooks/use-builder-form";
+import { scorerOption } from "../scorers";
 import type { AdminTestDetail } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
@@ -45,34 +46,39 @@ export function TestBuilderStudio({
         </div>
       )}
 
-      <div className="flex gap-1 border-b px-6 pt-3" role="tablist" aria-label="Bagian builder">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            role="tab"
-            aria-selected={builder.tab === t.key}
-            onClick={() => builder.setTab(t.key)}
-            className={cn(
-              "rounded-t-md px-4 py-2 text-sm transition-colors",
-              builder.tab === t.key
-                ? "border border-b-0 bg-muted font-medium text-foreground"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {t.label}
-            {t.key === "soal" && (
-              <span className="ml-1.5 text-xs tabular-nums text-muted-foreground">
-                {builder.itemsArray.fields.length}
-              </span>
-            )}
-            {t.key === "interpretasi" && (
-              <span className="ml-1.5 text-xs tabular-nums text-muted-foreground">
-                {builder.interpretationsArray.fields.length}
-              </span>
-            )}
-          </button>
-        ))}
+      <div className="flex items-center justify-between gap-3 border-b px-6 pt-3">
+        <div className="flex gap-1" role="tablist" aria-label="Bagian builder">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              role="tab"
+              aria-selected={builder.tab === t.key}
+              onClick={() => builder.setTab(t.key)}
+              className={cn(
+                "rounded-t-md px-4 py-2 text-sm transition-colors",
+                builder.tab === t.key
+                  ? "border border-b-0 bg-muted font-medium text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t.label}
+              {t.key === "soal" && (
+                <span className="ml-1.5 text-xs tabular-nums text-muted-foreground">
+                  {builder.itemsArray.fields.length}
+                </span>
+              )}
+              {t.key === "interpretasi" && (
+                <span className="ml-1.5 text-xs tabular-nums text-muted-foreground">
+                  {builder.interpretationsArray.fields.length}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+        <p className="pb-2 text-xs text-muted-foreground">
+          Tipe soal: {scorerOption(initialData.scorerType).label}
+        </p>
       </div>
 
       {builder.tab === "soal" &&

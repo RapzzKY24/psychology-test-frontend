@@ -12,8 +12,11 @@ export const CreateTestSchema = z.object({
   estimatedDurationMin: z.number().int().min(1, "Durasi minimal 1 menit."),
 });
 
-/** Settings tab edits everything except the scorer type. */
-export const TestSettingsSchema = CreateTestSchema.omit({ scorerType: true });
+/**
+ * The settings tab edits the same fields. The backend refuses a scorer change
+ * once the test has items or is published, so the UI only enables it there.
+ */
+export const TestSettingsSchema = CreateTestSchema;
 
 export type TestSettingsInput = z.infer<typeof TestSettingsSchema>;
 

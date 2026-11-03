@@ -43,6 +43,7 @@ export function SettingsModal({ detail, locked, onSaved, children }: SettingsMod
       slug: detail.slug,
       description: detail.description,
       category: detail.category,
+      scorerType: detail.scorerType,
       price: detail.price,
       estimatedDurationMin: detail.estimatedDurationMin,
     },
@@ -55,6 +56,7 @@ export function SettingsModal({ detail, locked, onSaved, children }: SettingsMod
       slug: detail.slug,
       description: detail.description,
       category: detail.category,
+      scorerType: detail.scorerType,
       price: detail.price,
       estimatedDurationMin: detail.estimatedDurationMin,
     });
@@ -100,7 +102,11 @@ export function SettingsModal({ detail, locked, onSaved, children }: SettingsMod
           className="grid gap-4"
         >
           <SettingsFields control={form.control} locked={locked} />
-          <SettingsMetaFields control={form.control} locked={locked} />
+          <SettingsMetaFields
+            control={form.control}
+            locked={locked}
+            scorerEditable={detail.status === "DRAFT" && detail.items.length === 0}
+          />
 
           <CoverImageUpload
             testId={detail.id}

@@ -2,7 +2,7 @@
 
 import { Controller } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { TEST_CATEGORIES } from "@/lib/api/types";
 import type { CreateTestInput } from "../schemas";
+import { SCORER_OPTIONS, scorerOption } from "../scorers";
 
 const CATEGORY_LABEL: Record<(typeof TEST_CATEGORIES)[number], string> = {
   PERSONALITY: "Kepribadian",
@@ -26,10 +27,12 @@ const CATEGORY_LABEL: Record<(typeof TEST_CATEGORIES)[number], string> = {
 interface CreateTestFieldsProps {
   form: UseFormReturn<CreateTestInput>;
   onSlugTyped: () => void;
+  /** Stops the category from overwriting a scorer type the admin picked. */
+  onScorerTyped: () => void;
 }
 
 /** Fields of the "Buat Tes" dialog — validation comes from the parent form. */
-export function CreateTestFields({ form, onSlugTyped }: CreateTestFieldsProps) {
+export function CreateTestFields({ form, onSlugTyped, onScorerTyped }: CreateTestFieldsProps) {
   return (
     <>
       <Controller
@@ -104,6 +107,39 @@ export function CreateTestFields({ form, onSlugTyped }: CreateTestFieldsProps) {
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
+      />
+
+      <Controller
+        name="scorerType"
+        control={form.control}
+        render={({ field, fieldState }) => {
+          const selected = scorerOption(field.value);
+          return (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="scorerType">Tipe soal</FieldLabel>
+              <Select
+                value={field.value}
+                onValueChange={(value) => {
+                  onScorerTyped();
+                  field.onChange(value);
+                }}
+              >
+                <SelectTrigger id="scorerType" aria-invalid={fieldState.invalid}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SCORER_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FieldDescription>{selected.description}</FieldDescription>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          );
+        }}
       />
 
       <div className="grid grid-cols-2 gap-4">
