@@ -43,6 +43,7 @@ function Harness({ error }: { error?: { path: string; message: string } }) {
       locked={false}
       onMove={() => {}}
       onRemove={() => {}}
+      onDuplicate={() => {}}
     />
   );
 }

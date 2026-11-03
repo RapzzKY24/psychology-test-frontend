@@ -15,6 +15,7 @@ interface RightWrongItemEditorProps {
   locked: boolean;
   onMove: (from: number, to: number) => void;
   onRemove: () => void;
+  onDuplicate: () => void;
 }
 
 /** Right pane: one item's question, image and answer options. */
@@ -26,6 +27,7 @@ export function RightWrongItemEditor({
   locked,
   onMove,
   onRemove,
+  onDuplicate,
 }: RightWrongItemEditorProps) {
   const { form } = builder;
   const content = form.watch(`items.${active}.content`) as unknown as
@@ -50,6 +52,7 @@ export function RightWrongItemEditor({
         locked={locked}
         onMove={onMove}
         onRemove={onRemove}
+        onDuplicate={onDuplicate}
       />
 
       <Field data-invalid={questionError ? true : undefined}>

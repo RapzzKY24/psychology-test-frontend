@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ItemToolbarProps {
@@ -9,10 +9,19 @@ interface ItemToolbarProps {
   locked: boolean;
   onMove: (from: number, to: number) => void;
   onRemove: () => void;
+  /** Optional: copies this item right after itself. */
+  onDuplicate?: () => void;
 }
 
 /** Item header shared by both builder tabs: number plus reorder/remove. */
-export function ItemToolbar({ index, total, locked, onMove, onRemove }: ItemToolbarProps) {
+export function ItemToolbar({
+  index,
+  total,
+  locked,
+  onMove,
+  onRemove,
+  onDuplicate,
+}: ItemToolbarProps) {
   return (
     <div className="flex items-center justify-between">
       <p className="text-sm font-medium">Item #{index + 1}</p>
@@ -39,6 +48,19 @@ export function ItemToolbar({ index, total, locked, onMove, onRemove }: ItemTool
         >
           <ArrowDown className="size-4" aria-hidden />
         </Button>
+        {onDuplicate && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="size-8"
+            aria-label="Duplikat item"
+            disabled={locked}
+            onClick={onDuplicate}
+          >
+            <Copy className="size-4" aria-hidden />
+          </Button>
+        )}
         <Button
           type="button"
           variant="outline"

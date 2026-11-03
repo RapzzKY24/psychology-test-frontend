@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +14,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import type { BuilderController } from "../hooks/use-builder-form";
+import type { RightWrongItemContentInput } from "../schemas";
+import { ImportItemsDialog } from "./import-items-dialog";
 import { RightWrongItemEditor } from "./right-wrong-item-editor";
 import { RightWrongItemList } from "./right-wrong-item-list";
 
@@ -56,6 +60,22 @@ export function RightWrongItemsTab({
     builder.setActiveItem(watchedItems.length);
   };
 
+  const importItems = (items: RightWrongItemContentInput[]) => {
+    const start = watchedItems.length;
+    itemsArray.append(items.map((content) => ({ content })) as never);
+    builder.setActiveItem(start);
+  };
+
+  const duplicate = () => {
+    const source = watchedItems[active];
+    if (!source) return;
+    // Drop the field-array key: reusing it would give two rows the same id.
+    const copy = structuredClone(source) as { id?: string };
+    delete copy.id;
+    itemsArray.insert(active + 1, copy as never);
+    builder.setActiveItem(active + 1);
+  };
+
   return (
     <div className="grid gap-0 lg:grid-cols-[280px_1fr]">
       <RightWrongItemList
@@ -64,6 +84,14 @@ export function RightWrongItemsTab({
         locked={locked}
         onSelect={builder.setActiveItem}
         onAdd={add}
+        importTrigger={
+          <ImportItemsDialog onImport={importItems}>
+            <Button type="button" variant="outline" size="sm" disabled={locked}>
+              <Upload className="size-4" aria-hidden />
+              Import
+            </Button>
+          </ImportItemsDialog>
+        }
       />
 
       <div className="space-y-5 p-6">
@@ -80,6 +108,7 @@ export function RightWrongItemsTab({
             locked={locked}
             onMove={move}
             onRemove={() => setConfirmRemove(active)}
+            onDuplicate={duplicate}
           />
         )}
 

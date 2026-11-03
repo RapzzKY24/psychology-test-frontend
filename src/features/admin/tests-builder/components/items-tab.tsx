@@ -35,8 +35,7 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
   const watchedItems = form.watch("items");
   const active = Math.min(builder.activeItem, Math.max(watchedItems.length - 1, 0));
   const content = form.watch(`items.${active}.content`) as unknown as
-    | { words?: string[]; mostMapping?: DiscDimension[]; leastMapping?: DiscDimension[] }
-    | undefined;
+    { words?: string[]; mostMapping?: DiscDimension[]; leastMapping?: DiscDimension[] } | undefined;
 
   const move = (from: number, to: number) => {
     if (to < 0 || to >= watchedItems.length) return;
@@ -54,6 +53,16 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
   const add = () => {
     itemsArray.append(EMPTY_ITEM);
     builder.setActiveItem(watchedItems.length);
+  };
+
+  const duplicate = () => {
+    const source = watchedItems[active];
+    if (!source) return;
+    // Drop the field-array key: reusing it would give two rows the same id.
+    const copy = structuredClone(source) as { id?: string };
+    delete copy.id;
+    itemsArray.insert(active + 1, copy as never);
+    builder.setActiveItem(active + 1);
   };
 
   return (
@@ -79,6 +88,7 @@ export function ItemsTab({ builder, locked }: { builder: BuilderController; lock
               locked={locked}
               onMove={move}
               onRemove={() => setConfirmRemove(active)}
+              onDuplicate={duplicate}
             />
 
             <div className="grid gap-3 sm:grid-cols-2">

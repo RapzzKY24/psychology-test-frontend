@@ -10,6 +10,8 @@ interface RightWrongItemListProps {
   locked: boolean;
   onSelect: (index: number) => void;
   onAdd: () => void;
+  /** Bulk paste — rendered next to Tambah, disabled while the test is locked. */
+  importTrigger?: React.ReactNode;
 }
 
 /** Left rail of the right/wrong tab: one row per item, plus the add button. */
@@ -19,17 +21,21 @@ export function RightWrongItemList({
   locked,
   onSelect,
   onAdd,
+  importTrigger,
 }: RightWrongItemListProps) {
   return (
     <aside className="border-b p-4 lg:border-b-0 lg:border-r">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 space-y-2">
         <p className="text-sm font-medium">
           {items.length} item <span className="text-muted-foreground">/ urutan soal</span>
         </p>
-        <Button type="button" variant="outline" size="sm" disabled={locked} onClick={onAdd}>
-          <Plus className="size-4" aria-hidden />
-          Tambah
-        </Button>
+        <div className="flex gap-1 [&>*]:flex-1">
+          {importTrigger}
+          <Button type="button" variant="outline" size="sm" disabled={locked} onClick={onAdd}>
+            <Plus className="size-4" aria-hidden />
+            Tambah
+          </Button>
+        </div>
       </div>
       <ol className="max-h-[60vh] space-y-1 overflow-y-auto">
         {items.map((item, idx) => {
