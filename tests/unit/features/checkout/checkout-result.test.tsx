@@ -57,6 +57,17 @@ describe("CheckoutResult", () => {
     expect(screen.queryByText("Pembayaran berhasil")).toBeNull();
   });
 
+  it("describes the verification without naming a provider", () => {
+    // The same page serves Snap and Doku, so the copy must not pick a side.
+    render(
+      <CheckoutResult initial={{ ...invoice, status: "UNPAID", paidAt: null }} hint="settlement" />,
+      { wrapper },
+    );
+
+    expect(screen.getByText(/penyedia pembayaran/i)).toBeTruthy();
+    expect(screen.queryByText(/midtrans/i)).toBeNull();
+  });
+
   it("offers a gateway check instead of a second dashboard button while verifying", () => {
     render(
       <CheckoutResult initial={{ ...invoice, status: "UNPAID", paidAt: null }} hint="settlement" />,

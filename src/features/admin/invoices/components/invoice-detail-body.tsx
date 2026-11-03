@@ -10,6 +10,7 @@ import { InvoiceStatusBadge } from "./invoice-status-badge";
 /** Who confirmed the payment, in words an admin can act on. */
 const SOURCE_LABEL: Record<string, string> = {
   MIDTRANS: "Midtrans",
+  DOKU: "Doku",
   ADMIN: "Verifikasi admin",
   MANUAL: "Input manual",
 };

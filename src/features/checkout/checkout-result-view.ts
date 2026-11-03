@@ -15,7 +15,7 @@ export const CHECKOUT_VIEW_COPY: Record<CheckoutView, { title: string; body: str
   },
   verifying: {
     title: "Pembayaran diterima — sedang diverifikasi",
-    body: "Midtrans sudah mencatat pembayaran ini. Sistem sedang memperbarui tagihan; halaman ini menyegarkan sendiri.",
+    body: "Pembayaran sudah tercatat di penyedia pembayaran. Sistem sedang memperbarui tagihan; halaman ini menyegarkan sendiri.",
   },
   waiting: {
     title: "Menunggu pembayaran",

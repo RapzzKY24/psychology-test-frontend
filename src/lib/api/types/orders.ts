@@ -15,7 +15,7 @@ export interface CreateOrderResult {
   /** Legacy VA number; null unless the order was created by the VA provider. */
   vaNumber: string | null;
   vaBankCode: string | null;
-  /** Hosted payment page (Midtrans Snap); null for VA and manual providers. */
+  /** Hosted payment page (Snap or Doku Checkout); null for manual providers. */
   paymentUrl: string | null;
   /** Snap token for the embedded popup; null for VA and manual providers. */
   paymentToken: string | null;
@@ -32,7 +32,7 @@ export interface OrderDetail {
   /** Seconds left in the payment window, computed server-side on read. */
   secondsRemaining: number;
   userClaimedAt: string | null;
-  /** Hosted payment page (Midtrans Snap); null for VA and manual providers. */
+  /** Hosted payment page (Snap or Doku Checkout); null for manual providers. */
   paymentUrl: string | null;
   /** Snap token for the embedded popup; null for VA and manual providers. */
   paymentToken: string | null;

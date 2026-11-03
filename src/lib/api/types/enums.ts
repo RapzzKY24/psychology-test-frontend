@@ -47,7 +47,12 @@ export const INVOICE_STATUSES = ["UNPAID", "PAID", "CANCELLED"] as const;
 export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
 
 /** Which gateway produced the payment instructions on an order. */
-export const PAYMENT_PROVIDERS = ["MANUAL_QRIS", "JOKUL_VA", "MIDTRANS_SNAP"] as const;
+export const PAYMENT_PROVIDERS = [
+  "MANUAL_QRIS",
+  "JOKUL_VA",
+  "MIDTRANS_SNAP",
+  "DOKU_CHECKOUT",
+] as const;
 export type PaymentProvider = (typeof PAYMENT_PROVIDERS)[number];
 
 /** Indonesian labels for UI copy (docs/features/README.md: UI copy Bahasa Indonesia). */
