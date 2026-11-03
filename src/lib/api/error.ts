@@ -118,7 +118,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   duplicate_id_number: "Nomor identitas sudah terdaftar di institusi ini.",
   duplicate_email: "Email sudah terdaftar — silakan masuk.",
   payment_gateway_failed:
-    "Penyedia pembayaran menolak permintaan ini — coba lagi beberapa saat lagi.",
+    "Pembayaran gagal diproses di penyedia pembayaran — coba lagi beberapa saat lagi.",
   payment_gateway_unavailable:
     "Pembayaran sedang tidak tersedia — hubungi admin atau coba lagi nanti.",
   invoice_not_found: "Tagihan tidak ditemukan.",
