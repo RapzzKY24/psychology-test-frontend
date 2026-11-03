@@ -14,15 +14,23 @@ import { archiveTest, publishTest, putInterpretations, putTestItems } from "../a
 import { partitionInterpretations } from "../coverage";
 import {
   DiscItemContentSchema,
+  PairItemContentSchema,
   RightWrongItemContentSchema,
   normalizeItemContent,
+  normalizePairContent,
   type DiscItemContentInput,
+  type PairItemContentInput,
   type RightWrongItemContentInput,
 } from "../schemas";
 
+function itemContentSchemaFor(scorerType: string) {
+  if (scorerType === "RIGHT_WRONG_NORM") return RightWrongItemContentSchema;
+  if (scorerType === "FORCED_CHOICE_PAIR") return PairItemContentSchema;
+  return DiscItemContentSchema;
+}
+
 function getBuilderFormSchema(scorerType: string) {
-  const itemContentSchema =
-    scorerType === "RIGHT_WRONG_NORM" ? RightWrongItemContentSchema : DiscItemContentSchema;
+  const itemContentSchema = itemContentSchemaFor(scorerType);
   return z.object({
     items: z.array(z.object({ content: itemContentSchema })),
     interpretations: z.array(
@@ -49,7 +57,9 @@ export function describeDetail(detail: string): string {
 }
 
 export type BuilderFormValues = {
-  items: { content: DiscItemContentInput | RightWrongItemContentInput }[];
+  items: {
+    content: DiscItemContentInput | PairItemContentInput | RightWrongItemContentInput;
+  }[];
   interpretations: { patternCode: string; title: string; body: string }[];
 };
 export type BuilderTab = "soal" | "interpretasi";
@@ -60,7 +70,9 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
       content:
         detail.scorerType === "RIGHT_WRONG_NORM"
           ? normalizeItemContent(item.content)
-          : (item.content as DiscItemContentInput),
+          : detail.scorerType === "FORCED_CHOICE_PAIR"
+            ? normalizePairContent(item.content)
+            : (item.content as DiscItemContentInput),
     })),
     interpretations: detail.interpretations.map((row) => ({
       patternCode: row.patternCode,
@@ -81,6 +93,8 @@ export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<BuilderTab>("soal");
   const [activeItem, setActiveItem] = useState(0);
+  // First pattern code of the family; the interpretations tab falls back to the
+  // first code that actually exists when this one is not part of the set.
   const [activePattern, setActivePattern] = useState<string>("1");
   const [missingCodes, setMissingCodes] = useState<string[]>([]);
   const [locked, setLocked] = useState(false);

@@ -19,6 +19,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
       "Tiap soal punya 2–6 opsi dan satu kunci jawaban. Skor dihitung dari jumlah jawaban benar.",
   },
   {
+    value: "FORCED_CHOICE_PAIR",
+    label: "Pasangan pernyataan (MBTI)",
+    description:
+      "Tiap soal berisi dua pernyataan; peserta memilih satu. Tiap pernyataan mewakili satu kutub dimensi, dan tipe akhirnya disusun dari kutub yang menang.",
+  },
+  {
     value: "FORCED_CHOICE_DISC",
     label: "DISC (4 kata)",
     description:

@@ -47,11 +47,22 @@ export interface RightWrongItemContent {
   accepted?: string[];
 }
 
+/**
+ * Forced-choice pair item (PairItemContentSchema in
+ * src/scorers/schemas/forced-choice-pair.ts). Two statements, one pick;
+ * `mapping` is the hidden key that says which pole each statement scores.
+ */
+export interface PairItemContent {
+  question: string;
+  statements: string[];
+  mapping: string[];
+}
+
 /** Builder payload (`GET /api/v1/admin/tests/:id` — merged 2026-09-05, PR #6). */
 export interface AdminTestItem {
   id: string;
   order: number;
-  content: DiscItemContent | RightWrongItemContent;
+  content: DiscItemContent | RightWrongItemContent | PairItemContent;
 }
 
 export interface AdminTestDetail extends AdminTest {
@@ -87,7 +98,7 @@ export interface DiscItemContent {
 
 /** Body of `PUT /api/v1/admin/tests/:id/items` (PutItemsSchema — content validated per scorerType in the service). */
 export interface PutItemsInput {
-  items: Array<{ content: DiscItemContent }>;
+  items: Array<{ content: DiscItemContent | RightWrongItemContent | PairItemContent }>;
 }
 
 /** Body of `PUT /api/v1/admin/tests/:id/interpretations` (keyed by patternCode). */

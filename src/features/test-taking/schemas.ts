@@ -12,6 +12,13 @@ export const DiscResponseSchema = z
 
 export type DiscResponse = z.infer<typeof DiscResponseSchema>;
 
+/** FORCED_CHOICE_PAIR answer (PairResponseSchema on the backend): statement index 0–1. */
+export const PairResponseSchema = z.object({
+  chosen: z.number().int().min(0).max(1),
+});
+
+export type PairResponse = z.infer<typeof PairResponseSchema>;
+
 /** RIGHT_WRONG_NORM answer (RightWrongResponseSchema on the backend): option index. */
 export const RightWrongResponseSchema = z.object({
   chosen: z.number().int().min(0).max(5),

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BuilderHeader } from "./builder-header";
 import { ItemsTab } from "./items-tab";
+import { PairItemsTab } from "./pair-items-tab";
 import { RightWrongItemsTab } from "./right-wrong-items-tab";
 import { InterpretationsTab } from "./interpretations-tab";
 import { useBuilderForm } from "../hooks/use-builder-form";
@@ -84,6 +85,8 @@ export function TestBuilderStudio({
       {builder.tab === "soal" &&
         (initialData.scorerType === "RIGHT_WRONG_NORM" ? (
           <RightWrongItemsTab builder={builder} locked={builder.locked} testId={testId} />
+        ) : initialData.scorerType === "FORCED_CHOICE_PAIR" ? (
+          <PairItemsTab builder={builder} locked={builder.locked} />
         ) : (
           <ItemsTab builder={builder} locked={builder.locked} />
         ))}

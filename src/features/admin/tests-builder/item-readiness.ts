@@ -13,6 +13,22 @@ export interface RightWrongItemDraft {
   accepted?: string[];
 }
 
+export interface PairItemDraft {
+  question?: string;
+  statements?: string[];
+  mapping?: string[];
+}
+
+/** Both statements filled and mapped to two different poles. */
+export function isPairItemReady(content: PairItemDraft | undefined): boolean {
+  if (!content) return false;
+  if (!content.question?.trim()) return false;
+  const statements = content.statements ?? [];
+  if (statements.length !== 2 || !statements.every((s) => s.trim().length > 0)) return false;
+  const mapping = (content.mapping ?? []).map((p) => p.trim().toUpperCase());
+  return mapping.length === 2 && Boolean(mapping[0]) && Boolean(mapping[1]) && mapping[0] !== mapping[1];
+}
+
 export function isRightWrongItemReady(content: RightWrongItemDraft | undefined): boolean {
   if (!content) return false;
   const hasPrompt = Boolean(content.question?.trim() || content.imageUrl);

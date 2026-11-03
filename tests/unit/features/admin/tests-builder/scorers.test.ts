@@ -6,9 +6,10 @@ import {
 } from "@/features/admin/tests-builder/scorers";
 
 describe("scorer options", () => {
-  it("offers both item editors", () => {
+  it("offers every item editor", () => {
     expect(SCORER_OPTIONS.map((option) => option.value)).toEqual([
       "RIGHT_WRONG_NORM",
+      "FORCED_CHOICE_PAIR",
       "FORCED_CHOICE_DISC",
     ]);
   });

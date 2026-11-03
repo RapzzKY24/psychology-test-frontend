@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isRightWrongItemReady } from "@/features/admin/tests-builder/item-readiness";
+import { isPairItemReady, isRightWrongItemReady } from "@/features/admin/tests-builder/item-readiness";
 
 describe("isRightWrongItemReady", () => {
   it("is ready when the question, every option and the key are filled", () => {
@@ -83,5 +83,37 @@ describe("isRightWrongItemReady", () => {
     expect(
       isRightWrongItemReady({ answerMode: "short", question: "Harga?", accepted: [" "] }),
     ).toBe(false);
+  });
+});
+
+describe("isPairItemReady", () => {
+  const ready = {
+    question: "Mana yang lebih Anda pilih?",
+    statements: ["Saya suka keramaian", "Saya suka menyendiri"],
+    mapping: ["E", "I"],
+  };
+
+  it("is ready with two statements on two different poles", () => {
+    expect(isPairItemReady(ready)).toBe(true);
+  });
+
+  it("compares poles case-insensitively", () => {
+    expect(isPairItemReady({ ...ready, mapping: ["e", "i"] })).toBe(true);
+  });
+
+  it("is not ready when both statements score the same pole", () => {
+    expect(isPairItemReady({ ...ready, mapping: ["E", "E"] })).toBe(false);
+  });
+
+  it("is not ready without a question", () => {
+    expect(isPairItemReady({ ...ready, question: "  " })).toBe(false);
+  });
+
+  it("is not ready when a statement is blank", () => {
+    expect(isPairItemReady({ ...ready, statements: ["Saya suka keramaian", ""] })).toBe(false);
+  });
+
+  it("is not ready when a pole is missing", () => {
+    expect(isPairItemReady({ ...ready, mapping: ["E", ""] })).toBe(false);
   });
 });

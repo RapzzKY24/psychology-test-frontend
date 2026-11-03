@@ -9,6 +9,7 @@ import type { DiscResponse } from "../schemas";
 /** Delay before jumping to the next question once an answer is complete. */
 const AUTO_ADVANCE_MS = {
   FORCED_CHOICE_DISC: 400,
+  FORCED_CHOICE_PAIR: 350,
   RIGHT_WRONG_NORM: 300,
 } as const;
 
@@ -42,6 +43,12 @@ function toText(value: unknown): string {
   return typeof v?.text === "string" ? v.text : "";
 }
 
+/** Pair answers store the picked statement index (0 or 1); anything else is blank. */
+function toPairChoice(value: unknown): number | null {
+  const v = value as { chosen?: number } | undefined;
+  return typeof v?.chosen === "number" && v.chosen >= 0 && v.chosen <= 1 ? v.chosen : null;
+}
+
 function isAnsweredRightWrong(value: unknown): boolean {
   return toChosen(value).length > 0 || toText(value).trim().length > 0;
 }
@@ -64,20 +71,24 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   const advanceTimer = useRef<number | null>(null);
 
   const isRightWrong = scorerType === "RIGHT_WRONG_NORM";
+  const isPair = scorerType === "FORCED_CHOICE_PAIR";
+  /** One definition of "answered" for the progress rail and the finish guard. */
+  const isAnswered = (value: unknown): boolean =>
+    isRightWrong
+      ? isAnsweredRightWrong(value)
+      : isPair
+        ? toPairChoice(value) !== null
+        : isAnsweredDisc(value);
   const total = attempt.items.length;
   const safeIndex = Math.min(index, Math.max(total - 1, 0));
   const item = attempt.items[safeIndex];
   const rawValue = item ? answers.answers[item.id] : undefined;
-  const currentAnswered = isRightWrong ? isAnsweredRightWrong(rawValue) : isAnsweredDisc(rawValue);
+  const currentAnswered = isAnswered(rawValue);
   const isLast = safeIndex === total - 1;
   const allAnswered = answers.answeredCount === total;
   const content = (item?.content ?? {}) as Record<string, unknown>;
 
-  const answered = attempt.items.map((it) =>
-    isRightWrong
-      ? isAnsweredRightWrong(answers.answers[it.id])
-      : isAnsweredDisc(answers.answers[it.id]),
-  );
+  const answered = attempt.items.map((it) => isAnswered(answers.answers[it.id]));
 
   const remainingSeconds = useRemainingSeconds(attempt.remainingSeconds);
   const timeUp = remainingSeconds !== null && remainingSeconds <= 0;
@@ -138,6 +149,16 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     [advance, answers, content.multi, isLast, item],
   );
 
+  /** A pair item holds one pick, so a single click is a complete answer. */
+  const choosePair = useCallback(
+    (chosen: number) => {
+      if (!item) return;
+      answers.answer(item.id, { chosen });
+      if (!isLast) advance();
+    },
+    [advance, answers, isLast, item],
+  );
+
   const typeRightWrong = useCallback(
     (text: string) => {
       if (!item) return;
@@ -175,7 +196,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
 
   // Partial DISC picks must still render on return, so the raw value goes
   // through as-is; the view already treats a missing half as "not picked".
-  const discValue = isRightWrong ? undefined : (rawValue as DiscResponse | undefined);
+  const discValue = isRightWrong || isPair ? undefined : (rawValue as DiscResponse | undefined);
 
   return {
     isRightWrong,
@@ -183,6 +204,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     safeIndex,
     item,
     discValue,
+    pairChoice: toPairChoice(rawValue),
     chosen: toChosen(rawValue),
     text: toText(rawValue),
     mode: content.answerMode === "short" ? ("short" as const) : ("choice" as const),
@@ -200,6 +222,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     timeUp,
     selectDisc,
     chooseRightWrong,
+    choosePair,
     typeRightWrong,
     goNext,
     goPrev,

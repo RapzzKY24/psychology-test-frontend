@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ReviewDetail, RightWrongItemContent } from "@/lib/api/types";
+import { PairDetailTable } from "./pair-detail-table";
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
 
 /** The table takes the item/response slices it renders, not the whole review. */
@@ -34,7 +35,19 @@ interface ReviewAnswerSectionProps {
 export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps) {
   // DISC items carry `words`; every right/wrong item carries options or an
   // accepted-answer list, so the key field is not a reliable marker any more.
-  const firstContent = detail.items[0]?.content as unknown as { words?: unknown } | undefined;
+  const firstContent = detail.items[0]?.content as unknown as
+    | { words?: unknown; statements?: unknown }
+    | undefined;
+
+  if (detail.items.length > 0 && Array.isArray(firstContent?.statements)) {
+    return (
+      <PairDetailTable
+        items={detail.items as unknown as Parameters<typeof PairDetailTable>[0]["items"]}
+        responses={detail.responses as unknown as Parameters<typeof PairDetailTable>[0]["responses"]}
+      />
+    );
+  }
+
   const isDisc = Array.isArray(firstContent?.words);
 
   if (detail.items.length > 0 && !isDisc) {

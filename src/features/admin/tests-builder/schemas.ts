@@ -33,6 +33,46 @@ export const DiscItemContentSchema = z.object({
 
 export type DiscItemContentInput = z.infer<typeof DiscItemContentSchema>;
 
+/** One pole of a dichotomy — MBTI uses single letters (E/I), other tools may use short codes. */
+const PoleSchema = z
+  .string()
+  .trim()
+  .min(1, "Kode kutub wajib diisi.")
+  .max(3, "Kode kutub maksimal 3 huruf.")
+  .regex(/^[A-Za-z]+$/, "Kode kutub hanya huruf.")
+  .transform((value) => value.toUpperCase());
+
+/**
+ * Two statements, one pick. `mapping` is the key: it says which pole each
+ * statement scores, and it must never be shown to the participant.
+ */
+export const PairItemContentSchema = z
+  .object({
+    question: z.string().trim().min(1, "Pertanyaan wajib diisi.").max(2000),
+    statements: z
+      .array(z.string().trim().min(1, "Pernyataan wajib diisi.").max(500))
+      .length(2),
+    mapping: z.array(PoleSchema).length(2),
+  })
+  .superRefine((data, ctx) => {
+    if (data.mapping[0] === data.mapping[1]) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Dua pernyataan harus mewakili kutub berbeda.",
+        path: ["mapping", 1],
+      });
+    }
+    if (data.statements[0].toLowerCase() === data.statements[1].toLowerCase()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Dua pernyataan tidak boleh sama.",
+        path: ["statements", 1],
+      });
+    }
+  });
+
+export type PairItemContentInput = z.infer<typeof PairItemContentSchema>;
+
 const itemBase = {
   question: z.string().trim().max(2000).optional(),
   imageUrl: z.string().trim().max(2048).optional().nullable(),
@@ -91,6 +131,23 @@ export type RightWrongItemContentInput = z.infer<typeof RightWrongItemContentSch
  * form needs one concrete shape, so legacy rows are lifted on load and never
  * written back in the old form.
  */
+/** Server rows are trusted to match the schema; the form only needs a concrete shape. */
+export function normalizePairContent(content: unknown): PairItemContentInput {
+  const raw = (content ?? {}) as {
+    question?: string;
+    statements?: string[];
+    mapping?: string[];
+  };
+  return {
+    question: raw.question ?? "",
+    statements: [raw.statements?.[0] ?? "", raw.statements?.[1] ?? ""],
+    mapping: [
+      (raw.mapping?.[0] ?? "").toUpperCase(),
+      (raw.mapping?.[1] ?? "").toUpperCase(),
+    ],
+  };
+}
+
 export function normalizeItemContent(content: unknown): RightWrongItemContentInput {
   const raw = (content ?? {}) as {
     answerMode?: "choice" | "short";

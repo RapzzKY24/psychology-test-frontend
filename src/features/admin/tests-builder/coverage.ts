@@ -34,8 +34,9 @@ export function missingPatternCodes(
   interpretations: InterpretationDraft[],
   scorerType = "FORCED_CHOICE_DISC",
   itemCount?: number,
+  itemContents?: unknown[],
 ): string[] {
-  const codes = getPatternCodes(scorerType, itemCount);
+  const codes = getPatternCodes(scorerType, itemCount, itemContents);
   const filled = new Set(interpretations.filter(isFilled).map((i) => i.patternCode));
   return (codes as readonly string[]).filter((code) => !filled.has(code));
 }
@@ -50,9 +51,10 @@ export function coverage(
   interpretations: InterpretationDraft[],
   scorerType = "FORCED_CHOICE_DISC",
   itemCount?: number,
+  itemContents?: unknown[],
 ): InterpretationCoverage {
-  const codes = getPatternCodes(scorerType, itemCount);
-  const missing = missingPatternCodes(interpretations, scorerType, itemCount);
+  const codes = getPatternCodes(scorerType, itemCount, itemContents);
+  const missing = missingPatternCodes(interpretations, scorerType, itemCount, itemContents);
   return {
     filled: codes.length - missing.length,
     total: codes.length,

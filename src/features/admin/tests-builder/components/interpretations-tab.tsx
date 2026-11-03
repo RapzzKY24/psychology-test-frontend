@@ -19,15 +19,21 @@ export function InterpretationsTab({
 }) {
   const { form, interpretationsArray } = builder;
   const watched = form.watch("interpretations");
-  // RIGHT_WRONG_NORM uses RAW_0..RAW_n, DISC uses 1..40 — pull count from builder
-  const scorerType =
-    (builder as unknown as { scorerType?: string }).scorerType ?? "FORCED_CHOICE_DISC";
-  const itemCount = form.watch("items")?.length;
-  const patternCodes = getPatternCodes(scorerType, itemCount);
-  const stat = coverage(watched, scorerType, itemCount);
-  const rowIndex = watched.findIndex((row) => row.patternCode === builder.activePattern);
+  // RIGHT_WRONG_NORM uses RAW_0..RAW_n, DISC 1..40, a pair instrument derives
+  // its codes from the item mappings — so the items are part of the input.
+  const { scorerType } = builder;
+  const watchedItems = form.watch("items") ?? [];
+  const itemCount = watchedItems.length;
+  const itemContents = watchedItems.map((item) => item.content);
+  const patternCodes = getPatternCodes(scorerType, itemCount, itemContents);
+  const stat = coverage(watched, scorerType, itemCount, itemContents);
+  // "1" is the DISC default; a pair test starts on its first derived code.
+  const activeCode = patternCodes.includes(builder.activePattern)
+    ? builder.activePattern
+    : (patternCodes[0] ?? builder.activePattern);
+  const rowIndex = watched.findIndex((row) => row.patternCode === activeCode);
   const activeRow = rowIndex >= 0 ? watched[rowIndex] : undefined;
-  const isMissing = builder.missingCodes.includes(builder.activePattern);
+  const isMissing = builder.missingCodes.includes(activeCode);
 
   const createRow = (code: string) => {
     // Read the live values, not the render snapshot: two quick clicks on an
@@ -58,7 +64,7 @@ export function InterpretationsTab({
             const row = watched.find((r) => r.patternCode === code);
             const filled = row !== undefined && isFilled(row);
             const highlighted = builder.missingCodes.includes(code);
-            const active = code === builder.activePattern;
+            const active = code === activeCode;
             return (
               <button
                 key={code}
@@ -98,7 +104,7 @@ export function InterpretationsTab({
       <div className="space-y-5 p-6">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium">
-            Pola <span className="tabular-nums">{builder.activePattern}</span>
+            Pola <span className="tabular-nums">{activeCode}</span>
             {isMissing && (
               <span className="ml-2 rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
                 dibutuhkan untuk publish
@@ -110,12 +116,12 @@ export function InterpretationsTab({
         {activeRow === undefined ? (
           <div className="rounded-lg border border-dashed p-10 text-center">
             <p className="text-sm text-muted-foreground">
-              Belum ada interpretasi untuk pola {builder.activePattern}.
+              Belum ada interpretasi untuk pola {activeCode}.
             </p>
             <Button
               className="mt-3"
               disabled={locked}
-              onClick={() => createRow(builder.activePattern)}
+              onClick={() => createRow(activeCode)}
             >
               <Plus className="size-4" aria-hidden />
               Buat interpretasi

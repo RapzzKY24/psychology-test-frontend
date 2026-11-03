@@ -93,6 +93,33 @@ function shortAttempt(): AttemptRead {
   };
 }
 
+function pairAttempt(responses: AttemptRead["responses"] = []): AttemptRead {
+  const attempt = rightWrongAttempt();
+  return {
+    ...attempt,
+    scorerType: "FORCED_CHOICE_PAIR",
+    responses,
+    items: [
+      {
+        id: "item-1",
+        order: 1,
+        content: {
+          question: "Mana yang lebih Anda pilih?",
+          statements: ["Saya suka keramaian", "Saya suka menyendiri"],
+        },
+      },
+      {
+        id: "item-2",
+        order: 2,
+        content: {
+          question: "Mana yang lebih Anda pilih?",
+          statements: ["Saya percaya fakta", "Saya percaya intuisi"],
+        },
+      },
+    ],
+  };
+}
+
 function timedAttempt(remainingSeconds: number): AttemptRead {
   return {
     ...rightWrongAttempt(),
@@ -202,6 +229,24 @@ describe("useAttemptRunner", () => {
       { timeout: 2000 },
     );
     expect(putResponse).toHaveBeenCalledTimes(1);
+  });
+
+  it("saves the picked statement and advances for a pair item", async () => {
+    const { result } = renderRunner(pairAttempt());
+
+    await act(async () => result.current.choosePair(1));
+
+    await waitFor(() =>
+      expect(putResponse).toHaveBeenCalledWith("attempt-1", "item-1", { chosen: 1 }, undefined),
+    );
+    await waitFor(() => expect(result.current.safeIndex).toBe(1));
+  });
+
+  it("prefills a stored pair pick and counts it as answered", () => {
+    const { result } = renderRunner(pairAttempt([{ itemId: "item-1", value: { chosen: 0 } }]));
+
+    expect(result.current.pairChoice).toBe(0);
+    expect(result.current.answered).toEqual([true, false]);
   });
 
   it("counts a typed answer as answered", async () => {

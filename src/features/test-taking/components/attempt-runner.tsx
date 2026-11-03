@@ -2,6 +2,7 @@
 
 import { AttemptCompleteScreen } from "./attempt-complete-screen";
 import { DiscItemView } from "./disc-item-view";
+import { PairItemView } from "./pair-item-view";
 import { RightWrongItemView } from "./right-wrong-item-view";
 import { RunnerHeader } from "./runner-header";
 import { RunnerMobileBar } from "./runner-mobile-bar";
@@ -56,7 +57,16 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
           remainingSeconds={runner.remainingSeconds}
         />
 
-        {runner.isRightWrong ? (
+        {scorerType === "FORCED_CHOICE_PAIR" ? (
+          <PairItemView
+            order={runner.safeIndex + 1}
+            question={(runner.content.question as string | null) ?? null}
+            statements={(runner.content.statements as string[]) ?? []}
+            value={runner.pairChoice}
+            disabled={runner.timeUp}
+            onChoose={runner.choosePair}
+          />
+        ) : runner.isRightWrong ? (
           <RightWrongItemView
             order={runner.safeIndex + 1}
             question={(runner.content.question as string | null) ?? null}

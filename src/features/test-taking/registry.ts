@@ -1,5 +1,6 @@
 import type { ScorerType } from "@/lib/api/types";
 import { DiscItemView } from "./components/disc-item-view";
+import { PairItemView } from "./components/pair-item-view";
 import { RightWrongItemView } from "./components/right-wrong-item-view";
 
 /**
@@ -9,6 +10,7 @@ import { RightWrongItemView } from "./components/right-wrong-item-view";
  */
 export const ITEM_RENDERERS = {
   FORCED_CHOICE_DISC: DiscItemView,
+  FORCED_CHOICE_PAIR: PairItemView,
   RIGHT_WRONG_NORM: RightWrongItemView,
 } as const satisfies Record<ScorerType, React.ElementType>;
 
@@ -24,8 +26,10 @@ function isValidScorerType(value: unknown): value is ScorerType {
 function sniffScorerType(
   items: Array<{ content: Record<string, unknown> }>,
 ): ScorerType {
-  const first = items[0]?.content as { words?: unknown } | undefined;
-  return Array.isArray(first?.words) ? "FORCED_CHOICE_DISC" : "RIGHT_WRONG_NORM";
+  const first = items[0]?.content as { words?: unknown; statements?: unknown } | undefined;
+  if (Array.isArray(first?.words)) return "FORCED_CHOICE_DISC";
+  if (Array.isArray(first?.statements)) return "FORCED_CHOICE_PAIR";
+  return "RIGHT_WRONG_NORM";
 }
 
 /**

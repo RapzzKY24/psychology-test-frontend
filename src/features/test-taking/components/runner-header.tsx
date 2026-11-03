@@ -12,6 +12,13 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       Anda. Jawaban tersimpan otomatis — boleh kembali ke soal sebelumnya.
     </>
   ),
+  FORCED_CHOICE_PAIR: (
+    <>
+      Tiap soal berisi dua pernyataan — pilih{" "}
+      <span className="font-medium text-foreground">satu</span> yang paling menggambarkan diri Anda.
+      Tidak ada jawaban benar atau salah; jawaban tersimpan otomatis.
+    </>
+  ),
   RIGHT_WRONG_NORM: (
     <>
       Jawab tiap soal sesuai petunjuknya — pilih opsi atau tulis jawaban singkat. Jawaban tersimpan
