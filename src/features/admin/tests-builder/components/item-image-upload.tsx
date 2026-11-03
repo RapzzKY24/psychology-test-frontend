@@ -13,10 +13,12 @@ const ALLOWED = ["image/png", "image/jpeg"];
 interface ItemImageUploadProps {
   testId: string;
   value?: string | null;
+  /** Validation message from the form schema, shown next to the picker. */
+  serverError?: string | null;
   onChange: (imageUrl: string | null) => void;
 }
 
-export function ItemImageUpload({ testId, value, onChange }: ItemImageUploadProps) {
+export function ItemImageUpload({ testId, value, serverError, onChange }: ItemImageUploadProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +32,7 @@ export function ItemImageUpload({ testId, value, onChange }: ItemImageUploadProp
   }, [preview]);
 
   const displayUrl = preview ?? value ?? null;
+  const shownError = error ?? serverError ?? null;
 
   // Reset load error when the displayed image changes. Done during render
   // (React docs "adjusting state on prop change") instead of useEffect to
@@ -135,7 +138,7 @@ export function ItemImageUpload({ testId, value, onChange }: ItemImageUploadProp
           </Button>
         </div>
       </div>
-      {error && <FieldError>{error}</FieldError>}
+      {shownError && <FieldError>{shownError}</FieldError>}
     </Field>
   );
 }

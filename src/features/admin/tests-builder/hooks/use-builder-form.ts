@@ -29,6 +29,23 @@ function getBuilderFormSchema(scorerType: string) {
   });
 }
 
+/**
+ * A 422 carries the actionable part in `details` ("test must have at least 1
+ * item", "items[3]: options.1: …"). Showing only the catalog code leaves the
+ * admin guessing, so the first detail replaces the generic copy.
+ */
+const DETAIL_COPY: Record<string, string> = {
+  "test must have at least 1 item": "Tes harus punya minimal 1 soal sebelum dipublish.",
+};
+
+export function describeDetail(detail: string): string {
+  const known = DETAIL_COPY[detail];
+  if (known) return known;
+  const item = /^items\[(\d+)\]: (.+)$/.exec(detail);
+  if (item) return `Soal #${Number(item[1]) + 1}: ${item[2]}`;
+  return detail;
+}
+
 export type BuilderFormValues = {
   items: { content: DiscItemContentInput | RightWrongItemContentInput }[];
   interpretations: { patternCode: string; title: string; body: string }[];
@@ -120,7 +137,8 @@ export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
   const handleApiError = useCallback((error: unknown) => {
     if (isApiError(error)) {
       if (error.code === "edit_locked") setLocked(true);
-      toast.error(error.message);
+      const detail = error.details?.[0];
+      toast.error(detail ? describeDetail(detail) : error.message);
       return;
     }
     toast.error("Terjadi kesalahan — coba lagi.");

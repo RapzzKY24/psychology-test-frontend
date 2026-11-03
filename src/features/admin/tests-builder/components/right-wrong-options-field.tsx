@@ -26,12 +26,11 @@ export function RightWrongOptionsField({
 }: RightWrongOptionsFieldProps) {
   const { form } = builder;
 
-  const optionError = (idx: number): OptionError | undefined => {
-    const content = form.formState.errors.items?.[active]?.content as unknown as {
-      options?: OptionError[];
-    };
-    return content?.options?.[idx];
-  };
+  const contentErrors = form.formState.errors.items?.[active]?.content as unknown as
+    { options?: OptionError[]; correctIndex?: OptionError } | undefined;
+
+  const optionError = (idx: number): OptionError | undefined => contentErrors?.options?.[idx];
+  const keyError = contentErrors?.correctIndex;
 
   const setOptions = (next: string[]) =>
     form.setValue(`items.${active}.content.options`, next as never, { shouldDirty: true });
@@ -52,8 +51,12 @@ export function RightWrongOptionsField({
     const next = [...options];
     next.splice(idx, 1);
     setOptions(next);
-    if (correctIndex >= next.length) {
-      form.setValue(`items.${active}.content.correctIndex`, next.length - 1 as never, {
+    // The key is positional, so deleting an earlier option has to drag it down
+    // with the rest — otherwise the key silently jumps to the next answer.
+    const shifted = idx < correctIndex ? correctIndex - 1 : correctIndex;
+    const clamped = Math.min(shifted, next.length - 1);
+    if (clamped !== correctIndex) {
+      form.setValue(`items.${active}.content.correctIndex`, clamped as never, {
         shouldDirty: true,
       });
     }
@@ -118,6 +121,8 @@ export function RightWrongOptionsField({
           </Field>
         );
       })}
+
+      {keyError && <FieldError errors={[keyError as never]} />}
 
       <p className="text-xs text-muted-foreground">
         Pilih radio untuk kunci jawaban. Minimal 2 opsi, maksimal 6.

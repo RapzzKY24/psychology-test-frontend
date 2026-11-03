@@ -1,6 +1,6 @@
 "use client";
 
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import type { BuilderController } from "../hooks/use-builder-form";
 import { ItemImageUpload } from "./item-image-upload";
@@ -37,9 +37,10 @@ export function RightWrongItemEditor({
       }
     | undefined;
 
-  const contentError = form.formState.errors.items?.[active]?.content as unknown as
-    | { message?: string }
-    | undefined;
+  const contentErrors = form.formState.errors.items?.[active]?.content as unknown as
+    { question?: { message?: string }; imageUrl?: { message?: string } } | undefined;
+  const questionError = contentErrors?.question;
+  const imageError = contentErrors?.imageUrl;
 
   return (
     <>
@@ -51,7 +52,7 @@ export function RightWrongItemEditor({
         onRemove={onRemove}
       />
 
-      <Field>
+      <Field data-invalid={questionError ? true : undefined}>
         <FieldLabel htmlFor="rw-question">Pertanyaan (opsional jika ada gambar)</FieldLabel>
         <Textarea
           id="rw-question"
@@ -59,17 +60,20 @@ export function RightWrongItemEditor({
           disabled={locked}
           rows={3}
           placeholder="Tulis pertanyaan..."
+          aria-invalid={questionError ? true : undefined}
           onChange={(e) =>
             form.setValue(`items.${active}.content.question`, e.target.value as never, {
               shouldDirty: true,
             })
           }
         />
+        {questionError && <FieldError errors={[questionError]} />}
       </Field>
 
       <ItemImageUpload
         testId={testId}
         value={content?.imageUrl ?? null}
+        serverError={imageError?.message ?? null}
         onChange={(url) =>
           form.setValue(`items.${active}.content.imageUrl`, url as never, { shouldDirty: true })
         }
@@ -82,12 +86,6 @@ export function RightWrongItemEditor({
         correctIndex={content?.correctIndex ?? 0}
         locked={locked}
       />
-
-      {contentError && (
-        <p className="text-sm text-destructive">
-          {contentError.message ?? "Periksa field yang bertanda merah."}
-        </p>
-      )}
     </>
   );
 }
