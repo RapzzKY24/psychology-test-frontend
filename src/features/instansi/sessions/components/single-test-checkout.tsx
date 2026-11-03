@@ -81,6 +81,9 @@ export function SingleTestCheckout({ testId, initialTests }: SingleTestCheckoutP
 function SingleTestCheckoutForm({ test }: { test: InstansiTestOption }) {
   const { form, submit, slots, totalAmount, isSubmitting, canSubmit } = useSingleTestCheckout(test);
   const slotError = form.formState.errors.slotLimit;
+  // A Rp 0 total can never be paid, so the submit gate stays closed. Say why
+  // instead of leaving a dead button.
+  const priceMissing = test.price <= 0;
 
   return (
     <form onSubmit={submit} className="space-y-6">
@@ -139,6 +142,11 @@ function SingleTestCheckoutForm({ test }: { test: InstansiTestOption }) {
               {formatIdr(totalAmount)}
             </p>
           </div>
+          {priceMissing && (
+            <p role="alert" className="text-destructive text-sm">
+              Harga tes ini belum diset — hubungi admin sebelum membeli slot.
+            </p>
+          )}
           <Button type="submit" className="w-full" disabled={!canSubmit}>
             {isSubmitting ? "Menyimpan…" : "Buat Sesi & Bayar"}
           </Button>

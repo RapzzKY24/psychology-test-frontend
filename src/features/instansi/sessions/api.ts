@@ -9,8 +9,8 @@ export interface InstansiSessionFilters {
 }
 
 /**
- * `GET /instansi/tests` returns the full public DTO (price included) — the
- * backend only narrows the list to the CPMI whitelist, not the fields.
+ * `GET /instansi/tests` returns the full public DTO (price included) for every
+ * published test.
  */
 export type InstansiTestOption = PublicTest;
 

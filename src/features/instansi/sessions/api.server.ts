@@ -27,6 +27,7 @@ export function fetchInstansiSessionDetailServer(
 }
 
 export function fetchPublishedTestsServer(): Promise<ApiSuccess<InstansiTestOption[]>> {
-  // Instansi only sees CPMI (WPT hidden) — BE whitelist via GET /instansi/tests
+  // Every published test is sellable — GET /instansi/tests returns the same set
+  // as the public catalog, price included.
   return apiFetchServer<InstansiTestOption[]>("/instansi/tests");
 }

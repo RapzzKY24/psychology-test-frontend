@@ -65,6 +65,16 @@ describe("SingleTestCheckout", () => {
     expect(screen.getByRole("button", { name: /Buat Sesi/ }).hasAttribute("disabled")).toBe(false);
   });
 
+  it("explains a test whose price is not set instead of leaving a dead button", () => {
+    const free: InstansiTestOption = { ...disc, id: "t-free", price: 0 };
+    render(<SingleTestCheckout testId="t-free" initialTests={[free]} />, { wrapper });
+
+    fireEvent.change(screen.getByLabelText("Jumlah slot"), { target: { value: "20" } });
+
+    expect(screen.getByRole("alert").textContent).toContain("Harga tes ini belum diset");
+    expect(screen.getByRole("button", { name: /Buat Sesi/ }).hasAttribute("disabled")).toBe(true);
+  });
+
   it("explains when the test is not sellable instead of showing an empty form", () => {
     render(<SingleTestCheckout testId="missing" initialTests={[disc]} />, { wrapper });
 
