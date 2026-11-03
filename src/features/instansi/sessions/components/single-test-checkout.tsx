@@ -1,17 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { AlertCircle, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { formatIdr } from "@/lib/format/format-idr";
 import type { InstansiTestOption } from "../api";
 import { MAX_SLOT_LIMIT } from "../constants";
 import { useInstansiTests } from "../hooks/use-instansi-tests";
 import { useSingleTestCheckout } from "../hooks/use-single-test-checkout";
+import { CheckoutStateCard } from "./checkout-state-card";
 
 interface SingleTestCheckoutProps {
   testId: string;
@@ -27,53 +26,19 @@ export function SingleTestCheckout({ testId, initialTests }: SingleTestCheckoutP
   const testsQuery = useInstansiTests(initialTests);
   const test = testsQuery.data?.find((option) => option.id === testId);
 
-  if (testsQuery.isLoading) {
-    return (
-      <Card>
-        <CardContent className="space-y-2 py-6">
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-        </CardContent>
-      </Card>
-    );
-  }
+  if (testsQuery.isLoading) return <CheckoutStateCard state="loading" />;
 
   if (testsQuery.isError) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
-          <AlertCircle className="text-destructive size-6" aria-hidden />
-          <p className="text-muted-foreground text-sm">Gagal memuat data tes.</p>
-          <Button
-            variant="outline"
-            onClick={() => void testsQuery.refetch()}
-            disabled={testsQuery.isFetching}
-          >
-            {testsQuery.isFetching ? "Memuat…" : "Coba lagi"}
-          </Button>
-        </CardContent>
-      </Card>
+      <CheckoutStateCard
+        state="error"
+        isRetrying={testsQuery.isFetching}
+        onRetry={() => void testsQuery.refetch()}
+      />
     );
   }
 
-  if (!test) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
-          <AlertCircle className="text-destructive size-6" aria-hidden />
-          <div className="space-y-1">
-            <p className="font-medium">Tes tidak tersedia</p>
-            <p className="text-muted-foreground text-sm">
-              Tes ini belum dijual atau sudah diarsipkan.
-            </p>
-          </div>
-          <Button asChild variant="outline">
-            <Link href="/tes">Kembali ke katalog</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  if (!test) return <CheckoutStateCard state="unavailable" />;
 
   return <SingleTestCheckoutForm test={test} />;
 }
@@ -83,7 +48,7 @@ function SingleTestCheckoutForm({ test }: { test: InstansiTestOption }) {
   const slotError = form.formState.errors.slotLimit;
   // A Rp 0 total can never be paid, so the submit gate stays closed. Say why
   // instead of leaving a dead button.
-  const priceMissing = test.price <= 0;
+  const isPriceMissing = test.price <= 0;
 
   return (
     <form onSubmit={submit} className="space-y-6">
@@ -142,7 +107,7 @@ function SingleTestCheckoutForm({ test }: { test: InstansiTestOption }) {
               {formatIdr(totalAmount)}
             </p>
           </div>
-          {priceMissing && (
+          {isPriceMissing && (
             <p role="alert" className="text-destructive text-sm">
               Harga tes ini belum diset — hubungi admin sebelum membeli slot.
             </p>
