@@ -41,6 +41,16 @@ describe("ProfileSchema", () => {
     ).toBe(false);
   });
 
+  it("accepts a profile with no SIPP number", () => {
+    expect(ProfileSchema.safeParse({ ...valid, sippNumber: "" }).success).toBe(true);
+  });
+
+  it("rejects a SIPP number shorter than three characters", () => {
+    expect(ProfileSchema.safeParse({ ...valid, sippNumber: "12" }).success).toBe(
+      false,
+    );
+  });
+
   it("rejects a non-numeric NIK", () => {
     expect(
       ProfileSchema.safeParse({ ...valid, nik: "abcdefghijklmnop" }).success,
@@ -57,6 +67,13 @@ describe("toProfilePayload", () => {
       nik: "3201010101010001",
       institutionName: "RS Harapan",
     });
+  });
+
+  it("sends the SIPP number only when it is filled in", () => {
+    expect(
+      toProfilePayload({ ...valid, sippNumber: "25022211674" }).sippNumber,
+    ).toBe("25022211674");
+    expect(toProfilePayload({ ...valid, sippNumber: "" }).sippNumber).toBeUndefined();
   });
 
   it("sends an empty degree when there is no comma", () => {

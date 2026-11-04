@@ -36,8 +36,20 @@ export function ProfileForm({ profile }: { profile: PsychologistProfile | null }
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="profile-license">Nomor lisensi (SIPP)</FieldLabel>
+              <FieldLabel htmlFor="profile-license">Nomor lisensi</FieldLabel>
               <Input {...field} id="profile-license" aria-invalid={fieldState.invalid} className="h-11" />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="sippNumber"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="profile-sipp">Nomor SIPP</FieldLabel>
+              <Input {...field} id="profile-sipp" aria-invalid={fieldState.invalid} className="h-11" />
+              <FieldDescription>Tercetak di sertifikat setelah tulisan SIPP NO.</FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}

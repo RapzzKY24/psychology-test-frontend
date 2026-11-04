@@ -32,6 +32,16 @@ export const ProfileSchema = z.object({
       message: "Gelar terlalu panjang (maks 100 karakter).",
     }),
   licenseNumber: z.string().trim().min(3, "Nomor lisensi minimal 3 karakter.").max(50),
+  /** Optional: printed as SIPP NO. Empty is allowed and prints nothing. */
+  sippNumber: z
+    .string()
+    .trim()
+    .max(50, "Nomor SIPP terlalu panjang (maks 50 karakter).")
+    .refine(
+      (v) => v.length === 0 || v.length >= 3,
+      "Nomor SIPP minimal 3 karakter.",
+    )
+    .optional(),
   nik: z.string().trim().regex(/^\d{16}$/, "NIK harus 16 digit angka."),
   institutionName: z.string().trim().min(2, "Asal instansi minimal 2 karakter.").max(200),
 });
@@ -43,6 +53,7 @@ export interface ProfilePayload {
   fullName: string;
   degree: string;
   licenseNumber: string;
+  sippNumber?: string;
   nik: string;
   institutionName: string;
 }
@@ -53,6 +64,7 @@ export function toProfilePayload(values: ProfileInput): ProfilePayload {
     fullName,
     degree,
     licenseNumber: values.licenseNumber,
+    ...(values.sippNumber ? { sippNumber: values.sippNumber } : {}),
     nik: values.nik,
     institutionName: values.institutionName,
   };

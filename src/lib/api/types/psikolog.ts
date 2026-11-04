@@ -5,6 +5,8 @@ export interface PsychologistProfile {
   fullName: string;
   degree: string;
   licenseNumber: string;
+  /** Printed as `SIPP NO` on the certificate; null on profiles made before it. */
+  sippNumber: string | null;
   nik: string | null;
   institutionName: string | null;
   signatureImagePath: string;
