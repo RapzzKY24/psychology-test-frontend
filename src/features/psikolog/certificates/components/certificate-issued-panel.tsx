@@ -68,6 +68,27 @@ export function CertificateIssuedPanel({ certificate }: { certificate: Certifica
         <Row label="Kode verifikasi" value={certificate.verifyCode ?? "—"} />
       </dl>
 
+      {certificate.verifyCode && (
+        <div className="flex flex-wrap items-center gap-4 rounded-lg border p-3">
+          {/* Served by the backend so the screen shows exactly what the paper prints. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`/api/v1/certificates/${certificate.id}/qr`}
+            alt="QR validasi sertifikat"
+            width={96}
+            height={96}
+            className="size-24 shrink-0 rounded border bg-white p-1"
+          />
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">QR validasi</p>
+            <p className="font-medium tabular-nums">{certificate.verifyCode}</p>
+            <p className="text-xs text-muted-foreground">
+              Pindai untuk memeriksa keaslian dokumen ini di halaman verifikasi.
+            </p>
+          </div>
+        </div>
+      )}
+
       {revoked && (
         <dl className="grid gap-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 sm:grid-cols-2">
           <Row label="Dibatalkan pada" value={formatIdDate(certificate.revokedAt)} />
