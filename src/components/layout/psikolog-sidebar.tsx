@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
+  Award,
   ClipboardCheck,
   ExternalLink,
   FileText,
@@ -29,6 +30,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
       { href: "/psikolog", label: "Ringkasan", icon: LayoutDashboard },
       { href: "/psikolog/review", label: "Review Hasil", icon: ClipboardCheck },
       { href: "/psikolog/laporan", label: "Laporan", icon: FileText },
+      { href: "/psikolog/sertifikat", label: "Sertifikat", icon: Award },
       { href: "/psikolog/profil", label: "Profil & TTD", icon: UserRound },
     ],
   },

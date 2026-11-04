@@ -1,9 +1,13 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { ResultsTable } from "@/features/instansi/results/components/results-table";
 import { formatIdDate } from "@/lib/format/format-date";
 import type { InstansiResultItem } from "@/lib/api/types";
+
+vi.mock("@/features/instansi/results/components/instansi-certificate-download-button", () => ({
+  InstansiCertificateDownloadButton: () => <button type="button">Sertifikat</button>,
+}));
 
 const row: InstansiResultItem = {
   resultId: "r1",
@@ -12,6 +16,7 @@ const row: InstansiResultItem = {
   patternCode: "DISC-D",
   scores: { graph: { D: 7, I: 3 } },
   approvedAt: "2026-10-01T00:00:00.000Z",
+  certificate: null,
 };
 
 const meta = { page: 1, limit: 10, total: 1, totalPages: 1 };
@@ -35,9 +40,21 @@ describe("ResultsTable", () => {
     expect(screen.getByText(formatIdDate(row.approvedAt))).toBeTruthy();
   });
 
-  it("does not render the deferred PDF action", () => {
+  it("offers no download when the result has no live certificate", () => {
     render(<ResultsTable rows={[row]} meta={meta} pageHref={pageHref} />);
 
-    expect(screen.queryByText(/PDF/i)).toBeNull();
+    expect(screen.queryByRole("button", { name: /sertifikat/i })).toBeNull();
+  });
+
+  it("offers the certificate download once one is issued", () => {
+    render(
+      <ResultsTable
+        rows={[{ ...row, certificate: { id: "c1", number: "060/TES/YM/XI/2026" } }]}
+        meta={meta}
+        pageHref={pageHref}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: /sertifikat/i })).toBeTruthy();
   });
 });

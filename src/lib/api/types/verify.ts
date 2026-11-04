@@ -44,3 +44,26 @@ export interface VerifyCodeResult {
     licenseNumber: string;
   };
 }
+
+/**
+ * `GET /api/v1/public/certificates/verify/:code` — QR on the certificate PDF.
+ * No identity block, no photo: a scanner sees the number, the masked name, the
+ * verdict and who signed it. A cancelled certificate keeps its reason and
+ * loses its verdict.
+ */
+export interface CertificateVerification {
+  valid: boolean;
+  number?: string;
+  revision?: number;
+  status?: "ACTIVE" | "REVOKED";
+  holderName?: string;
+  testName?: string;
+  verdict?: "MEMENUHI_SYARAT" | "TIDAK_MEMENUHI_SYARAT";
+  /** ISO date (YYYY-MM-DD). */
+  validUntil?: string;
+  issuedAt?: string;
+  issuerName?: string;
+  issuerSipp?: string | null;
+  revokedAt?: string;
+  revokeReason?: string;
+}

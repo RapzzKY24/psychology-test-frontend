@@ -7,6 +7,7 @@ import type {
   PublicArticle,
   InvoiceVerification,
   ReportVerification,
+  CertificateVerification,
 } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 
@@ -116,6 +117,28 @@ export async function findReportVerificationServer(
 ): Promise<ReportVerification | null> {
   try {
     return (await fetchReportVerificationServer(code)).data;
+  } catch (error) {
+    if (isApiError(error) && (error.isNotFound || error.statusCode === 422)) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+/** Verifikasi sertifikat lewat kode QR. Tidak di-cache: revisi dan pembatalan mengubah jawabannya. */
+const fetchCertificateVerificationServer = cache(
+  (code: string): Promise<ApiSuccess<CertificateVerification>> =>
+    apiFetchServer<CertificateVerification>(
+      `/public/certificates/verify/${encodeURIComponent(code)}`,
+      { revalidate: false },
+    ),
+);
+
+export async function findCertificateVerificationServer(
+  code: string,
+): Promise<CertificateVerification | null> {
+  try {
+    return (await fetchCertificateVerificationServer(code)).data;
   } catch (error) {
     if (isApiError(error) && (error.isNotFound || error.statusCode === 422)) {
       return null;

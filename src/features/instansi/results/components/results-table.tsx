@@ -12,6 +12,7 @@ import { safeRenderScores } from "@/lib/format/format-scores";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
 import type { InstansiResultItem } from "@/lib/api/types";
 import { formatIdDate } from "@/lib/format/format-date";
+import { InstansiCertificateDownloadButton } from "./instansi-certificate-download-button";
 
 interface ResultsTableProps {
   rows: InstansiResultItem[];
@@ -20,8 +21,8 @@ interface ResultsTableProps {
 }
 
 /**
- * Institution results list. The per-candidate "Unduh PDF" action is deferred
- * to T19 (needs Feature 08) and intentionally not rendered yet.
+ * Institution results list. A result with a live certificate offers its PDF;
+ * the institution reads and downloads, it never issues or revokes.
  */
 export function ResultsTable({ rows, meta, pageHref }: ResultsTableProps) {
   if (rows.length === 0) {
@@ -43,6 +44,7 @@ export function ResultsTable({ rows, meta, pageHref }: ResultsTableProps) {
               <TableHead>Tes</TableHead>
               <TableHead>Ringkasan</TableHead>
               <TableHead>Disetujui</TableHead>
+              <TableHead className="w-32">Sertifikat</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -54,6 +56,16 @@ export function ResultsTable({ rows, meta, pageHref }: ResultsTableProps) {
                   {safeRenderScores(row.scores, row.patternCode)}
                 </TableCell>
                 <TableCell className="tabular-nums">{formatIdDate(row.approvedAt)}</TableCell>
+                <TableCell>
+                  {row.certificate ? (
+                    <InstansiCertificateDownloadButton
+                      id={row.certificate.id}
+                      number={row.certificate.number}
+                    />
+                  ) : (
+                    <span className="text-sm text-muted-foreground">—</span>
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

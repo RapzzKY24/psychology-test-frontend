@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
+import { downloadFile } from "@/lib/download";
 import type { InstansiResultItem } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 
@@ -20,4 +21,13 @@ export function fetchInstansiResults(
   filters: InstansiResultFilters = {},
 ): Promise<ApiSuccess<InstansiResultItem[]>> {
   return apiFetch<InstansiResultItem[]>(`/instansi/results${buildQuery(filters)}`);
+}
+
+/** `GET /instansi/certificates/:id/pdf` — 404 if another institution owns it. */
+export function downloadInstansiCertificatePdf(
+  id: string,
+  number: string | null,
+): Promise<void> {
+  const filename = number ? `sertifikat-${number.replace(/\//g, "-")}.pdf` : "sertifikat.pdf";
+  return downloadFile(`/instansi/certificates/${encodeURIComponent(id)}/pdf`, filename);
 }

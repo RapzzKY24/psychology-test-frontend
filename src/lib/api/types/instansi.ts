@@ -77,6 +77,8 @@ export interface InstansiResultItem {
   patternCode: string;
   scores: unknown;
   approvedAt: string | null;
+  /** The live certificate, when one was issued. Institutions may only download it. */
+  certificate: { id: string; number: string } | null;
 }
 
 /**
