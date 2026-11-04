@@ -59,7 +59,11 @@ export function CertificatePhotoField({
     });
   };
 
-  const previewSrc = pendingPreview ?? (photoPath ? `/${photoPath}?v=${cacheKey}` : null);
+  // The photo is personal data, so the backend streams it behind auth instead
+  // of mounting uploads/certificates as public static.
+  const previewSrc =
+    pendingPreview ??
+    (photoPath ? `/api/v1/certificates/${certificateId}/photo?v=${cacheKey}` : null);
 
   return (
     <Field data-invalid={Boolean(error)}>
