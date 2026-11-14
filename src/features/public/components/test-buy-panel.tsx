@@ -2,6 +2,7 @@ import { Check, ShieldCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatIdr } from "@/lib/format/format-idr";
 import type { PublicTest, UserRole } from "@/lib/api/types";
+import { AgeGateCard } from "./age-gate";
 import { TestBuyCta } from "./test-buy-cta";
 
 const INCLUDES = [
@@ -30,6 +31,8 @@ export function TestBuyPanel({ test, role }: BuyProps) {
             Sekali bayar, termasuk laporan hasil.
           </p>
         </div>
+
+        <AgeGateCard role={role} />
 
         <TestBuyCta testId={test.id} role={role} className="w-full" />
 

@@ -1,3 +1,4 @@
+import type { AgeBand } from "@/lib/age";
 import type { ScorerType, TestCategory, TestStatus } from "./enums";
 
 /** `GET /api/v1/tests` + `GET /api/v1/tests/:slug` (PublicTestSchema — safe fields only). */
@@ -11,10 +12,12 @@ export interface PublicTest {
   category: TestCategory;
   price: number;
   estimatedDurationMin: number;
+  /** Norm age band in completed months; null = the norm covers every age. */
+  ageBand: AgeBand | null;
 }
 
-/** Admin test row (`GET /api/v1/admin/tests`). */
-export interface AdminTest extends PublicTest {
+/** Admin test row (`GET /api/v1/admin/tests`) — the public shape plus builder fields. */
+export interface AdminTest extends Omit<PublicTest, "ageBand"> {
   status: TestStatus;
   scorerType: ScorerType;
   /** Hard limit enforced from `startedAt`; null = untimed. */

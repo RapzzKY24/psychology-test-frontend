@@ -16,6 +16,7 @@ const test: PublicTest = {
   category: "WORK_STYLE",
   price: 150000,
   estimatedDurationMin: 15,
+  ageBand: null,
 };
 
 const article: PublicArticleListItem = {

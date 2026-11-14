@@ -19,6 +19,7 @@ const disc: InstansiTestOption = {
   category: "PERSONALITY",
   price: 75000,
   estimatedDurationMin: 30,
+  ageBand: null,
 };
 
 const cpmi: InstansiTestOption = {
