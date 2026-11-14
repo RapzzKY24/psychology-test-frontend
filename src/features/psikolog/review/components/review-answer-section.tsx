@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ReviewDetail, RightWrongItemContent } from "@/lib/api/types";
+import { ChoiceTallyDetailTable } from "./choice-tally-detail-table";
 import { PairDetailTable, type PairItem, type PairResponseRow } from "./pair-detail-table";
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
 import { ScaleTallyDetailTable } from "./scale-tally-detail-table";
@@ -37,7 +38,7 @@ export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps
   // DISC items carry `words`; every right/wrong item carries options or an
   // accepted-answer list, so the key field is not a reliable marker any more.
   const firstContent = detail.items[0]?.content as unknown as
-    | { words?: unknown; statements?: unknown }
+    | { words?: unknown; statements?: unknown; options?: unknown; mapping?: unknown; scale?: unknown }
     | undefined;
 
   if (detail.items.length > 0 && Array.isArray(firstContent?.statements)) {
@@ -49,11 +50,25 @@ export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps
     );
   }
 
+  // Choice-tally items map every option to its own scale, so the scale column
+  // has to follow the chosen option rather than the item.
+  const isChoiceTally =
+    detail.items.length > 0 &&
+    Array.isArray(firstContent?.options) &&
+    Array.isArray(firstContent?.mapping);
+
+  if (isChoiceTally) {
+    return (
+      <ChoiceTallyDetailTable
+        items={detail.items as unknown as Parameters<typeof ChoiceTallyDetailTable>[0]["items"]}
+        responses={detail.responses}
+      />
+    );
+  }
+
   // Tally items carry the scale they feed; they have no answer key, so the
   // right/wrong table would print "Salah" for every row.
-  const isScaleTally =
-    detail.items.length > 0 &&
-    typeof (firstContent as { scale?: unknown } | undefined)?.scale === "string";
+  const isScaleTally = detail.items.length > 0 && typeof firstContent?.scale === "string";
 
   if (isScaleTally) {
     return (

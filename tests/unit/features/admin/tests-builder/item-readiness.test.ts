@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  isChoiceTallyItemReady,
   isPairItemReady,
   isRightWrongItemReady,
   isScaleTallyItemReady,
@@ -143,5 +144,41 @@ describe("isScaleTallyItemReady", () => {
 
   it("is not ready when a label is blank", () => {
     expect(isScaleTallyItemReady({ ...ready, options: ["Ya", ""] })).toBe(false);
+  });
+});
+
+describe("isChoiceTallyItemReady", () => {
+  const ready = {
+    question: "Bagi saya, kesulitan adalah …",
+    options: ["Tantangan", "Risiko", "Jalan buntu"],
+    mapping: ["Q", "CA", "CL"],
+  };
+
+  it("is ready when every option carries its own scale", () => {
+    expect(isChoiceTallyItemReady(ready)).toBe(true);
+  });
+
+  it("is not ready without a question", () => {
+    expect(isChoiceTallyItemReady({ ...ready, question: "  " })).toBe(false);
+  });
+
+  it("is not ready when a scale is missing", () => {
+    expect(isChoiceTallyItemReady({ ...ready, mapping: ["Q", "", "CL"] })).toBe(false);
+  });
+
+  it("is not ready when mapping and options are out of sync", () => {
+    expect(isChoiceTallyItemReady({ ...ready, mapping: ["Q", "CA"] })).toBe(false);
+  });
+
+  it("is not ready with a single option", () => {
+    expect(isChoiceTallyItemReady({ ...ready, options: ["Tantangan"], mapping: ["Q"] })).toBe(
+      false,
+    );
+  });
+
+  it("is not ready when an option is blank", () => {
+    expect(isChoiceTallyItemReady({ ...ready, options: ["Tantangan", " ", "Jalan buntu"] })).toBe(
+      false,
+    );
   });
 });

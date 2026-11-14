@@ -94,6 +94,28 @@ export const ScaleTallyItemContentSchema = z.object({
 
 export type ScaleTallyItemContentInput = z.infer<typeof ScaleTallyItemContentSchema>;
 
+/**
+ * Pick one option; every option feeds a scale. `mapping` lines up with
+ * `options` and is the key, so it never reaches the participant.
+ */
+export const ChoiceTallyItemContentSchema = z
+  .object({
+    question: z.string().trim().min(1, "Pertanyaan wajib diisi.").max(2000),
+    options: z.array(z.string().trim().min(1, "Opsi wajib diisi.").max(500)).min(2).max(8),
+    mapping: z.array(ScaleCodeSchema).min(2).max(8),
+  })
+  .superRefine((data, ctx) => {
+    if (data.mapping.length !== data.options.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Tiap opsi harus punya satu kode skala.",
+        path: ["mapping"],
+      });
+    }
+  });
+
+export type ChoiceTallyItemContentInput = z.infer<typeof ChoiceTallyItemContentSchema>;
+
 const itemBase = {
   question: z.string().trim().max(2000).optional(),
   imageUrl: z.string().trim().max(2048).optional().nullable(),
@@ -181,6 +203,22 @@ export function normalizeScaleTallyContent(content: unknown): ScaleTallyItemCont
     question: raw.question ?? "",
     options: [options[0] ?? "Ya", options[1] ?? "Tidak"],
     scale: (raw.scale ?? "").toUpperCase(),
+  };
+}
+
+/** Options and their scales are kept the same length so the form stays valid. */
+export function normalizeChoiceTallyContent(content: unknown): ChoiceTallyItemContentInput {
+  const raw = (content ?? {}) as {
+    question?: string;
+    options?: string[];
+    mapping?: string[];
+  };
+  const options = raw.options?.length ? raw.options : ["", ""];
+  const mapping = raw.mapping ?? [];
+  return {
+    question: raw.question ?? "",
+    options,
+    mapping: options.map((_, index) => (mapping[index] ?? "").toUpperCase()),
   };
 }
 

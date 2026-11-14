@@ -9,6 +9,7 @@ import type { DiscResponse } from "../schemas";
 
 /** Delay before jumping to the next question once an answer is complete. */
 const AUTO_ADVANCE_MS = {
+  CHOICE_TALLY: 300,
   FORCED_CHOICE_DISC: 400,
   FORCED_CHOICE_PAIR: 350,
   RIGHT_WRONG_NORM: 300,
@@ -44,9 +45,12 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
   const advanceTimer = useRef<number | null>(null);
 
-  // Two families draw the same "question + options" screen: right/wrong items
-  // and tally statements. Only the scoring behind them differs.
-  const usesChoiceView = scorerType === "RIGHT_WRONG_NORM" || scorerType === "SCALE_TALLY";
+  // Three families draw the same "question + options" screen: right/wrong
+  // items, tally statements and choice tallies. Only the scoring differs.
+  const usesChoiceView =
+    scorerType === "RIGHT_WRONG_NORM" ||
+    scorerType === "SCALE_TALLY" ||
+    scorerType === "CHOICE_TALLY";
   const isPair = scorerType === "FORCED_CHOICE_PAIR";
   const isAnswered = (value: unknown) => isAnsweredValue(scorerType, value);
   const total = attempt.items.length;

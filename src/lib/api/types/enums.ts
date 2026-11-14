@@ -19,6 +19,7 @@ export const TEST_STATUSES = ["DRAFT", "PUBLISHED", "ARCHIVED"] as const;
 export type TestStatus = (typeof TEST_STATUSES)[number];
 
 export const SCORER_TYPES = [
+  "CHOICE_TALLY",
   "FORCED_CHOICE_DISC",
   "FORCED_CHOICE_PAIR",
   "RIGHT_WRONG_NORM",

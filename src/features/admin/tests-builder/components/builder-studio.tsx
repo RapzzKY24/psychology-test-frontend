@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BuilderHeader } from "./builder-header";
+import { ChoiceTallyItemsTab } from "./choice-tally-items-tab";
 import { ItemsTab } from "./items-tab";
 import { PairItemsTab } from "./pair-items-tab";
 import { RightWrongItemsTab } from "./right-wrong-items-tab";
@@ -90,6 +91,8 @@ export function TestBuilderStudio({
           <PairItemsTab builder={builder} locked={builder.locked} />
         ) : initialData.scorerType === "SCALE_TALLY" ? (
           <ScaleTallyItemsTab builder={builder} locked={builder.locked} />
+        ) : initialData.scorerType === "CHOICE_TALLY" ? (
+          <ChoiceTallyItemsTab builder={builder} locked={builder.locked} />
         ) : (
           <ItemsTab builder={builder} locked={builder.locked} />
         ))}

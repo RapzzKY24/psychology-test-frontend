@@ -15,6 +15,8 @@ export const ITEM_RENDERERS = {
   // A tally item is a statement with two labels ("Ya"/"Tidak"), which is the
   // same shape the right/wrong view already draws.
   SCALE_TALLY: RightWrongItemView,
+  // A choice tally is a question with N options — also the right/wrong shape.
+  CHOICE_TALLY: RightWrongItemView,
 } as const satisfies Record<ScorerType, React.ElementType>;
 
 export type RendererScorerType = keyof typeof ITEM_RENDERERS;

@@ -55,6 +55,25 @@ export function scaleTallyPatternCodes(contents: unknown[]): readonly string[] {
 }
 
 /**
+ * Pattern codes of a choice tally are the scales its option mappings name — the
+ * scale that ends up ahead becomes the code. Mirror of the backend
+ * `choiceTallyPatternCodes`.
+ */
+export function choiceTallyPatternCodes(contents: unknown[]): readonly string[] {
+  const seen = new Set<string>();
+  for (const content of contents) {
+    const mapping = (content as { mapping?: unknown } | undefined)?.mapping;
+    if (!Array.isArray(mapping)) continue;
+    for (const scale of mapping) {
+      if (typeof scale !== "string") continue;
+      const code = scale.trim().toUpperCase();
+      if (code) seen.add(code);
+    }
+  }
+  return [...seen];
+}
+
+/**
  * Codes a test must cover before publish: a raw score uses every RAW_n, DISC
  * uses 1..40, a pair instrument derives them from its item mappings.
  */
@@ -69,6 +88,7 @@ export function getPatternCodes(
   }
   if (scorerType === "FORCED_CHOICE_PAIR") return pairPatternCodes(itemContents ?? []);
   if (scorerType === "SCALE_TALLY") return scaleTallyPatternCodes(itemContents ?? []);
+  if (scorerType === "CHOICE_TALLY") return choiceTallyPatternCodes(itemContents ?? []);
   return PATTERN_CODES;
 }
 

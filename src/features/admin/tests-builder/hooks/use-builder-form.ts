@@ -13,13 +13,16 @@ import type { AdminTestDetail } from "@/lib/api/types";
 import { archiveTest, publishTest, putInterpretations, putTestItems } from "../api";
 import { partitionInterpretations } from "../coverage";
 import {
+  ChoiceTallyItemContentSchema,
   DiscItemContentSchema,
   PairItemContentSchema,
   RightWrongItemContentSchema,
   ScaleTallyItemContentSchema,
+  normalizeChoiceTallyContent,
   normalizeItemContent,
   normalizePairContent,
   normalizeScaleTallyContent,
+  type ChoiceTallyItemContentInput,
   type DiscItemContentInput,
   type PairItemContentInput,
   type RightWrongItemContentInput,
@@ -30,6 +33,7 @@ function itemContentSchemaFor(scorerType: string) {
   if (scorerType === "RIGHT_WRONG_NORM") return RightWrongItemContentSchema;
   if (scorerType === "FORCED_CHOICE_PAIR") return PairItemContentSchema;
   if (scorerType === "SCALE_TALLY") return ScaleTallyItemContentSchema;
+  if (scorerType === "CHOICE_TALLY") return ChoiceTallyItemContentSchema;
   return DiscItemContentSchema;
 }
 
@@ -63,6 +67,7 @@ export function describeDetail(detail: string): string {
 export type BuilderFormValues = {
   items: {
     content:
+      | ChoiceTallyItemContentInput
       | DiscItemContentInput
       | PairItemContentInput
       | RightWrongItemContentInput
@@ -82,7 +87,9 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
             ? normalizePairContent(item.content)
             : detail.scorerType === "SCALE_TALLY"
               ? normalizeScaleTallyContent(item.content)
-              : (item.content as DiscItemContentInput),
+              : detail.scorerType === "CHOICE_TALLY"
+                ? normalizeChoiceTallyContent(item.content)
+                : (item.content as DiscItemContentInput),
     })),
     interpretations: detail.interpretations.map((row) => ({
       patternCode: row.patternCode,

@@ -36,6 +36,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
     description:
       "Tiap pernyataan dijawab Ya atau Tidak dan menambah skor satu skala. Hasilnya peringkat skala; kode diambil dari tiga skala terkuat.",
   },
+  {
+    value: "CHOICE_TALLY",
+    label: "Pilihan ganda berskala",
+    description:
+      "Tiap soal punya beberapa opsi dan setiap opsi menambah skor satu skala — tidak ada jawaban benar atau salah. Skala yang paling dominan menjadi hasil.",
+  },
 ] as const;
 
 export const DEFAULT_SCORER_BY_CATEGORY: Record<TestCategory, ScorerType> = {

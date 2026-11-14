@@ -34,6 +34,23 @@ export function isScaleTallyItemReady(content: ScaleTallyItemDraft | undefined):
   return /^[A-Za-z]{1,4}$/.test(content.scale?.trim() ?? "");
 }
 
+export interface ChoiceTallyItemDraft {
+  question?: string;
+  options?: string[];
+  mapping?: string[];
+}
+
+/** Every option filled, and every option carrying its own scale code. */
+export function isChoiceTallyItemReady(content: ChoiceTallyItemDraft | undefined): boolean {
+  if (!content) return false;
+  if (!content.question?.trim()) return false;
+  const options = content.options ?? [];
+  const mapping = content.mapping ?? [];
+  if (options.length < 2 || options.length !== mapping.length) return false;
+  if (!options.every((o) => o.trim().length > 0)) return false;
+  return mapping.every((scale) => /^[A-Za-z]{1,4}$/.test(scale.trim()));
+}
+
 /** Both statements filled and mapped to two different poles. */
 export function isPairItemReady(content: PairItemDraft | undefined): boolean {
   if (!content) return false;

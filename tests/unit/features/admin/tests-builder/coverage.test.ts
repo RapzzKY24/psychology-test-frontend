@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { PATTERN_CODES } from "@/features/admin/tests-builder/constants";
 import {
+  choiceTallyPatternCodes,
   coverage,
   missingPatternCodes,
   scaleTallyPatternCodes,
@@ -63,5 +64,31 @@ describe("scaleTallyPatternCodes", () => {
     ];
     const filled = [{ patternCode: "R", title: "a", body: "x" }];
     expect(missingPatternCodes(filled, "SCALE_TALLY", 2, contents)).toEqual(["I"]);
+  });
+});
+
+describe("choiceTallyPatternCodes", () => {
+  it("collects the distinct option scales in first-appearance order", () => {
+    const contents = [
+      { question: "a", options: ["x", "y"], mapping: ["Q", "CA"] },
+      { question: "b", options: ["x", "y"], mapping: ["cl", "Q"] },
+    ];
+    expect(choiceTallyPatternCodes(contents)).toEqual(["Q", "CA", "CL"]);
+  });
+
+  it("ignores items without a mapping", () => {
+    expect(choiceTallyPatternCodes([{ question: "a" }, null])).toEqual([]);
+  });
+
+  it("drives the publish coverage of a choice tally test", () => {
+    const contents = [
+      { question: "a", options: ["x", "y"], mapping: ["Q", "CA"] },
+      { question: "b", options: ["x", "y"], mapping: ["CL", "Q"] },
+    ];
+    const filled = [
+      { patternCode: "Q", title: "a", body: "x" },
+      { patternCode: "CA", title: "b", body: "x" },
+    ];
+    expect(missingPatternCodes(filled, "CHOICE_TALLY", 2, contents)).toEqual(["CL"]);
   });
 });

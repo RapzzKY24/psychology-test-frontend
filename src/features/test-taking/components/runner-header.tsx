@@ -32,6 +32,12 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       jawaban benar atau salah; jawaban tersimpan otomatis.
     </>
   ),
+  CHOICE_TALLY: (
+    <>
+      Pilih satu jawaban yang paling menggambarkan diri Anda. Tidak ada jawaban benar atau salah;
+      jawaban tersimpan otomatis.
+    </>
+  ),
 };
 
 interface RunnerHeaderProps {
