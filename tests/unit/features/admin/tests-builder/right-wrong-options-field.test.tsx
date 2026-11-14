@@ -90,6 +90,15 @@ describe("RightWrongOptionsField", () => {
     expect(state.keys()).toEqual([2]);
   });
 
+  it("numbers the rows so a letter-valued option is not doubled", () => {
+    // CFIT stores "a"–"f" as the option text; an "A." marker would read "A. a".
+    setup(["a", "b", "c"], [0]);
+
+    expect(screen.getByText("1.")).toBeTruthy();
+    expect(screen.getByText("3.")).toBeTruthy();
+    expect(screen.queryByText("A.")).toBeNull();
+  });
+
   it("refuses to go below two options", () => {
     setup(["A", "B"], [0]);
 

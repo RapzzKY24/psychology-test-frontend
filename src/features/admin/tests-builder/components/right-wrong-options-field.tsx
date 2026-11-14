@@ -102,7 +102,9 @@ export function RightWrongOptionsField({
                   className="size-4"
                   aria-label={`Kunci opsi ${idx + 1}`}
                 />
-                <span className="text-sm tabular-nums">{String.fromCharCode(65 + idx)}.</span>
+                {/* Position, not a letter: a figure item stores "a"–"f" as the
+                    option itself, so an "A." marker would read "A. a". */}
+                <span className="text-sm tabular-nums text-muted-foreground">{idx + 1}.</span>
               </div>
               <Input
                 value={opt}
