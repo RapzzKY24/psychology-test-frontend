@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AttemptAgeBlocked, AttemptAgeGate } from "./attempt-age-gate";
 import { AttemptRunner } from "./attempt-runner";
 import { useAttempt } from "../hooks/use-attempt";
 import { isApiError } from "@/lib/api/client";
@@ -26,7 +27,10 @@ export function AttemptRunnerIsland({ attemptId }: { attemptId: string }) {
   );
   const token = mounted ? getGuestTokenForAttempt(attemptId) : null;
 
-  const query = useAttempt(attemptId, mounted ? token : null);
+  // The API stores the first date it accepts, so this only has to survive the
+  // retry that unlocks a banded attempt.
+  const [birthDate, setBirthDate] = useState<string | null>(null);
+  const query = useAttempt(attemptId, mounted ? token : null, birthDate);
 
   if (!mounted || query.isPending) {
     return (
@@ -39,6 +43,21 @@ export function AttemptRunnerIsland({ attemptId }: { attemptId: string }) {
   }
 
   if (query.isError) {
+    if (isApiError(query.error)) {
+      if (query.error.code === "birth_date_required" || query.error.code === "birth_date_invalid") {
+        return (
+          <AttemptAgeGate
+            invalid={query.error.code === "birth_date_invalid"}
+            initialValue={birthDate ?? ""}
+            onSubmit={setBirthDate}
+          />
+        );
+      }
+      if (query.error.code === "age_out_of_band") {
+        return <AttemptAgeBlocked />;
+      }
+    }
+
     const unauthorized = isApiError(query.error) && query.error.isUnauthorized;
     return (
       <main className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-24 text-center">

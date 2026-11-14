@@ -10,8 +10,12 @@ import type { ApiSuccess } from "@/lib/api/types/pagination";
 export function fetchAttempt(
   attemptId: string,
   participantToken?: string | undefined,
+  birthDate?: string | null,
 ): Promise<ApiSuccess<AttemptRead>> {
-  return apiFetch<AttemptRead>(`/public/attempts/${attemptId}`, { participantToken });
+  // Only needed the first time a banded test is opened; the API stores it and
+  // later calls ignore the parameter.
+  const query = birthDate ? `?birthDate=${encodeURIComponent(birthDate)}` : "";
+  return apiFetch<AttemptRead>(`/public/attempts/${attemptId}${query}`, { participantToken });
 }
 
 export function putResponse(
