@@ -1,4 +1,4 @@
-import { Brain, CheckCircle2, Fingerprint, ListChecks, Percent } from "lucide-react";
+import { Brain, CheckCircle2, Fingerprint, ListChecks, Percent, TrendingUp } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 interface Stat {
@@ -88,6 +88,32 @@ function tallyStats(scores: Record<string, unknown>): Stat[] | null {
   return stats;
 }
 
+/**
+ * LIKERT shares the tally shape but adds a band per scale, so the winner is a
+ * scale plus its category ("A / Tinggi") — not a personality type.
+ */
+function likertStats(scores: Record<string, unknown>): Stat[] | null {
+  const type = scores.type;
+  if (typeof type !== "string" || !type.trim()) return null;
+  if (typeof scores.band !== "string" || !scores.band.trim()) return null;
+  if (!isRecord(scores.scales)) return null;
+
+  const stats: Stat[] = [
+    { key: "type", label: "Skala tertinggi", value: type.trim(), icon: Fingerprint },
+    { key: "band", label: "Kategori", value: scores.band.trim(), icon: TrendingUp },
+  ];
+  const { answered, total } = scores;
+  if (typeof answered === "number" && typeof total === "number") {
+    stats.push({
+      key: "answered",
+      label: "Butir terjawab",
+      value: `${answered}/${total}`,
+      icon: ListChecks,
+    });
+  }
+  return stats;
+}
+
 function barsFrom(values: Record<string, unknown>): Bar[] {
   const bars: Bar[] = [];
   for (const [key, value] of Object.entries(values)) {
@@ -103,25 +129,89 @@ function discBars(scores: Record<string, unknown>): Bar[] | null {
   return bars.length > 0 ? bars : null;
 }
 
-export function ScoreSummary({ scores }: { scores: Record<string, unknown> }) {
-  const stats = rightWrongStats(scores) ?? tallyStats(scores) ?? typeStats(scores);
-  if (stats) {
-    return (
-      <div className="flex flex-wrap gap-3">
-        {stats.map((stat) => (
-          <div
-            key={stat.key}
-            className="flex min-w-40 flex-1 items-start gap-3 rounded-lg border p-4"
-          >
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <stat.icon className="size-4" aria-hidden />
-            </span>
-            <div className="min-w-0">
-              <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
-              <p className="text-2xl font-semibold leading-tight tabular-nums">{stat.value}</p>
-            </div>
+interface ScaleBar {
+  label: string;
+  /** Percent of the scale's own ceiling, so scales of different length compare. */
+  value: number;
+  band?: string;
+}
+
+/**
+ * Tally families keep every scale one level down under `scales`, each with its
+ * own `{ score, max, percent, band }`. The percent is what the reader compares;
+ * the band is what the workbook prints next to it.
+ */
+function scaleBars(scores: Record<string, unknown>): ScaleBar[] | null {
+  if (!isRecord(scores.scales)) return null;
+  const bars: ScaleBar[] = [];
+  for (const [label, value] of Object.entries(scores.scales)) {
+    if (!isRecord(value) || typeof value.percent !== "number") continue;
+    bars.push({
+      label,
+      value: value.percent,
+      band: typeof value.band === "string" ? value.band : undefined,
+    });
+  }
+  return bars.length > 0 ? bars : null;
+}
+
+function StatCards({ stats }: { stats: Stat[] }) {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {stats.map((stat) => (
+        <div
+          key={stat.key}
+          className="flex min-w-40 flex-1 items-start gap-3 rounded-lg border p-4"
+        >
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <stat.icon className="size-4" aria-hidden />
+          </span>
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
+            <p className="text-2xl font-semibold leading-tight tabular-nums">{stat.value}</p>
           </div>
-        ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ScaleBars({ bars }: { bars: ScaleBar[] }) {
+  return (
+    <div className="space-y-3">
+      {bars.map((bar) => (
+        <div key={bar.label} className="space-y-1">
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="font-medium">
+              {bar.label}
+              {bar.band && (
+                <span className="ml-2 text-xs font-normal text-muted-foreground">{bar.band}</span>
+              )}
+            </span>
+            <span className="tabular-nums text-muted-foreground">{bar.value}%</span>
+          </div>
+          <div className="h-2 rounded-full bg-muted">
+            <div
+              className="h-2 rounded-full bg-primary"
+              style={{ width: `${Math.max(bar.value, 4)}%` }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function ScoreSummary({ scores }: { scores: Record<string, unknown> }) {
+  const stats =
+    rightWrongStats(scores) ?? likertStats(scores) ?? tallyStats(scores) ?? typeStats(scores);
+  const scales = scaleBars(scores);
+
+  if (stats || scales) {
+    return (
+      <div className="space-y-4">
+        {stats && <StatCards stats={stats} />}
+        {scales && <ScaleBars bars={scales} />}
       </div>
     );
   }

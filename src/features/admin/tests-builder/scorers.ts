@@ -48,6 +48,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
     description:
       "Tiap soal punya beberapa opsi dan setiap opsi menambah skor satu skala — tidak ada jawaban benar atau salah. Skala yang paling dominan menjadi hasil.",
   },
+  {
+    value: "LIKERT",
+    label: "Skala penilaian (Likert)",
+    description:
+      "Tiap pernyataan dinilai pada skala angka (mis. 1–5). Skor tiap trait adalah jumlah nilai, dan trait dengan persentase tertinggi menjadi hasil — bisa diberi kategori Rendah/Sedang/Tinggi.",
+  },
 ] as const;
 
 export const DEFAULT_SCORER_BY_CATEGORY: Record<TestCategory, ScorerType> = {

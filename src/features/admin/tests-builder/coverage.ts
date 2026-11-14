@@ -97,6 +97,46 @@ export function pairTallyPatternCodes(contents: unknown[]): readonly string[] {
   return [...seen];
 }
 
+/** A band label becomes part of the pattern code: "Sangat Tinggi" -> "SANGAT_TINGGI". */
+export function bandCode(label: string): string {
+  return label
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+/**
+ * Pattern codes of a Likert inventory: every scale crossed with every band the
+ * test declares (`E_RENDAH` … `E_TINGGI`). Without bands the scale is the code.
+ * Mirror of the backend `likertPatternCodes`.
+ */
+export function likertPatternCodes(
+  contents: unknown[],
+  scoringConfig?: unknown,
+): readonly string[] {
+  const scales = new Set<string>();
+  for (const content of contents) {
+    const scale = (content as { scale?: unknown } | undefined)?.scale;
+    if (typeof scale !== "string") continue;
+    const code = scale.trim().toUpperCase();
+    if (code) scales.add(code);
+  }
+
+  const bands = (scoringConfig as { bands?: unknown } | undefined)?.bands;
+  if (!Array.isArray(bands) || bands.length === 0) return [...scales];
+
+  const codes: string[] = [];
+  for (const scale of scales) {
+    for (const band of bands) {
+      const label = (band as { label?: unknown } | undefined)?.label;
+      if (typeof label !== "string" || !label.trim()) continue;
+      codes.push(`${scale}_${bandCode(label)}`);
+    }
+  }
+  return codes;
+}
+
 /**
  * Codes a test must cover before publish: a raw score uses every RAW_n, DISC
  * uses 1..40, a pair instrument derives them from its item mappings.
@@ -105,6 +145,7 @@ export function getPatternCodes(
   scorerType: string,
   itemCount?: number,
   itemContents?: unknown[],
+  scoringConfig?: unknown,
 ): readonly string[] {
   if (scorerType === "RIGHT_WRONG_NORM") {
     const total =
@@ -113,6 +154,7 @@ export function getPatternCodes(
   }
   if (scorerType === "FORCED_CHOICE_PAIR") return pairPatternCodes(itemContents ?? []);
   if (scorerType === "PAIR_TALLY") return pairTallyPatternCodes(itemContents ?? []);
+  if (scorerType === "LIKERT") return likertPatternCodes(itemContents ?? [], scoringConfig);
   if (scorerType === "SCALE_TALLY") return scaleTallyPatternCodes(itemContents ?? []);
   if (scorerType === "CHOICE_TALLY") return choiceTallyPatternCodes(itemContents ?? []);
   return PATTERN_CODES;
@@ -147,8 +189,9 @@ export function missingPatternCodes(
   scorerType = "FORCED_CHOICE_DISC",
   itemCount?: number,
   itemContents?: unknown[],
+  scoringConfig?: unknown,
 ): string[] {
-  const codes = getPatternCodes(scorerType, itemCount, itemContents);
+  const codes = getPatternCodes(scorerType, itemCount, itemContents, scoringConfig);
   const filled = new Set(interpretations.filter(isFilled).map((i) => i.patternCode));
   return (codes as readonly string[]).filter((code) => !filled.has(code));
 }
@@ -164,9 +207,16 @@ export function coverage(
   scorerType = "FORCED_CHOICE_DISC",
   itemCount?: number,
   itemContents?: unknown[],
+  scoringConfig?: unknown,
 ): InterpretationCoverage {
-  const codes = getPatternCodes(scorerType, itemCount, itemContents);
-  const missing = missingPatternCodes(interpretations, scorerType, itemCount, itemContents);
+  const codes = getPatternCodes(scorerType, itemCount, itemContents, scoringConfig);
+  const missing = missingPatternCodes(
+    interpretations,
+    scorerType,
+    itemCount,
+    itemContents,
+    scoringConfig,
+  );
   return {
     filled: codes.length - missing.length,
     total: codes.length,

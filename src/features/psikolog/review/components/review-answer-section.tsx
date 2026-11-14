@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import type { ReviewDetail, RightWrongItemContent } from "@/lib/api/types";
 import { ChoiceTallyDetailTable } from "./choice-tally-detail-table";
+import { LikertDetailTable } from "./likert-detail-table";
 import { PairDetailTable, type PairItem, type PairResponseRow } from "./pair-detail-table";
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
 import { ScaleTallyDetailTable } from "./scale-tally-detail-table";
@@ -38,8 +39,28 @@ export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps
   // DISC items carry `words`; every right/wrong item carries options or an
   // accepted-answer list, so the key field is not a reliable marker any more.
   const firstContent = detail.items[0]?.content as unknown as
-    | { words?: unknown; statements?: unknown; options?: unknown; mapping?: unknown; scale?: unknown }
+    | {
+        words?: unknown;
+        statements?: unknown;
+        options?: unknown;
+        mapping?: unknown;
+        scale?: unknown;
+        text?: unknown;
+      }
     | undefined;
+
+  // Likert items carry `text` + `scale`; they must be checked before the
+  // scale-tally branch, which would otherwise claim them by their scale.
+  const isLikert = detail.items.length > 0 && typeof firstContent?.text === "string";
+
+  if (isLikert) {
+    return (
+      <LikertDetailTable
+        items={detail.items as unknown as Parameters<typeof LikertDetailTable>[0]["items"]}
+        responses={detail.responses}
+      />
+    );
+  }
 
   if (detail.items.length > 0 && Array.isArray(firstContent?.statements)) {
     return (

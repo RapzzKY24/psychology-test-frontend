@@ -116,6 +116,27 @@ export const ChoiceTallyItemContentSchema = z
 
 export type ChoiceTallyItemContentInput = z.infer<typeof ChoiceTallyItemContentSchema>;
 
+/** A Likert scale code is longer than a tally's — Big Five may spell the trait out. */
+const LongScaleCodeSchema = z
+  .string()
+  .trim()
+  .min(1, "Kode skala wajib diisi.")
+  .max(12, "Kode skala maksimal 12 huruf.")
+  .regex(/^[A-Za-z]+$/, "Kode skala hanya huruf.")
+  .transform((value) => value.toUpperCase());
+
+/**
+ * One statement rated on a numeric scale. `scale` and `reverse` are the key:
+ * they say which scale the rating feeds and whether it is flipped.
+ */
+export const LikertItemContentSchema = z.object({
+  text: z.string().trim().min(1, "Pernyataan wajib diisi.").max(2000),
+  scale: LongScaleCodeSchema,
+  reverse: z.boolean().optional(),
+});
+
+export type LikertItemContentInput = z.infer<typeof LikertItemContentSchema>;
+
 const itemBase = {
   question: z.string().trim().max(2000).optional(),
   imageUrl: z.string().trim().max(2048).optional().nullable(),
@@ -206,8 +227,7 @@ export function normalizeScaleTallyContent(content: unknown): ScaleTallyItemCont
   };
 }
 
-/** Options and their scales are kept the same length so the form stays valid. */
-export function normalizeChoiceTallyContent(content: unknown): ChoiceTallyItemContentInput {
+/** Options and their scales are kept the same length so the form stays valid. */export function normalizeChoiceTallyContent(content: unknown): ChoiceTallyItemContentInput {
   const raw = (content ?? {}) as {
     question?: string;
     options?: string[];
@@ -219,6 +239,20 @@ export function normalizeChoiceTallyContent(content: unknown): ChoiceTallyItemCo
     question: raw.question ?? "",
     options,
     mapping: options.map((_, index) => (mapping[index] ?? "").toUpperCase()),
+  };
+}
+
+/** A Likert row always has a statement, a scale and a reverse flag (default off). */
+export function normalizeLikertContent(content: unknown): LikertItemContentInput {
+  const raw = (content ?? {}) as {
+    text?: string;
+    scale?: string;
+    reverse?: boolean;
+  };
+  return {
+    text: raw.text ?? "",
+    scale: (raw.scale ?? "").toUpperCase(),
+    reverse: raw.reverse === true,
   };
 }
 

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   CreateTestSchema,
   DiscItemContentSchema,
+  LikertItemContentSchema,
+  normalizeLikertContent,
   slugify,
 } from "@/features/admin/tests-builder/schemas";
 
@@ -73,5 +75,34 @@ describe("DiscItemContentSchema", () => {
         leastMapping: ["D", "I", "S", "C"],
       }).success,
     ).toBe(false);
+  });
+});
+
+describe("LikertItemContentSchema", () => {
+  it("accepts a statement with a scale and an optional reverse flag", () => {
+    expect(LikertItemContentSchema.safeParse({ text: "Saya suka bergaul", scale: "E" }).success).toBe(
+      true,
+    );
+    expect(
+      LikertItemContentSchema.safeParse({ text: "Saya mudah cemas", scale: "n", reverse: true })
+        .success,
+    ).toBe(true);
+  });
+
+  it("rejects an empty statement or a scale that is not letters", () => {
+    expect(LikertItemContentSchema.safeParse({ text: "  ", scale: "E" }).success).toBe(false);
+    expect(LikertItemContentSchema.safeParse({ text: "a", scale: "E1" }).success).toBe(false);
+    expect(LikertItemContentSchema.safeParse({ text: "a", scale: "ABCDEFGHIJKLM" }).success).toBe(
+      false,
+    );
+  });
+
+  it("normalizes a draft into the stored shape", () => {
+    expect(normalizeLikertContent({ text: "a", scale: "e" })).toEqual({
+      text: "a",
+      scale: "E",
+      reverse: false,
+    });
+    expect(normalizeLikertContent(undefined)).toEqual({ text: "", scale: "", reverse: false });
   });
 });

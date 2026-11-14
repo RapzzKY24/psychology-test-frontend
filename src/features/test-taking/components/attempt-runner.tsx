@@ -2,6 +2,7 @@
 
 import { AttemptCompleteScreen } from "./attempt-complete-screen";
 import { DiscItemView } from "./disc-item-view";
+import { LikertItemView } from "./likert-item-view";
 import { PairItemView } from "./pair-item-view";
 import { RightWrongItemView } from "./right-wrong-item-view";
 import { RunnerHeader } from "./runner-header";
@@ -57,7 +58,17 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
           remainingSeconds={runner.remainingSeconds}
         />
 
-        {runner.isPair ? (
+        {runner.usesRatingView ? (
+          <LikertItemView
+            order={runner.safeIndex + 1}
+            text={(runner.content.text as string | null) ?? ""}
+            min={typeof runner.content.min === "number" ? runner.content.min : 1}
+            max={typeof runner.content.max === "number" ? runner.content.max : 5}
+            rating={runner.rating}
+            disabled={runner.timeUp}
+            onRate={runner.rate}
+          />
+        ) : runner.isPair ? (
           <PairItemView
             order={runner.safeIndex + 1}
             question={(runner.content.question as string | null) ?? null}

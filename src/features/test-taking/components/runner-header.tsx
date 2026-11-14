@@ -19,6 +19,12 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       Tidak ada jawaban benar atau salah; jawaban tersimpan otomatis.
     </>
   ),
+  LIKERT: (
+    <>
+      Nilai seberapa sesuai tiap pernyataan dengan diri Anda pada skala angka yang tersedia. Tidak
+      ada jawaban benar atau salah; jawaban tersimpan otomatis.
+    </>
+  ),
   PAIR_TALLY: (
     <>
       Tiap soal berisi dua pernyataan — pilih{" "}

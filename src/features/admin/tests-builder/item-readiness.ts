@@ -51,6 +51,19 @@ export function isChoiceTallyItemReady(content: ChoiceTallyItemDraft | undefined
   return mapping.every((scale) => /^[A-Za-z]{1,4}$/.test(scale.trim()));
 }
 
+export interface LikertItemDraft {
+  text?: string;
+  scale?: string;
+  reverse?: boolean;
+}
+
+/** A Likert item needs the statement and the scale its rating feeds. */
+export function isLikertItemReady(content: LikertItemDraft | undefined): boolean {
+  if (!content) return false;
+  if (!content.text?.trim()) return false;
+  return /^[A-Za-z]{1,12}$/.test(content.scale?.trim() ?? "");
+}
+
 /** Both statements filled and mapped to two different poles. */
 export function isPairItemReady(content: PairItemDraft | undefined): boolean {
   if (!content) return false;

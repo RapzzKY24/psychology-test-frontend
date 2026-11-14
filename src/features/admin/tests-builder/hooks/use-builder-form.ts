@@ -15,15 +15,18 @@ import { partitionInterpretations } from "../coverage";
 import {
   ChoiceTallyItemContentSchema,
   DiscItemContentSchema,
+  LikertItemContentSchema,
   PairItemContentSchema,
   RightWrongItemContentSchema,
   ScaleTallyItemContentSchema,
   normalizeChoiceTallyContent,
   normalizeItemContent,
+  normalizeLikertContent,
   normalizePairContent,
   normalizeScaleTallyContent,
   type ChoiceTallyItemContentInput,
   type DiscItemContentInput,
+  type LikertItemContentInput,
   type PairItemContentInput,
   type RightWrongItemContentInput,
   type ScaleTallyItemContentInput,
@@ -34,6 +37,7 @@ function itemContentSchemaFor(scorerType: string) {
   if (scorerType === "FORCED_CHOICE_PAIR" || scorerType === "PAIR_TALLY") {
     return PairItemContentSchema;
   }
+  if (scorerType === "LIKERT") return LikertItemContentSchema;
   if (scorerType === "SCALE_TALLY") return ScaleTallyItemContentSchema;
   if (scorerType === "CHOICE_TALLY") return ChoiceTallyItemContentSchema;
   return DiscItemContentSchema;
@@ -71,6 +75,7 @@ export type BuilderFormValues = {
     content:
       | ChoiceTallyItemContentInput
       | DiscItemContentInput
+      | LikertItemContentInput
       | PairItemContentInput
       | RightWrongItemContentInput
       | ScaleTallyItemContentInput;
@@ -87,7 +92,9 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
           ? normalizeItemContent(item.content)
           : detail.scorerType === "FORCED_CHOICE_PAIR" || detail.scorerType === "PAIR_TALLY"
             ? normalizePairContent(item.content)
-            : detail.scorerType === "SCALE_TALLY"
+            : detail.scorerType === "LIKERT"
+              ? normalizeLikertContent(item.content)
+              : detail.scorerType === "SCALE_TALLY"
               ? normalizeScaleTallyContent(item.content)
               : detail.scorerType === "CHOICE_TALLY"
                 ? normalizeChoiceTallyContent(item.content)
@@ -268,6 +275,7 @@ export function useBuilderForm(testId: string, initialData: AdminTestDetail) {
     setActiveItem,
     activePattern,
     scorerType: initialData.scorerType,
+    scoringConfig: initialData.scoringConfig,
     setActivePattern,
     missingCodes,
     locked,

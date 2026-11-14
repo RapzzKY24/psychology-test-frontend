@@ -24,8 +24,8 @@ export function InterpretationsTab({
   const watchedItems = form.watch("items") ?? [];
   const itemCount = watchedItems.length;
   const itemContents = watchedItems.map((item) => item.content);
-  const patternCodes = getPatternCodes(scorerType, itemCount, itemContents);
-  const stat = coverage(watched, scorerType, itemCount, itemContents);
+  const patternCodes = getPatternCodes(scorerType, itemCount, itemContents, builder.scoringConfig);
+  const stat = coverage(watched, scorerType, itemCount, itemContents, builder.scoringConfig);
   // "1" is the DISC default; a pair test starts on its first derived code.
   const activeCode = patternCodes.includes(builder.activePattern)
     ? builder.activePattern

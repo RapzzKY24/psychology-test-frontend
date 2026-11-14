@@ -53,9 +53,36 @@ describe("ScoreSummary", () => {
     );
 
     expect(screen.getByText("Skala dominan")).toBeTruthy();
-    expect(screen.getByText("G")).toBeTruthy();
+    // Once in the stat card, once as the bar label.
+    expect(screen.getAllByText("G")).toHaveLength(2);
     expect(screen.getByText("90/90")).toBeTruthy();
     expect(screen.queryByText("Tipe kepribadian")).toBeNull();
+  });
+
+  it("shows a Likert inventory as scale bars with their bands", () => {
+    render(
+      <ScoreSummary
+        scores={{
+          type: "A",
+          band: "Tinggi",
+          total: 44,
+          answered: 44,
+          scales: {
+            E: { score: 32, max: 40, percent: 80, band: "Tinggi" },
+            A: { score: 40, max: 45, percent: 89, band: "Tinggi" },
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Skala tertinggi")).toBeTruthy();
+    expect(screen.getByText("Kategori")).toBeTruthy();
+    expect(screen.getByText("44/44")).toBeTruthy();
+    expect(screen.getByText("89%")).toBeTruthy();
+    expect(screen.getByText("80%")).toBeTruthy();
+    // The band rides along with the bar label, plus the category stat card.
+    expect(screen.getAllByText("Tinggi")).toHaveLength(3);
+    expect(screen.queryByText("Skala dominan")).toBeNull();
   });
 
   it("draws the DISC profile from graph, not from the M/P counters", () => {

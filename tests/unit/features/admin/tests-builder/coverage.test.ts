@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { PATTERN_CODES } from "@/features/admin/tests-builder/constants";
 import {
+  bandCode,
   choiceTallyPatternCodes,
   coverage,
+  likertPatternCodes,
   missingPatternCodes,
   pairTallyPatternCodes,
   scaleTallyPatternCodes,
@@ -122,5 +124,62 @@ describe("choiceTallyPatternCodes", () => {
       { patternCode: "CA", title: "b", body: "x" },
     ];
     expect(missingPatternCodes(filled, "CHOICE_TALLY", 2, contents)).toEqual(["CL"]);
+  });
+});
+
+describe("bandCode", () => {
+  it("turns a band label into a pattern-code fragment", () => {
+    expect(bandCode("Sangat Tinggi")).toBe("SANGAT_TINGGI");
+    expect(bandCode("  rendah ")).toBe("RENDAH");
+  });
+});
+
+describe("likertPatternCodes", () => {
+  const contents = [
+    { text: "a", scale: "E" },
+    { text: "b", scale: "a" },
+    { text: "c", scale: "E", reverse: true },
+  ];
+  const bands = [
+    { max: 33, label: "Rendah" },
+    { max: 66, label: "Sedang" },
+    { max: 100, label: "Tinggi" },
+  ];
+
+  it("crosses every scale with every band", () => {
+    expect(likertPatternCodes(contents, { bands })).toEqual([
+      "E_RENDAH",
+      "E_SEDANG",
+      "E_TINGGI",
+      "A_RENDAH",
+      "A_SEDANG",
+      "A_TINGGI",
+    ]);
+  });
+
+  it("falls back to the bare scales when the test declares no bands", () => {
+    expect(likertPatternCodes(contents, undefined)).toEqual(["E", "A"]);
+    expect(likertPatternCodes(contents, { bands: [] })).toEqual(["E", "A"]);
+  });
+
+  it("drives the publish coverage of a Likert test", () => {
+    const filled = [
+      { patternCode: "E_RENDAH", title: "a", body: "x" },
+      { patternCode: "E_SEDANG", title: "b", body: "x" },
+    ];
+    expect(missingPatternCodes(filled, "LIKERT", 3, contents, { bands })).toEqual([
+      "E_TINGGI",
+      "A_RENDAH",
+      "A_SEDANG",
+      "A_TINGGI",
+    ]);
+  });
+
+  it("counts the cross-product as the total", () => {
+    expect(coverage([], "LIKERT", 3, contents, { bands })).toEqual({
+      filled: 0,
+      total: 6,
+      missing: 6,
+    });
   });
 });

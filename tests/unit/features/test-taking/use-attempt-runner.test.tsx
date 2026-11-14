@@ -120,6 +120,27 @@ function pairAttempt(responses: AttemptRead["responses"] = []): AttemptRead {
   };
 }
 
+function likertAttempt(responses: AttemptRead["responses"] = []): AttemptRead {
+  const attempt = rightWrongAttempt();
+  return {
+    ...attempt,
+    scorerType: "LIKERT",
+    responses,
+    items: [
+      {
+        id: "item-1",
+        order: 1,
+        content: { text: "Saya suka bergaul", scale: "E", min: 1, max: 5 },
+      },
+      {
+        id: "item-2",
+        order: 2,
+        content: { text: "Saya mudah cemas", scale: "N", min: 1, max: 5 },
+      },
+    ],
+  };
+}
+
 function timedAttempt(remainingSeconds: number): AttemptRead {
   return {
     ...rightWrongAttempt(),
@@ -269,6 +290,30 @@ describe("useAttemptRunner", () => {
     await act(async () => result.current.typeRightWrong("20"));
 
     expect(result.current.answered[0]).toBe(true);
+  });
+
+  it("treats a Likert item as a rating, not a choice or a pair", async () => {
+    const { result } = renderRunner(likertAttempt());
+
+    expect(result.current.usesRatingView).toBe(true);
+    expect(result.current.usesChoiceView).toBe(false);
+    expect(result.current.isPair).toBe(false);
+    expect(result.current.discValue).toBeUndefined();
+
+    await act(async () => result.current.rate(4));
+
+    await waitFor(() =>
+      expect(putResponse).toHaveBeenCalledWith("attempt-1", "item-1", { rating: 4 }, undefined),
+    );
+    await waitFor(() => expect(result.current.safeIndex).toBe(1));
+    expect(result.current.answered[0]).toBe(true);
+  });
+
+  it("prefills a stored rating", () => {
+    const { result } = renderRunner(likertAttempt([{ itemId: "item-1", value: { rating: 3 } }]));
+
+    expect(result.current.rating).toBe(3);
+    expect(result.current.answered).toEqual([true, false]);
   });
 
   it("submits on its own when the deadline passes", async () => {

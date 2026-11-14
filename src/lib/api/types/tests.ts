@@ -71,6 +71,11 @@ export interface AdminTestItem {
 export interface AdminTestDetail extends AdminTest {
   items: AdminTestItem[];
   interpretations: Interpretation[];
+  /**
+   * Seed-owned family settings (tie-break, rating range, score bands). The
+   * builder only reads it — the settings modal never edits it.
+   */
+  scoringConfig?: unknown;
 }
 
 /** Body of `POST /api/v1/admin/tests` (CreateTestSchema, verified). */

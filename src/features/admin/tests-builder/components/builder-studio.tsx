@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BuilderHeader } from "./builder-header";
 import { ChoiceTallyItemsTab } from "./choice-tally-items-tab";
 import { ItemsTab } from "./items-tab";
+import { LikertItemsTab } from "./likert-items-tab";
 import { PairItemsTab } from "./pair-items-tab";
 import { RightWrongItemsTab } from "./right-wrong-items-tab";
 import { ScaleTallyItemsTab } from "./scale-tally-items-tab";
@@ -37,6 +38,8 @@ function ItemsTabFor({
       return <PairItemsTab builder={builder} locked={builder.locked} />;
     case "SCALE_TALLY":
       return <ScaleTallyItemsTab builder={builder} locked={builder.locked} />;
+    case "LIKERT":
+      return <LikertItemsTab builder={builder} locked={builder.locked} />;
     case "CHOICE_TALLY":
       return <ChoiceTallyItemsTab builder={builder} locked={builder.locked} />;
     default:
