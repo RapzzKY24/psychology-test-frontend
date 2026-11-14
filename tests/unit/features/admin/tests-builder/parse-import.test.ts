@@ -83,10 +83,24 @@ describe("parseRightWrongImport", () => {
     expect(errors).toEqual(['Baris 1: kunci "D" tidak cocok dengan opsi mana pun.']);
   });
 
-  it("rejects more than six options", () => {
-    const { errors } = parseRightWrongImport("A? | 1 | 2 | 3 | 4 | 5 | 6 | 7 | A");
+  it("rejects more than eight options", () => {
+    const { errors } = parseRightWrongImport(
+      "A? | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A",
+    );
 
-    expect(errors).toEqual(["Baris 1: maksimal 6 opsi."]);
+    expect(errors).toEqual(["Baris 1: maksimal 8 opsi."]);
+  });
+
+  it("accepts the eight-option grid used by the Aptitude Test", () => {
+    const { items, errors } = parseRightWrongImport(
+      "A? | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | H",
+    );
+
+    expect(errors).toEqual([]);
+    expect(items[0]).toMatchObject({
+      options: ["1", "2", "3", "4", "5", "6", "7", "8"],
+      correctIndexes: [7],
+    });
   });
 
   it("keeps parsing the other lines while reporting the broken one", () => {

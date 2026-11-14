@@ -16,7 +16,7 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
     value: "RIGHT_WRONG_NORM",
     label: "Pilihan ganda",
     description:
-      "Tiap soal punya 2–6 opsi dan satu kunci jawaban. Skor dihitung dari jumlah jawaban benar.",
+      "Tiap soal punya 2–8 opsi dan satu kunci jawaban. Skor dihitung dari jumlah jawaban benar.",
   },
   {
     value: "FORCED_CHOICE_PAIR",

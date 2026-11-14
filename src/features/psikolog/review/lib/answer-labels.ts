@@ -1,6 +1,6 @@
 import type { RightWrongItemContent } from "@/lib/api/types";
 
-const LETTERS = "ABCDEF";
+const LETTERS = "ABCDEFGH";
 
 function letter(index: number): string {
   return LETTERS[index] ?? String(index + 1);

@@ -51,7 +51,7 @@ export function RightWrongOptionsField({
   };
 
   const addOption = () => {
-    if (options.length >= 6) return;
+    if (options.length >= 8) return;
     setOptions([...options, ""]);
   };
 
@@ -76,12 +76,12 @@ export function RightWrongOptionsField({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <FieldLabel>Pilihan jawaban (2–6)</FieldLabel>
+        <FieldLabel>Pilihan jawaban (2–8)</FieldLabel>
         <Button
           type="button"
           variant="outline"
           size="sm"
-          disabled={locked || options.length >= 6}
+          disabled={locked || options.length >= 8}
           onClick={addOption}
         >
           <Plus className="size-4" /> Tambah opsi

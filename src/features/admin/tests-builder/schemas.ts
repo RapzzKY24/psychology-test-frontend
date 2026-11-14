@@ -83,7 +83,7 @@ const itemBase = {
 export const RightWrongChoiceContentSchema = z.object({
   answerMode: z.literal("choice"),
   ...itemBase,
-  options: z.array(z.string().trim().min(1, "Opsi wajib diisi.").max(500)).min(2).max(6),
+  options: z.array(z.string().trim().min(1, "Opsi wajib diisi.").max(500)).min(2).max(8),
   correctIndexes: z.array(z.number().int().min(0)).min(1, "Tandai minimal satu kunci."),
 });
 

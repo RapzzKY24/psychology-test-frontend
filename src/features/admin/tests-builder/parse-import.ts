@@ -1,6 +1,6 @@
 import type { RightWrongItemContentInput } from "./schemas";
 
-const KEY_LETTERS = "ABCDEF";
+const KEY_LETTERS = "ABCDEFGH";
 
 export interface ImportParseResult {
   items: RightWrongItemContentInput[];
@@ -51,8 +51,8 @@ export function parseRightWrongImport(raw: string): ImportParseResult {
       );
       return;
     }
-    if (fields.length > 7) {
-      errors.push(`Baris ${lineNo}: maksimal 6 opsi.`);
+    if (fields.length > 10) {
+      errors.push(`Baris ${lineNo}: maksimal 8 opsi.`);
       return;
     }
 
