@@ -97,6 +97,25 @@ export function pairTallyPatternCodes(contents: unknown[]): readonly string[] {
   return [...seen];
 }
 
+/**
+ * Pattern codes of a ranking instrument are the interest fields its mappings
+ * name — the strongest field becomes the code. Mirror of the backend
+ * `rankGroupPatternCodes`.
+ */
+export function rankGroupPatternCodes(contents: unknown[]): readonly string[] {
+  const seen = new Set<string>();
+  for (const content of contents) {
+    const mapping = (content as { mapping?: unknown } | undefined)?.mapping;
+    if (!Array.isArray(mapping)) continue;
+    for (const field of mapping) {
+      if (typeof field !== "string") continue;
+      const code = field.trim().toUpperCase();
+      if (code) seen.add(code);
+    }
+  }
+  return [...seen];
+}
+
 /** A band label becomes part of the pattern code: "Sangat Tinggi" -> "SANGAT_TINGGI". */
 export function bandCode(label: string): string {
   return label
@@ -179,6 +198,7 @@ export function getPatternCodes(
   }
   if (scorerType === "FORCED_CHOICE_PAIR") return pairPatternCodes(itemContents ?? []);
   if (scorerType === "PAIR_TALLY") return pairTallyPatternCodes(itemContents ?? []);
+  if (scorerType === "RANK_GROUP") return rankGroupPatternCodes(itemContents ?? []);
   if (scorerType === "LIKERT") return likertPatternCodes(itemContents ?? [], scoringConfig);
   if (scorerType === "SCALE_TALLY") return scaleTallyPatternCodes(itemContents ?? []);
   if (scorerType === "CHOICE_TALLY") return choiceTallyPatternCodes(itemContents ?? []);

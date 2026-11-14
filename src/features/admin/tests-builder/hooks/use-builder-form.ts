@@ -17,17 +17,20 @@ import {
   DiscItemContentSchema,
   LikertItemContentSchema,
   PairItemContentSchema,
+  RankGroupItemContentSchema,
   RightWrongItemContentSchema,
   ScaleTallyItemContentSchema,
   normalizeChoiceTallyContent,
   normalizeItemContent,
   normalizeLikertContent,
   normalizePairContent,
+  normalizeRankGroupContent,
   normalizeScaleTallyContent,
   type ChoiceTallyItemContentInput,
   type DiscItemContentInput,
   type LikertItemContentInput,
   type PairItemContentInput,
+  type RankGroupItemContentInput,
   type RightWrongItemContentInput,
   type ScaleTallyItemContentInput,
 } from "../schemas";
@@ -38,6 +41,7 @@ function itemContentSchemaFor(scorerType: string) {
     return PairItemContentSchema;
   }
   if (scorerType === "LIKERT") return LikertItemContentSchema;
+  if (scorerType === "RANK_GROUP") return RankGroupItemContentSchema;
   if (scorerType === "SCALE_TALLY") return ScaleTallyItemContentSchema;
   if (scorerType === "CHOICE_TALLY") return ChoiceTallyItemContentSchema;
   return DiscItemContentSchema;
@@ -77,6 +81,7 @@ export type BuilderFormValues = {
       | DiscItemContentInput
       | LikertItemContentInput
       | PairItemContentInput
+      | RankGroupItemContentInput
       | RightWrongItemContentInput
       | ScaleTallyItemContentInput;
   }[];
@@ -98,7 +103,9 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
               ? normalizeScaleTallyContent(item.content)
               : detail.scorerType === "CHOICE_TALLY"
                 ? normalizeChoiceTallyContent(item.content)
-                : (item.content as DiscItemContentInput),
+                : detail.scorerType === "RANK_GROUP"
+                  ? normalizeRankGroupContent(item.content)
+                  : (item.content as DiscItemContentInput),
     })),
     interpretations: detail.interpretations.map((row) => ({
       patternCode: row.patternCode,

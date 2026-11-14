@@ -49,6 +49,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
       "Tiap soal punya beberapa opsi dan setiap opsi menambah skor satu skala — tidak ada jawaban benar atau salah. Skala yang paling dominan menjadi hasil.",
   },
   {
+    value: "RANK_GROUP",
+    label: "Peringkat dalam kelompok (RMIB)",
+    description:
+      "Tiap soal berisi satu daftar pekerjaan; peserta mengurutkannya dari yang paling disukai sampai yang paling tidak disukai. Tiap posisi menambah skor satu bidang minat, dan bidang dengan skor terkuat menjadi hasil.",
+  },
+  {
     value: "LIKERT",
     label: "Skala penilaian (Likert)",
     description:

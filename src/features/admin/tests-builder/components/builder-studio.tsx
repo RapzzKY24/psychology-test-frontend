@@ -6,6 +6,7 @@ import { ChoiceTallyItemsTab } from "./choice-tally-items-tab";
 import { ItemsTab } from "./items-tab";
 import { LikertItemsTab } from "./likert-items-tab";
 import { PairItemsTab } from "./pair-items-tab";
+import { RankGroupItemsTab } from "./rank-group-items-tab";
 import { RightWrongItemsTab } from "./right-wrong-items-tab";
 import { ScaleTallyItemsTab } from "./scale-tally-items-tab";
 import { InterpretationsTab } from "./interpretations-tab";
@@ -42,6 +43,8 @@ function ItemsTabFor({
       return <LikertItemsTab builder={builder} locked={builder.locked} />;
     case "CHOICE_TALLY":
       return <ChoiceTallyItemsTab builder={builder} locked={builder.locked} />;
+    case "RANK_GROUP":
+      return <RankGroupItemsTab builder={builder} locked={builder.locked} />;
     default:
       return <ItemsTab builder={builder} locked={builder.locked} />;
   }

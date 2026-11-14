@@ -24,6 +24,7 @@ export const SCORER_TYPES = [
   "FORCED_CHOICE_PAIR",
   "LIKERT",
   "PAIR_TALLY",
+  "RANK_GROUP",
   "RIGHT_WRONG_NORM",
   "SCALE_TALLY",
 ] as const;

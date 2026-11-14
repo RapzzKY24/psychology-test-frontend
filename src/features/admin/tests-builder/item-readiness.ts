@@ -74,6 +74,33 @@ export function isPairItemReady(content: PairItemDraft | undefined): boolean {
   return mapping.length === 2 && Boolean(mapping[0]) && Boolean(mapping[1]) && mapping[0] !== mapping[1];
 }
 
+export interface RankGroupItemDraft {
+  question?: string;
+  options?: string[];
+  femaleOptions?: string[];
+  mapping?: string[];
+}
+
+/**
+ * A rank group needs a label, at least two occupations with one field code
+ * each, and — when it has a female list at all — the same number of entries on
+ * both sides.
+ */
+export function isRankGroupItemReady(content: RankGroupItemDraft | undefined): boolean {
+  if (!content) return false;
+  if (!content.question?.trim()) return false;
+  const options = content.options ?? [];
+  const mapping = content.mapping ?? [];
+  if (options.length < 2 || options.length !== mapping.length) return false;
+  if (!options.every((option) => option.trim().length > 0)) return false;
+  if (!mapping.every((field) => /^[A-Za-z][A-Za-z.]{0,5}$/.test(field.trim()))) return false;
+  const female = content.femaleOptions ?? [];
+  if (female.length === 0) return true;
+  return (
+    female.length === options.length && female.every((option) => option.trim().length > 0)
+  );
+}
+
 export function isRightWrongItemReady(content: RightWrongItemDraft | undefined): boolean {
   if (!content) return false;
   const hasPrompt = Boolean(content.question?.trim() || content.imageUrl);

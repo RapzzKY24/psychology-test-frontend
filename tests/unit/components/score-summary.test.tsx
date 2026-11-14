@@ -125,6 +125,33 @@ describe("ScoreSummary", () => {
     expect(screen.queryByText("OVERALL")).toBeNull();
   });
 
+  it("shows the top three interests for a ranking instrument", () => {
+    render(
+      <ScoreSummary
+        scores={{
+          type: "OUT_S.S_MUS",
+          dominant: "OUT",
+          total: 9,
+          answered: 9,
+          scales: {
+            OUT: { score: 9, min: 9, max: 108, percent: 100 },
+            MUS: { score: 60, min: 9, max: 108, percent: 48 },
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Minat utama")).toBeTruthy();
+    // Once as the headline stat, once as the bar label.
+    expect(screen.getAllByText("OUT")).toHaveLength(2);
+    expect(screen.getByText("Tiga minat terkuat")).toBeTruthy();
+    expect(screen.getByText("OUT · S.S · MUS")).toBeTruthy();
+    expect(screen.getByText("9/9")).toBeTruthy();
+    // The scales still get their bars, so the reader sees the whole profile.
+    expect(screen.getByText("100%")).toBeTruthy();
+    expect(screen.getByText("48%")).toBeTruthy();
+  });
+
   it("draws the DISC profile from graph, not from the M/P counters", () => {
     render(
       <ScoreSummary scores={{ M: { D: 6 }, P: { D: 2 }, graph: { D: 12, I: 8, S: 5, C: 3 } }} />,

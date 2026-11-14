@@ -147,6 +147,60 @@ export const LikertItemContentSchema = z.object({
 
 export type LikertItemContentInput = z.infer<typeof LikertItemContentSchema>;
 
+/**
+ * One interest field of a ranking instrument — RMIB spells them OUT, ME, S.S.
+ * The dot is allowed because the workbook keeps it in "s.s" (social service).
+ */
+const RankFieldCodeSchema = z
+  .string()
+  .trim()
+  .min(1, "Kode bidang wajib diisi.")
+  .max(6, "Kode bidang maksimal 6 karakter.")
+  .regex(/^[A-Za-z][A-Za-z.]*$/, "Kode bidang diawali huruf.")
+  .transform((value) => value.toUpperCase());
+
+/**
+ * A group the participant orders from 1..N. `mapping` lines up with `options`
+ * and is the key. `femaleOptions` is the same group worded for female
+ * respondents (RMIB prints two lists); it is optional and, when present, must
+ * stay the same length because the mapping is positional.
+ */
+export const RankGroupItemContentSchema = z
+  .object({
+    question: z.string().trim().min(1, "Nama kelompok wajib diisi.").max(2000),
+    options: z
+      .array(z.string().trim().min(1, "Pekerjaan wajib diisi.").max(120))
+      .min(2, "Minimal 2 pekerjaan.")
+      .max(12, "Maksimal 12 pekerjaan."),
+    femaleOptions: z
+      .array(z.string().trim().min(1, "Pekerjaan wajib diisi.").max(120))
+      .min(2, "Minimal 2 pekerjaan.")
+      .max(12, "Maksimal 12 pekerjaan.")
+      .optional(),
+    mapping: z
+      .array(RankFieldCodeSchema)
+      .min(2, "Minimal 2 bidang.")
+      .max(12, "Maksimal 12 bidang."),
+  })
+  .superRefine((data, ctx) => {
+    if (data.mapping.length !== data.options.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Tiap pekerjaan harus punya satu kode bidang.",
+        path: ["mapping"],
+      });
+    }
+    if (data.femaleOptions && data.femaleOptions.length !== data.options.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Daftar perempuan harus sama panjang dengan daftar laki-laki.",
+        path: ["femaleOptions"],
+      });
+    }
+  });
+
+export type RankGroupItemContentInput = z.infer<typeof RankGroupItemContentSchema>;
+
 const itemBase = {
   question: z.string().trim().max(2000).optional(),
   imageUrl: z.string().trim().max(2048).optional().nullable(),
@@ -268,6 +322,32 @@ export function normalizeLikertContent(content: unknown): LikertItemContentInput
     // Preserved, not edited: dropping it here would silently move every MSAI
     // item out of its section the first time an admin saves the test.
     ...(section ? { section } : {}),
+  };
+}
+
+/** A rank group always keeps `options` and `mapping` the same length. */
+export function normalizeRankGroupContent(content: unknown): RankGroupItemContentInput {
+  const raw = (content ?? {}) as {
+    question?: string;
+    options?: string[];
+    femaleOptions?: string[];
+    mapping?: string[];
+  };
+  const options = raw.options?.length ? raw.options : ["", ""];
+  const mapping = raw.mapping ?? [];
+  const female = raw.femaleOptions ?? [];
+  const femaleFilled = female.some((option) => option.trim().length > 0);
+  return {
+    question: raw.question ?? "",
+    options,
+    // Dropped when the group has no female variant, so the saved content keeps
+    // the backend's "same length as options" rule instead of a list of blanks.
+    ...(femaleFilled
+      ? {
+          femaleOptions: options.map((_, index) => female[index] ?? ""),
+        }
+      : {}),
+    mapping: options.map((_, index) => (mapping[index] ?? "").toUpperCase()),
   };
 }
 

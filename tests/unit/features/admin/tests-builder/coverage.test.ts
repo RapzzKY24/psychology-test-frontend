@@ -8,6 +8,7 @@ import {
   likertSections,
   missingPatternCodes,
   pairTallyPatternCodes,
+  rankGroupPatternCodes,
   scaleTallyPatternCodes,
 } from "@/features/admin/tests-builder/coverage";
 
@@ -211,5 +212,24 @@ describe("likertPatternCodes with sections", () => {
   it("lists the sections in first-appearance order", () => {
     expect(likertSections(contents)).toEqual(["BEHAVIOUR", "IMPORTANCE"]);
     expect(likertSections([{ text: "a", scale: "E" }])).toEqual([]);
+  });
+});
+
+describe("rankGroupPatternCodes", () => {
+  const groups = [
+    { question: "Kelompok A", options: ["a", "b"], mapping: ["out", "me"] },
+    { question: "Kelompok B", options: ["c", "d"], mapping: ["ME", "s.s"] },
+  ];
+
+  it("collects the interest fields in first-appearance order", () => {
+    expect(rankGroupPatternCodes(groups)).toEqual(["OUT", "ME", "S.S"]);
+  });
+
+  it("ignores rows that are not groups", () => {
+    expect(rankGroupPatternCodes([{ question: "x" }, null, { mapping: "nope" }])).toEqual([]);
+  });
+
+  it("feeds getPatternCodes for the family", () => {
+    expect(missingPatternCodes([], "RANK_GROUP", 2, groups)).toEqual(["OUT", "ME", "S.S"]);
   });
 });

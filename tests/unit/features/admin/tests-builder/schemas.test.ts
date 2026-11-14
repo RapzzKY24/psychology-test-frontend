@@ -3,7 +3,9 @@ import {
   CreateTestSchema,
   DiscItemContentSchema,
   LikertItemContentSchema,
+  RankGroupItemContentSchema,
   normalizeLikertContent,
+  normalizeRankGroupContent,
   slugify,
 } from "@/features/admin/tests-builder/schemas";
 
@@ -127,5 +129,72 @@ describe("LikertItemContentSchema", () => {
       reverse: false,
     });
     expect(normalizeLikertContent(undefined)).toEqual({ text: "", scale: "", reverse: false });
+  });
+});
+
+describe("RankGroupItemContentSchema", () => {
+  const ready = {
+    question: "Kelompok A",
+    options: ["Petani", "Insinyur sipil"],
+    mapping: ["out", "me"],
+  };
+
+  it("accepts a group and uppercases its field codes", () => {
+    expect(RankGroupItemContentSchema.parse(ready)).toEqual({
+      question: "Kelompok A",
+      options: ["Petani", "Insinyur sipil"],
+      mapping: ["OUT", "ME"],
+    });
+  });
+
+  it("keeps the workbook's dotted code", () => {
+    expect(
+      RankGroupItemContentSchema.parse({ ...ready, mapping: ["s.s", "cler"] }).mapping,
+    ).toEqual(["S.S", "CLER"]);
+  });
+
+  it("rejects a group whose mapping is shorter than its options", () => {
+    const parsed = RankGroupItemContentSchema.safeParse({ ...ready, mapping: ["OUT"] });
+    expect(parsed.success).toBe(false);
+    expect(parsed.error?.issues.some((i) => i.message.includes("satu kode bidang"))).toBe(true);
+  });
+
+  it("rejects a female list of a different length", () => {
+    const parsed = RankGroupItemContentSchema.safeParse({
+      ...ready,
+      femaleOptions: ["Petani perempuan"],
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it("drops an all-blank female list when a draft is normalized", () => {
+    expect(
+      normalizeRankGroupContent({
+        question: "Kelompok A",
+        options: ["Petani", "Akuntan"],
+        femaleOptions: ["", ""],
+        mapping: ["out", "comp"],
+      }),
+    ).toEqual({
+      question: "Kelompok A",
+      options: ["Petani", "Akuntan"],
+      mapping: ["OUT", "COMP"],
+    });
+  });
+
+  it("keeps a female list that has content, padded to the option count", () => {
+    expect(
+      normalizeRankGroupContent({
+        question: "Kelompok A",
+        options: ["Petani", "Akuntan"],
+        femaleOptions: ["Pekerjaan pertanian"],
+        mapping: ["out", "comp"],
+      }),
+    ).toEqual({
+      question: "Kelompok A",
+      options: ["Petani", "Akuntan"],
+      femaleOptions: ["Pekerjaan pertanian", ""],
+      mapping: ["OUT", "COMP"],
+    });
   });
 });

@@ -3,7 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAttemptAnswers } from "./use-attempt-answers";
 import { useRemainingSeconds } from "./use-remaining-seconds";
-import { isAnsweredValue, toChosen, toPairChoice, toRating, toText } from "../lib/answer-state";
+import {
+  isAnsweredValue,
+  toChosen,
+  toPairChoice,
+  toRanks,
+  toRating,
+  toText,
+} from "../lib/answer-state";
 import type { AttemptRead, ScorerType } from "@/lib/api/types";
 import type { DiscResponse } from "../schemas";
 
@@ -14,6 +21,7 @@ const AUTO_ADVANCE_MS = {
   FORCED_CHOICE_PAIR: 350,
   LIKERT: 250,
   PAIR_TALLY: 350,
+  RANK_GROUP: 400,
   RIGHT_WRONG_NORM: 300,
   SCALE_TALLY: 300,
 } as const;
@@ -55,6 +63,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     scorerType === "CHOICE_TALLY";
   const isPair = scorerType === "FORCED_CHOICE_PAIR" || scorerType === "PAIR_TALLY";
   const usesRatingView = scorerType === "LIKERT";
+  const usesRankView = scorerType === "RANK_GROUP";
   const isAnswered = (value: unknown) => isAnsweredValue(scorerType, value);
   const total = attempt.items.length;
   const safeIndex = Math.min(index, Math.max(total - 1, 0));
@@ -136,6 +145,19 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     [advance, answers, isLast, item],
   );
 
+  /**
+   * A ranking grows one click at a time. The view already keeps the numbers
+   * contiguous, so the item is complete the moment the last option gets a rank.
+   */
+  const rank = useCallback(
+    (ranks: number[]) => {
+      if (!item) return;
+      answers.answer(item.id, { ranks });
+      if (ranks.every((value) => value > 0) && !isLast) advance();
+    },
+    [advance, answers, isLast, item],
+  );
+
   /** A Likert item holds one rating, so a single click is a complete answer. */
   const rate = useCallback(
     (rating: number) => {
@@ -184,11 +206,14 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   // Partial DISC picks must still render on return, so the raw value goes
   // through as-is; the view already treats a missing half as "not picked".
   const discValue =
-    usesChoiceView || isPair || usesRatingView ? undefined : (rawValue as DiscResponse | undefined);
+    usesChoiceView || isPair || usesRatingView || usesRankView
+      ? undefined
+      : (rawValue as DiscResponse | undefined);
 
   return {
     usesChoiceView,
     usesRatingView,
+    usesRankView,
     isPair,
     total,
     safeIndex,
@@ -196,6 +221,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     discValue,
     pairChoice: toPairChoice(rawValue),
     rating: toRating(rawValue),
+    ranks: toRanks(rawValue),
     chosen: toChosen(rawValue),
     text: toText(rawValue),
     mode: content.answerMode === "short" ? ("short" as const) : ("choice" as const),
@@ -215,6 +241,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     chooseRightWrong,
     choosePair,
     rate,
+    rank,
     typeRightWrong,
     goNext,
     goPrev,

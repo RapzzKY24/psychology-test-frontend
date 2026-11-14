@@ -24,6 +24,8 @@ function discAttempt(responses: AttemptRead["responses"] = [], itemCount = 3): A
     completedAt: null,
     timeLimitMin: null,
     remainingSeconds: null,
+    requiresGender: false,
+    gender: null,
     items: Array.from({ length: itemCount }, (_, i) => ({
       id: `item-${i + 1}`,
       order: i + 1,
@@ -136,6 +138,27 @@ function likertAttempt(responses: AttemptRead["responses"] = []): AttemptRead {
         id: "item-2",
         order: 2,
         content: { text: "Saya mudah cemas", scale: "N", min: 1, max: 5 },
+      },
+    ],
+  };
+}
+
+function rankAttempt(responses: AttemptRead["responses"] = []): AttemptRead {
+  const attempt = rightWrongAttempt();
+  return {
+    ...attempt,
+    scorerType: "RANK_GROUP",
+    responses,
+    items: [
+      {
+        id: "item-1",
+        order: 1,
+        content: { question: "Kelompok A", options: ["Petani", "Akuntan", "Dokter"] },
+      },
+      {
+        id: "item-2",
+        order: 2,
+        content: { question: "Kelompok B", options: ["Nelayan", "Kasir", "Ahli bedah"] },
       },
     ],
   };
@@ -313,6 +336,39 @@ describe("useAttemptRunner", () => {
     const { result } = renderRunner(likertAttempt([{ itemId: "item-1", value: { rating: 3 } }]));
 
     expect(result.current.rating).toBe(3);
+    expect(result.current.answered).toEqual([true, false]);
+  });
+
+  it("treats a ranking group as answered only once every option has a rank", async () => {
+    const { result } = renderRunner(rankAttempt());
+
+    expect(result.current.usesRankView).toBe(true);
+    expect(result.current.usesRatingView).toBe(false);
+    expect(result.current.discValue).toBeUndefined();
+
+    await act(async () => result.current.rank([1, 0, 0]));
+    expect(result.current.answered[0]).toBe(false);
+
+    await act(async () => result.current.rank([1, 2, 3]));
+    await waitFor(() =>
+      expect(putResponse).toHaveBeenCalledWith(
+        "attempt-1",
+        "item-1",
+        { ranks: [1, 2, 3] },
+        undefined,
+      ),
+    );
+    expect(result.current.answered[0]).toBe(true);
+    // The last rank completes the group, so the runner moves on by itself.
+    await waitFor(() => expect(result.current.safeIndex).toBe(1));
+  });
+
+  it("prefills a stored ranking", () => {
+    const { result } = renderRunner(
+      rankAttempt([{ itemId: "item-1", value: { ranks: [2, 1, 3] } }]),
+    );
+
+    expect(result.current.ranks).toEqual([2, 1, 3]);
     expect(result.current.answered).toEqual([true, false]);
   });
 

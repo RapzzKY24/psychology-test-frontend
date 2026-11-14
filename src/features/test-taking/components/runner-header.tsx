@@ -51,6 +51,13 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       jawaban tersimpan otomatis.
     </>
   ),
+  RANK_GROUP: (
+    <>
+      Urutkan tiap daftar pekerjaan dari yang{" "}
+      <span className="font-medium text-foreground">paling Anda sukai</span> sampai yang paling
+      tidak disukai. Tidak ada jawaban benar atau salah; jawaban tersimpan otomatis.
+    </>
+  ),
 };
 
 interface RunnerHeaderProps {

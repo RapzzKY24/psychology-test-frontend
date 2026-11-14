@@ -32,6 +32,23 @@ export function toRating(value: unknown): number | null {
   return typeof v?.rating === "number" ? v.rating : null;
 }
 
+/**
+ * Ranking answers store one rank per option, in option order; 0 means "not
+ * ranked yet". Keeping the zero (instead of dropping the entry) lets the view
+ * line a rank up with its occupation while the participant is still deciding.
+ */
+export function toRanks(value: unknown): number[] {
+  const v = value as { ranks?: unknown } | undefined;
+  if (!Array.isArray(v?.ranks)) return [];
+  return v.ranks.map((rank) => (typeof rank === "number" ? rank : 0));
+}
+
+/** A group counts as answered only when every option holds a rank. */
+export function isAnsweredRanks(value: unknown): boolean {
+  const ranks = toRanks(value);
+  return ranks.length >= 2 && ranks.every((rank) => rank > 0);
+}
+
 export function isAnsweredDisc(value: unknown): value is DiscResponse {
   const v = value as DiscResponse | undefined;
   return v !== undefined && v.most >= 0 && v.least >= 0;
@@ -49,5 +66,6 @@ export function isAnsweredValue(scorerType: ScorerType, value: unknown): boolean
     return toPairChoice(value) !== null;
   }
   if (scorerType === "LIKERT") return toRating(value) !== null;
+  if (scorerType === "RANK_GROUP") return isAnsweredRanks(value);
   return isAnsweredRightWrong(value);
 }

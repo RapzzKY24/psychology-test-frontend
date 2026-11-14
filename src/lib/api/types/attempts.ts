@@ -13,13 +13,30 @@ export interface RightWrongResponse {
   text?: string;
 }
 
+/** Likert answer: one rating inside the test's own scale. */
+export interface LikertResponse {
+  rating: number;
+}
+
+/**
+ * Ranking answer: one rank per option, `ranks[optionIndex]` counting from 1.
+ * Every number from 1..N appears exactly once, so a half-filled group is not a
+ * valid answer (the API rejects it).
+ */
+export interface RankGroupResponse {
+  ranks: number[];
+}
+
+/** `MALE` / `FEMALE` — declared once when the instrument ships two item lists. */
+export type Gender = "MALE" | "FEMALE";
+
 /**
  * Body of `PUT /api/v1/public/attempts/:id/responses` (PutResponseSchema).
  * `value` is scorer-specific.
  */
 export interface PutResponseInput {
   itemId: string;
-  value: DiscResponse | RightWrongResponse;
+  value: DiscResponse | LikertResponse | RankGroupResponse | RightWrongResponse;
 }
 
 /** `GET /api/v1/public/attempts/:id` (AttemptReadDto, verified). Items arrive sanitized: content only — never `mapping`/`correctIndex`. */
@@ -36,6 +53,10 @@ export interface AttemptRead {
   timeLimitMin: number | null;
   /** Seconds left, computed by the server from `startedAt + timeLimitMin`. */
   remainingSeconds: number | null;
+  /** The item list differs by sex, so the client must declare one first. */
+  requiresGender: boolean;
+  /** Declared sex; null on a test that does not ask. */
+  gender: Gender | null;
   items: Array<{ id: string; order: number; content: Record<string, unknown> }>;
   responses: Array<{ itemId: string; value: unknown }>;
 }

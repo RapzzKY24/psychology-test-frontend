@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   isChoiceTallyItemReady,
   isPairItemReady,
+  isRankGroupItemReady,
   isRightWrongItemReady,
   isScaleTallyItemReady,
 } from "@/features/admin/tests-builder/item-readiness";
@@ -180,5 +181,37 @@ describe("isChoiceTallyItemReady", () => {
     expect(isChoiceTallyItemReady({ ...ready, options: ["Tantangan", " ", "Jalan buntu"] })).toBe(
       false,
     );
+  });
+});
+
+describe("isRankGroupItemReady", () => {
+  const ready = {
+    question: "Kelompok A",
+    options: ["Petani", "Insinyur sipil"],
+    mapping: ["OUT", "ME"],
+  };
+
+  it("is ready with a label, two occupations and one field each", () => {
+    expect(isRankGroupItemReady(ready)).toBe(true);
+  });
+
+  it("is ready when the female list mirrors the male list", () => {
+    expect(
+      isRankGroupItemReady({ ...ready, femaleOptions: ["Pekerjaan pertanian", "Sopir militer"] }),
+    ).toBe(true);
+  });
+
+  it("is not ready while the female list is half filled", () => {
+    expect(isRankGroupItemReady({ ...ready, femaleOptions: ["Pekerjaan pertanian", ""] })).toBe(
+      false,
+    );
+  });
+
+  it("is not ready without a group label", () => {
+    expect(isRankGroupItemReady({ ...ready, question: "  " })).toBe(false);
+  });
+
+  it("is not ready when a field code is missing", () => {
+    expect(isRankGroupItemReady({ ...ready, mapping: ["OUT", ""] })).toBe(false);
   });
 });

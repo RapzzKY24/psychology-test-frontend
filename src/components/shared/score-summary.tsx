@@ -1,4 +1,12 @@
-import { Brain, CheckCircle2, Fingerprint, ListChecks, Percent, TrendingUp } from "lucide-react";
+import {
+  Brain,
+  CheckCircle2,
+  Compass,
+  Fingerprint,
+  ListChecks,
+  Percent,
+  TrendingUp,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 interface Stat {
@@ -55,6 +63,40 @@ function typeStats(scores: Record<string, unknown>): Stat[] | null {
     stats.push({
       key: "answered",
       label: "Pernyataan terjawab",
+      value: `${answered}/${total}`,
+      icon: ListChecks,
+    });
+  }
+  return stats;
+}
+
+/**
+ * RANK_GROUP (RMIB) keeps `dominant` and a three-field `type` next to the same
+ * `scales` shape a tally uses. The workbook prints "Minat Tertinggi ke-1/2/3",
+ * so the headline is the top three — not a single winning scale.
+ */
+function rankStats(scores: Record<string, unknown>): Stat[] | null {
+  const dominant = scores.dominant;
+  if (typeof dominant !== "string" || !dominant.trim()) return null;
+  if (!isRecord(scores.scales)) return null;
+
+  const stats: Stat[] = [
+    { key: "dominant", label: "Minat utama", value: dominant.trim(), icon: Compass },
+  ];
+  const type = scores.type;
+  if (typeof type === "string" && type.trim()) {
+    stats.push({
+      key: "type",
+      label: "Tiga minat terkuat",
+      value: type.trim().split("_").join(" · "),
+      icon: Fingerprint,
+    });
+  }
+  const { answered, total } = scores;
+  if (typeof answered === "number" && typeof total === "number") {
+    stats.push({
+      key: "answered",
+      label: "Butir terjawab",
       value: `${answered}/${total}`,
       icon: ListChecks,
     });
@@ -283,7 +325,11 @@ function ScaleBars({ bars }: { bars: ScaleBar[] }) {
 
 export function ScoreSummary({ scores }: { scores: Record<string, unknown> }) {
   const stats =
-    rightWrongStats(scores) ?? likertStats(scores) ?? tallyStats(scores) ?? typeStats(scores);
+    rightWrongStats(scores) ??
+    likertStats(scores) ??
+    rankStats(scores) ??
+    tallyStats(scores) ??
+    typeStats(scores);
   const scales = scaleBars(scores);
   const table = sectionTable(scores);
 

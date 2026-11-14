@@ -2,6 +2,7 @@ import type { ScorerType } from "@/lib/api/types";
 import { DiscItemView } from "./components/disc-item-view";
 import { LikertItemView } from "./components/likert-item-view";
 import { PairItemView } from "./components/pair-item-view";
+import { RankGroupItemView } from "./components/rank-group-item-view";
 import { RightWrongItemView } from "./components/right-wrong-item-view";
 
 /**
@@ -17,6 +18,9 @@ export const ITEM_RENDERERS = {
   // A pair tally asks the same question ("pick one of two statements"); only
   // the scoring differs — every statement feeds a named scale.
   PAIR_TALLY: PairItemView,
+  // A ranking group shows one list of occupations per item and asks for an
+  // order, not a pick — it needs its own view.
+  RANK_GROUP: RankGroupItemView,
   RIGHT_WRONG_NORM: RightWrongItemView,
   // A tally item is a statement with two labels ("Ya"/"Tidak"), which is the
   // same shape the right/wrong view already draws.
