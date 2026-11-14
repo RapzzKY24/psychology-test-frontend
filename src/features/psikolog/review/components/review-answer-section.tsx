@@ -10,6 +10,7 @@ import {
 import type { ReviewDetail, RightWrongItemContent } from "@/lib/api/types";
 import { PairDetailTable, type PairItem, type PairResponseRow } from "./pair-detail-table";
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
+import { ScaleTallyDetailTable } from "./scale-tally-detail-table";
 
 /** The table takes the item/response slices it renders, not the whole review. */
 interface RightWrongItem {
@@ -44,6 +45,21 @@ export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps
       <PairDetailTable
         items={detail.items as unknown as PairItem[]}
         responses={detail.responses as unknown as PairResponseRow[]}
+      />
+    );
+  }
+
+  // Tally items carry the scale they feed; they have no answer key, so the
+  // right/wrong table would print "Salah" for every row.
+  const isScaleTally =
+    detail.items.length > 0 &&
+    typeof (firstContent as { scale?: unknown } | undefined)?.scale === "string";
+
+  if (isScaleTally) {
+    return (
+      <ScaleTallyDetailTable
+        items={detail.items as unknown as Parameters<typeof ScaleTallyDetailTable>[0]["items"]}
+        responses={detail.responses}
       />
     );
   }

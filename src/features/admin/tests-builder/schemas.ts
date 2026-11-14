@@ -73,6 +73,27 @@ export const PairItemContentSchema = z
 
 export type PairItemContentInput = z.infer<typeof PairItemContentSchema>;
 
+/** One scale of a tally instrument — RIASEC uses R/I/A/S/E/C. */
+const ScaleCodeSchema = z
+  .string()
+  .trim()
+  .min(1, "Kode skala wajib diisi.")
+  .max(4, "Kode skala maksimal 4 huruf.")
+  .regex(/^[A-Za-z]+$/, "Kode skala hanya huruf.")
+  .transform((value) => value.toUpperCase());
+
+/**
+ * A statement with two labels and the scale a "Ya" feeds. `scale` is the key
+ * and is never shown to the participant.
+ */
+export const ScaleTallyItemContentSchema = z.object({
+  question: z.string().trim().min(1, "Pernyataan wajib diisi.").max(2000),
+  options: z.array(z.string().trim().min(1, "Label wajib diisi.").max(200)).length(2),
+  scale: ScaleCodeSchema,
+});
+
+export type ScaleTallyItemContentInput = z.infer<typeof ScaleTallyItemContentSchema>;
+
 const itemBase = {
   question: z.string().trim().max(2000).optional(),
   imageUrl: z.string().trim().max(2048).optional().nullable(),
@@ -145,6 +166,21 @@ export function normalizePairContent(content: unknown): PairItemContentInput {
       (raw.mapping?.[0] ?? "").toUpperCase(),
       (raw.mapping?.[1] ?? "").toUpperCase(),
     ],
+  };
+}
+
+/** A tally item always has two labels; the default pair is the printed one. */
+export function normalizeScaleTallyContent(content: unknown): ScaleTallyItemContentInput {
+  const raw = (content ?? {}) as {
+    question?: string;
+    options?: string[];
+    scale?: string;
+  };
+  const options = raw.options?.length === 2 ? raw.options : [];
+  return {
+    question: raw.question ?? "",
+    options: [options[0] ?? "Ya", options[1] ?? "Tidak"],
+    scale: (raw.scale ?? "").toUpperCase(),
   };
 }
 

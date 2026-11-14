@@ -12,6 +12,9 @@ export const ITEM_RENDERERS = {
   FORCED_CHOICE_DISC: DiscItemView,
   FORCED_CHOICE_PAIR: PairItemView,
   RIGHT_WRONG_NORM: RightWrongItemView,
+  // A tally item is a statement with two labels ("Ya"/"Tidak"), which is the
+  // same shape the right/wrong view already draws.
+  SCALE_TALLY: RightWrongItemView,
 } as const satisfies Record<ScorerType, React.ElementType>;
 
 export type RendererScorerType = keyof typeof ITEM_RENDERERS;

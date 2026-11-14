@@ -22,6 +22,7 @@ export const SCORER_TYPES = [
   "FORCED_CHOICE_DISC",
   "FORCED_CHOICE_PAIR",
   "RIGHT_WRONG_NORM",
+  "SCALE_TALLY",
 ] as const;
 export type ScorerType = (typeof SCORER_TYPES)[number];
 

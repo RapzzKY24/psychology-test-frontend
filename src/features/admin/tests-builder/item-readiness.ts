@@ -19,6 +19,21 @@ export interface PairItemDraft {
   mapping?: string[];
 }
 
+export interface ScaleTallyItemDraft {
+  question?: string;
+  options?: string[];
+  scale?: string;
+}
+
+/** A tally item needs the statement, both labels and the scale it feeds. */
+export function isScaleTallyItemReady(content: ScaleTallyItemDraft | undefined): boolean {
+  if (!content) return false;
+  if (!content.question?.trim()) return false;
+  const options = content.options ?? [];
+  if (options.length !== 2 || !options.every((o) => o.trim().length > 0)) return false;
+  return /^[A-Za-z]{1,4}$/.test(content.scale?.trim() ?? "");
+}
+
 /** Both statements filled and mapped to two different poles. */
 export function isPairItemReady(content: PairItemDraft | undefined): boolean {
   if (!content) return false;

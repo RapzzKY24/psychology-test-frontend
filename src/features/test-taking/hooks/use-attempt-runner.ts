@@ -12,6 +12,7 @@ const AUTO_ADVANCE_MS = {
   FORCED_CHOICE_DISC: 400,
   FORCED_CHOICE_PAIR: 350,
   RIGHT_WRONG_NORM: 300,
+  SCALE_TALLY: 300,
 } as const;
 
 /**
@@ -43,7 +44,9 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
   const advanceTimer = useRef<number | null>(null);
 
-  const isRightWrong = scorerType === "RIGHT_WRONG_NORM";
+  // Two families draw the same "question + options" screen: right/wrong items
+  // and tally statements. Only the scoring behind them differs.
+  const usesChoiceView = scorerType === "RIGHT_WRONG_NORM" || scorerType === "SCALE_TALLY";
   const isPair = scorerType === "FORCED_CHOICE_PAIR";
   const isAnswered = (value: unknown) => isAnsweredValue(scorerType, value);
   const total = attempt.items.length;
@@ -163,10 +166,10 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
 
   // Partial DISC picks must still render on return, so the raw value goes
   // through as-is; the view already treats a missing half as "not picked".
-  const discValue = isRightWrong || isPair ? undefined : (rawValue as DiscResponse | undefined);
+  const discValue = usesChoiceView || isPair ? undefined : (rawValue as DiscResponse | undefined);
 
   return {
-    isRightWrong,
+    usesChoiceView,
     total,
     safeIndex,
     item,

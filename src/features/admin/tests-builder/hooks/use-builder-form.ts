@@ -16,16 +16,20 @@ import {
   DiscItemContentSchema,
   PairItemContentSchema,
   RightWrongItemContentSchema,
+  ScaleTallyItemContentSchema,
   normalizeItemContent,
   normalizePairContent,
+  normalizeScaleTallyContent,
   type DiscItemContentInput,
   type PairItemContentInput,
   type RightWrongItemContentInput,
+  type ScaleTallyItemContentInput,
 } from "../schemas";
 
 function itemContentSchemaFor(scorerType: string) {
   if (scorerType === "RIGHT_WRONG_NORM") return RightWrongItemContentSchema;
   if (scorerType === "FORCED_CHOICE_PAIR") return PairItemContentSchema;
+  if (scorerType === "SCALE_TALLY") return ScaleTallyItemContentSchema;
   return DiscItemContentSchema;
 }
 
@@ -58,7 +62,11 @@ export function describeDetail(detail: string): string {
 
 export type BuilderFormValues = {
   items: {
-    content: DiscItemContentInput | PairItemContentInput | RightWrongItemContentInput;
+    content:
+      | DiscItemContentInput
+      | PairItemContentInput
+      | RightWrongItemContentInput
+      | ScaleTallyItemContentInput;
   }[];
   interpretations: { patternCode: string; title: string; body: string }[];
 };
@@ -72,7 +80,9 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
           ? normalizeItemContent(item.content)
           : detail.scorerType === "FORCED_CHOICE_PAIR"
             ? normalizePairContent(item.content)
-            : (item.content as DiscItemContentInput),
+            : detail.scorerType === "SCALE_TALLY"
+              ? normalizeScaleTallyContent(item.content)
+              : (item.content as DiscItemContentInput),
     })),
     interpretations: detail.interpretations.map((row) => ({
       patternCode: row.patternCode,

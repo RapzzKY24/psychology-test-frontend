@@ -66,7 +66,7 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
             disabled={runner.timeUp}
             onChoose={runner.choosePair}
           />
-        ) : runner.isRightWrong ? (
+        ) : runner.usesChoiceView ? (
           <RightWrongItemView
             order={runner.safeIndex + 1}
             question={(runner.content.question as string | null) ?? null}

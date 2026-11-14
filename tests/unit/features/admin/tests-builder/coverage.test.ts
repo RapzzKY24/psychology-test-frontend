@@ -3,6 +3,7 @@ import { PATTERN_CODES } from "@/features/admin/tests-builder/constants";
 import {
   coverage,
   missingPatternCodes,
+  scaleTallyPatternCodes,
 } from "@/features/admin/tests-builder/coverage";
 
 describe("PATTERN_CODES", () => {
@@ -38,5 +39,29 @@ describe("coverage", () => {
       { patternCode: "2", title: "b", body: "x" },
     ]);
     expect(result).toEqual({ filled: 2, total: 40, missing: 38 });
+  });
+});
+
+describe("scaleTallyPatternCodes", () => {
+  it("collects the distinct scales in first-appearance order", () => {
+    const contents = [
+      { question: "a", options: ["Ya", "Tidak"], scale: "S" },
+      { question: "b", options: ["Ya", "Tidak"], scale: "r" },
+      { question: "c", options: ["Ya", "Tidak"], scale: "S" },
+    ];
+    expect(scaleTallyPatternCodes(contents)).toEqual(["S", "R"]);
+  });
+
+  it("ignores items without a scale", () => {
+    expect(scaleTallyPatternCodes([{ question: "a" }, null])).toEqual([]);
+  });
+
+  it("drives the publish coverage of a tally test", () => {
+    const contents = [
+      { question: "a", options: ["Ya", "Tidak"], scale: "R" },
+      { question: "b", options: ["Ya", "Tidak"], scale: "I" },
+    ];
+    const filled = [{ patternCode: "R", title: "a", body: "x" }];
+    expect(missingPatternCodes(filled, "SCALE_TALLY", 2, contents)).toEqual(["I"]);
   });
 });

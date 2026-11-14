@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { isPairItemReady, isRightWrongItemReady } from "@/features/admin/tests-builder/item-readiness";
+import {
+  isPairItemReady,
+  isRightWrongItemReady,
+  isScaleTallyItemReady,
+} from "@/features/admin/tests-builder/item-readiness";
 
 describe("isRightWrongItemReady", () => {
   it("is ready when the question, every option and the key are filled", () => {
@@ -115,5 +119,29 @@ describe("isPairItemReady", () => {
 
   it("is not ready when a pole is missing", () => {
     expect(isPairItemReady({ ...ready, mapping: ["E", ""] })).toBe(false);
+  });
+});
+
+describe("isScaleTallyItemReady", () => {
+  const ready = {
+    question: "Senang menonton drama",
+    options: ["Ya", "Tidak"],
+    scale: "A",
+  };
+
+  it("is ready with a statement, two labels and a scale", () => {
+    expect(isScaleTallyItemReady(ready)).toBe(true);
+  });
+
+  it("is not ready without a statement", () => {
+    expect(isScaleTallyItemReady({ ...ready, question: " " })).toBe(false);
+  });
+
+  it("is not ready when the scale is missing", () => {
+    expect(isScaleTallyItemReady({ ...ready, scale: "" })).toBe(false);
+  });
+
+  it("is not ready when a label is blank", () => {
+    expect(isScaleTallyItemReady({ ...ready, options: ["Ya", ""] })).toBe(false);
   });
 });

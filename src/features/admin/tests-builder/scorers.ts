@@ -30,13 +30,19 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
     description:
       "Tiap soal berisi 4 kata; peserta memilih satu yang paling sesuai (Most) dan satu yang paling tidak sesuai (Least).",
   },
+  {
+    value: "SCALE_TALLY",
+    label: "Skala minat (Ya/Tidak)",
+    description:
+      "Tiap pernyataan dijawab Ya atau Tidak dan menambah skor satu skala. Hasilnya peringkat skala; kode diambil dari tiga skala terkuat.",
+  },
 ] as const;
 
 export const DEFAULT_SCORER_BY_CATEGORY: Record<TestCategory, ScorerType> = {
   COGNITIVE: "RIGHT_WRONG_NORM",
   PERSONALITY: "FORCED_CHOICE_DISC",
   WORK_STYLE: "FORCED_CHOICE_DISC",
-  INTEREST: "FORCED_CHOICE_DISC",
+  INTEREST: "SCALE_TALLY",
   PROJECTIVE: "FORCED_CHOICE_DISC",
 };
 

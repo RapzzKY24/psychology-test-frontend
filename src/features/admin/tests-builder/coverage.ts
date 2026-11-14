@@ -40,6 +40,21 @@ export function pairPatternCodes(contents: unknown[]): readonly string[] {
 }
 
 /**
+ * Pattern codes of a tally instrument are the scales its items name — the
+ * strongest scale becomes the code. Mirror of the backend `scaleTallyPatternCodes`.
+ */
+export function scaleTallyPatternCodes(contents: unknown[]): readonly string[] {
+  const seen = new Set<string>();
+  for (const content of contents) {
+    const scale = (content as { scale?: unknown } | undefined)?.scale;
+    if (typeof scale !== "string") continue;
+    const code = scale.trim().toUpperCase();
+    if (code) seen.add(code);
+  }
+  return [...seen];
+}
+
+/**
  * Codes a test must cover before publish: a raw score uses every RAW_n, DISC
  * uses 1..40, a pair instrument derives them from its item mappings.
  */
@@ -53,6 +68,7 @@ export function getPatternCodes(
     return Array.from({ length: total + 1 }, (_, i) => `RAW_${i}`);
   }
   if (scorerType === "FORCED_CHOICE_PAIR") return pairPatternCodes(itemContents ?? []);
+  if (scorerType === "SCALE_TALLY") return scaleTallyPatternCodes(itemContents ?? []);
   return PATTERN_CODES;
 }
 

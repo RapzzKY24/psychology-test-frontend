@@ -25,6 +25,13 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       otomatis; soal yang dilewati dihitung salah.
     </>
   ),
+  SCALE_TALLY: (
+    <>
+      Pilih <span className="font-medium text-foreground">Ya</span> bila pernyataan menggambarkan
+      diri Anda, <span className="font-medium text-foreground">Tidak</span> bila tidak. Tidak ada
+      jawaban benar atau salah; jawaban tersimpan otomatis.
+    </>
+  ),
 };
 
 interface RunnerHeaderProps {

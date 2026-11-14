@@ -5,6 +5,7 @@ import { BuilderHeader } from "./builder-header";
 import { ItemsTab } from "./items-tab";
 import { PairItemsTab } from "./pair-items-tab";
 import { RightWrongItemsTab } from "./right-wrong-items-tab";
+import { ScaleTallyItemsTab } from "./scale-tally-items-tab";
 import { InterpretationsTab } from "./interpretations-tab";
 import { useBuilderForm } from "../hooks/use-builder-form";
 import { scorerOption } from "../scorers";
@@ -87,6 +88,8 @@ export function TestBuilderStudio({
           <RightWrongItemsTab builder={builder} locked={builder.locked} testId={testId} />
         ) : initialData.scorerType === "FORCED_CHOICE_PAIR" ? (
           <PairItemsTab builder={builder} locked={builder.locked} />
+        ) : initialData.scorerType === "SCALE_TALLY" ? (
+          <ScaleTallyItemsTab builder={builder} locked={builder.locked} />
         ) : (
           <ItemsTab builder={builder} locked={builder.locked} />
         ))}
