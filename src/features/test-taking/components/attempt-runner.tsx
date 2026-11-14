@@ -64,6 +64,11 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
             text={(runner.content.text as string | null) ?? ""}
             min={typeof runner.content.min === "number" ? runner.content.min : 1}
             max={typeof runner.content.max === "number" ? runner.content.max : 5}
+            labels={
+              Array.isArray(runner.content.labels)
+                ? (runner.content.labels as string[])
+                : undefined
+            }
             rating={runner.rating}
             disabled={runner.timeUp}
             onRate={runner.rate}

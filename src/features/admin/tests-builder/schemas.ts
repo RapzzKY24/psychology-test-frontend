@@ -122,7 +122,7 @@ const LongScaleCodeSchema = z
   .trim()
   .min(1, "Kode skala wajib diisi.")
   .max(12, "Kode skala maksimal 12 huruf.")
-  .regex(/^[A-Za-z]+$/, "Kode skala hanya huruf.")
+  .regex(/^[A-Za-z][A-Za-z0-9]*$/, "Kode skala diawali huruf, lalu huruf atau angka.")
   .transform((value) => value.toUpperCase());
 
 /**

@@ -89,9 +89,17 @@ describe("LikertItemContentSchema", () => {
     ).toBe(true);
   });
 
-  it("rejects an empty statement or a scale that is not letters", () => {
+  it("accepts a numbered type code, so Enneagram can use T1..T9", () => {
+    expect(LikertItemContentSchema.parse({ text: "a", scale: "t1" })).toEqual({
+      text: "a",
+      scale: "T1",
+    });
+  });
+
+  it("rejects an empty statement or a scale that does not start with a letter", () => {
     expect(LikertItemContentSchema.safeParse({ text: "  ", scale: "E" }).success).toBe(false);
-    expect(LikertItemContentSchema.safeParse({ text: "a", scale: "E1" }).success).toBe(false);
+    expect(LikertItemContentSchema.safeParse({ text: "a", scale: "1" }).success).toBe(false);
+    expect(LikertItemContentSchema.safeParse({ text: "a", scale: "T-1" }).success).toBe(false);
     expect(LikertItemContentSchema.safeParse({ text: "a", scale: "ABCDEFGHIJKLM" }).success).toBe(
       false,
     );

@@ -7,9 +7,11 @@ interface LikertItemViewProps {
   order: number;
   /** The statement, already stripped of its hidden scale by the API. */
   text: string;
-  /** Rating bounds travel with the item (Big Five 1–5, other inventories 1–7). */
+  /** Rating bounds travel with the item (Big Five 1–5, Enneagram 0–3). */
   min: number;
   max: number;
+  /** What each point means, lowest first — only the instrument knows. */
+  labels?: string[];
   rating: number | null;
   disabled: boolean;
   onRate: (rating: number) => void;
@@ -25,12 +27,15 @@ export function LikertItemView({
   text,
   min,
   max,
+  labels,
   rating,
   disabled,
   onRate,
 }: LikertItemViewProps) {
   const values = Array.from({ length: Math.max(max - min + 1, 1) }, (_, i) => min + i);
-  const ends = END_LABELS[values.length];
+  // A label list only makes sense one-per-point; anything else falls back.
+  const legend = labels?.length === values.length ? labels : undefined;
+  const ends = legend ? undefined : END_LABELS[values.length];
 
   return (
     <div className="space-y-6">
@@ -44,13 +49,14 @@ export function LikertItemView({
         <div className="flex flex-wrap gap-2">
           {values.map((value) => {
             const selected = rating === value;
+            const label = legend?.[value - min];
             return (
               <button
                 key={value}
                 type="button"
                 disabled={disabled}
                 aria-pressed={selected}
-                aria-label={`Nilai ${value}`}
+                aria-label={label ? `Nilai ${value} — ${label}` : `Nilai ${value}`}
                 onClick={() => onRate(value)}
                 className={cn(
                   "flex size-12 items-center justify-center rounded-lg border text-base font-medium tabular-nums transition-colors",
@@ -64,6 +70,16 @@ export function LikertItemView({
             );
           })}
         </div>
+
+        {legend && (
+          <div className="flex max-w-md flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            {values.map((value) => (
+              <span key={value}>
+                <span className="font-medium tabular-nums">{value}</span> {legend[value - min]}
+              </span>
+            ))}
+          </div>
+        )}
 
         {ends && (
           <div className="flex max-w-md justify-between text-xs text-muted-foreground">
