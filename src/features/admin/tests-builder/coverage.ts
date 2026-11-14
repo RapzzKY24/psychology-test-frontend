@@ -106,20 +106,45 @@ export function bandCode(label: string): string {
     .replace(/^_+|_+$/g, "");
 }
 
+/** Sections in first-appearance order; empty when the items declare none. */
+export function likertSections(contents: unknown[]): readonly string[] {
+  const seen = new Set<string>();
+  for (const content of contents) {
+    const section = (content as { section?: unknown } | undefined)?.section;
+    if (typeof section !== "string" || !section.trim()) continue;
+    seen.add(section.trim().toUpperCase());
+  }
+  return [...seen];
+}
+
 /**
  * Pattern codes of a Likert inventory: every scale crossed with every band the
  * test declares (`E_RENDAH` … `E_TINGGI`). Without bands the scale is the code.
  * Mirror of the backend `likertPatternCodes`.
+ *
+ * Only the pattern section counts: a multi-section inventory (MSAI) rates the
+ * same twelve roles three ways, so including every section would ask for the
+ * same codes three times over.
  */
 export function likertPatternCodes(
   contents: unknown[],
   scoringConfig?: unknown,
 ): readonly string[] {
+  const sections = likertSections(contents);
+  const wanted = (scoringConfig as { patternSection?: unknown } | undefined)?.patternSection;
+  const patternSection =
+    typeof wanted === "string" && sections.includes(wanted.trim().toUpperCase())
+      ? wanted.trim().toUpperCase()
+      : sections[0];
+
   const scales = new Set<string>();
   for (const content of contents) {
-    const scale = (content as { scale?: unknown } | undefined)?.scale;
-    if (typeof scale !== "string") continue;
-    const code = scale.trim().toUpperCase();
+    const raw = content as { scale?: unknown; section?: unknown } | undefined;
+    if (typeof raw?.scale !== "string") continue;
+    const section =
+      typeof raw.section === "string" ? raw.section.trim().toUpperCase() : undefined;
+    if (patternSection !== undefined && section !== patternSection) continue;
+    const code = raw.scale.trim().toUpperCase();
     if (code) scales.add(code);
   }
 

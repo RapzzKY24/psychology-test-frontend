@@ -155,6 +155,85 @@ function scaleBars(scores: Record<string, unknown>): ScaleBar[] | null {
   return bars.length > 0 ? bars : null;
 }
 
+interface SectionRow {
+  label: string;
+  /** Percent per section, in the same order as the table's columns. */
+  values: (number | null)[];
+}
+
+interface SectionTable {
+  sections: string[];
+  rows: SectionRow[];
+}
+
+/** "EFFECTIVENESS" -> "Effectiveness"; keeps a longer code readable. */
+function sectionTitle(code: string): string {
+  return code
+    .toLowerCase()
+    .split(/[_\s]+/)
+    .filter(Boolean)
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+/**
+ * A multi-section inventory (MSAI) rates the same roles more than once, so the
+ * bars above only tell a third of the story. This lines the sections up per
+ * role — behaviour next to effectiveness and importance — which is the
+ * comparison the workbook's summary block prints.
+ */
+function sectionTable(scores: Record<string, unknown>): SectionTable | null {
+  if (!isRecord(scores.sections)) return null;
+  const sections = Object.keys(scores.sections);
+  if (sections.length < 2 || !isRecord(scores.scales)) return null;
+
+  const rows: SectionRow[] = [];
+  for (const label of Object.keys(scores.scales)) {
+    const values = sections.map((section) => {
+      const bucket = (scores.sections as Record<string, unknown>)[section];
+      if (!isRecord(bucket)) return null;
+      const entry = bucket[label];
+      return isRecord(entry) && typeof entry.percent === "number" ? entry.percent : null;
+    });
+    rows.push({ label, values });
+  }
+  return rows.length > 0 ? { sections, rows } : null;
+}
+
+function SectionTable({ table }: { table: SectionTable }) {
+  return (
+    <div className="overflow-x-auto rounded-lg border">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b bg-primary/5 text-left">
+            <th className="px-3 py-2 font-medium text-muted-foreground">Skala</th>
+            {table.sections.map((section) => (
+              <th key={section} className="px-3 py-2 text-right font-medium text-muted-foreground">
+                {sectionTitle(section)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((row) => (
+            <tr key={row.label} className="border-b last:border-b-0">
+              <td className="px-3 py-2 font-medium">{row.label}</td>
+              {row.values.map((value, index) => (
+                <td
+                  key={table.sections[index]}
+                  className="px-3 py-2 text-right tabular-nums text-muted-foreground"
+                >
+                  {value === null ? "–" : `${value}%`}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function StatCards({ stats }: { stats: Stat[] }) {
   return (
     <div className="flex flex-wrap gap-3">
@@ -206,12 +285,14 @@ export function ScoreSummary({ scores }: { scores: Record<string, unknown> }) {
   const stats =
     rightWrongStats(scores) ?? likertStats(scores) ?? tallyStats(scores) ?? typeStats(scores);
   const scales = scaleBars(scores);
+  const table = sectionTable(scores);
 
-  if (stats || scales) {
+  if (stats || scales || table) {
     return (
       <div className="space-y-4">
         {stats && <StatCards stats={stats} />}
         {scales && <ScaleBars bars={scales} />}
+        {table && <SectionTable table={table} />}
       </div>
     );
   }

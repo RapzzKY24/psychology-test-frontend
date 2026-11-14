@@ -5,6 +5,7 @@ import {
   choiceTallyPatternCodes,
   coverage,
   likertPatternCodes,
+  likertSections,
   missingPatternCodes,
   pairTallyPatternCodes,
   scaleTallyPatternCodes,
@@ -181,5 +182,34 @@ describe("likertPatternCodes", () => {
       total: 6,
       missing: 6,
     });
+  });
+});
+
+describe("likertPatternCodes with sections", () => {
+  const contents = [
+    { text: "a", scale: "TEAMS", section: "BEHAVIOUR" },
+    { text: "b", scale: "FUTURE", section: "BEHAVIOUR" },
+    { text: "c", scale: "TEAMS", section: "IMPORTANCE" },
+  ];
+
+  it("counts only the pattern section, like the backend", () => {
+    expect(likertPatternCodes(contents, { patternSection: "BEHAVIOUR" })).toEqual([
+      "TEAMS",
+      "FUTURE",
+    ]);
+    expect(likertPatternCodes(contents, { patternSection: "IMPORTANCE" })).toEqual(["TEAMS"]);
+  });
+
+  it("defaults to the first section when the config names none", () => {
+    expect(likertPatternCodes(contents)).toEqual(["TEAMS", "FUTURE"]);
+  });
+
+  it("ignores a pattern section the items do not use", () => {
+    expect(likertPatternCodes(contents, { patternSection: "NOPE" })).toEqual(["TEAMS", "FUTURE"]);
+  });
+
+  it("lists the sections in first-appearance order", () => {
+    expect(likertSections(contents)).toEqual(["BEHAVIOUR", "IMPORTANCE"]);
+    expect(likertSections([{ text: "a", scale: "E" }])).toEqual([]);
   });
 });

@@ -128,11 +128,21 @@ const LongScaleCodeSchema = z
 /**
  * One statement rated on a numeric scale. `scale` and `reverse` are the key:
  * they say which scale the rating feeds and whether it is flipped.
+ * `section` marks which part of a multi-section inventory the item belongs to
+ * (MSAI); it is carried through edits, not typed by hand.
  */
 export const LikertItemContentSchema = z.object({
   text: z.string().trim().min(1, "Pernyataan wajib diisi.").max(2000),
   scale: LongScaleCodeSchema,
   reverse: z.boolean().optional(),
+  section: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .min(1)
+    .max(20)
+    .regex(/^[A-Z][A-Z0-9]*$/, "Kode bagian diawali huruf, lalu huruf atau angka.")
+    .optional(),
 });
 
 export type LikertItemContentInput = z.infer<typeof LikertItemContentSchema>;
@@ -248,11 +258,16 @@ export function normalizeLikertContent(content: unknown): LikertItemContentInput
     text?: string;
     scale?: string;
     reverse?: boolean;
+    section?: string;
   };
+  const section = (raw.section ?? "").toUpperCase();
   return {
     text: raw.text ?? "",
     scale: (raw.scale ?? "").toUpperCase(),
     reverse: raw.reverse === true,
+    // Preserved, not edited: dropping it here would silently move every MSAI
+    // item out of its section the first time an admin saves the test.
+    ...(section ? { section } : {}),
   };
 }
 

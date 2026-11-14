@@ -85,6 +85,46 @@ describe("ScoreSummary", () => {
     expect(screen.queryByText("Skala dominan")).toBeNull();
   });
 
+  it("lines the sections of a multi-section inventory up per scale", () => {
+    render(
+      <ScoreSummary
+        scores={{
+          type: "TEAMS",
+          total: 85,
+          answered: 85,
+          scales: {
+            TEAMS: { score: 25, max: 25, percent: 100 },
+            FUTURE: { score: 5, max: 25, percent: 20 },
+          },
+          sections: {
+            BEHAVIOUR: {
+              TEAMS: { score: 25, max: 25, percent: 100 },
+              FUTURE: { score: 5, max: 25, percent: 20 },
+            },
+            EFFECTIVENESS: {
+              TEAMS: { score: 4, max: 5, percent: 80 },
+              FUTURE: { score: 3, max: 5, percent: 60 },
+              OVERALL: { score: 5, max: 5, percent: 100 },
+            },
+            IMPORTANCE: {
+              TEAMS: { score: 5, max: 5, percent: 100 },
+              FUTURE: { score: 2, max: 5, percent: 40 },
+            },
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Behaviour")).toBeTruthy();
+    expect(screen.getByText("Effectiveness")).toBeTruthy();
+    expect(screen.getByText("Importance")).toBeTruthy();
+    expect(screen.getByText("80%")).toBeTruthy();
+    expect(screen.getByText("60%")).toBeTruthy();
+    expect(screen.getByText("40%")).toBeTruthy();
+    // Rows follow the pattern section, so OVERALL does not become a row.
+    expect(screen.queryByText("OVERALL")).toBeNull();
+  });
+
   it("draws the DISC profile from graph, not from the M/P counters", () => {
     render(
       <ScoreSummary scores={{ M: { D: 6 }, P: { D: 2 }, graph: { D: 12, I: 8, S: 5, C: 3 } }} />,

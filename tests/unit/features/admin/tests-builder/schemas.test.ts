@@ -105,6 +105,21 @@ describe("LikertItemContentSchema", () => {
     );
   });
 
+  it("carries a section through an edit, so MSAI keeps its parts", () => {
+    expect(normalizeLikertContent({ text: "a", scale: "teams", section: "behaviour" })).toEqual({
+      text: "a",
+      scale: "TEAMS",
+      reverse: false,
+      section: "BEHAVIOUR",
+    });
+    expect(LikertItemContentSchema.parse({ text: "a", scale: "TEAMS", section: "BEHAVIOUR" })).toEqual(
+      { text: "a", scale: "TEAMS", section: "BEHAVIOUR" },
+    );
+    expect(LikertItemContentSchema.safeParse({ text: "a", scale: "TEAMS", section: "1X" }).success).toBe(
+      false,
+    );
+  });
+
   it("normalizes a draft into the stored shape", () => {
     expect(normalizeLikertContent({ text: "a", scale: "e" })).toEqual({
       text: "a",
