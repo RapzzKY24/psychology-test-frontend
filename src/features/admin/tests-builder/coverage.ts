@@ -17,8 +17,12 @@ export function pairPatternCodes(contents: unknown[]): readonly string[] {
   for (const content of contents) {
     const mapping = (content as { mapping?: unknown } | undefined)?.mapping;
     if (!Array.isArray(mapping) || mapping.length !== 2) continue;
-    const left = String(mapping[0] ?? "").trim().toUpperCase();
-    const right = String(mapping[1] ?? "").trim().toUpperCase();
+    const left = String(mapping[0] ?? "")
+      .trim()
+      .toUpperCase();
+    const right = String(mapping[1] ?? "")
+      .trim()
+      .toUpperCase();
     if (!left || !right) continue;
     const key = [left, right].sort().join("");
     if (seen.has(key)) continue;
@@ -74,6 +78,26 @@ export function choiceTallyPatternCodes(contents: unknown[]): readonly string[] 
 }
 
 /**
+ * Pattern codes of a pair tally are the scales its statement mappings name — the
+ * scale picked most often becomes the code. Unlike `pairPatternCodes` there is
+ * no cartesian product: every statement scores on its own. Mirror of the backend
+ * `pairTallyScales`.
+ */
+export function pairTallyPatternCodes(contents: unknown[]): readonly string[] {
+  const seen = new Set<string>();
+  for (const content of contents) {
+    const mapping = (content as { mapping?: unknown } | undefined)?.mapping;
+    if (!Array.isArray(mapping)) continue;
+    for (const scale of mapping) {
+      if (typeof scale !== "string") continue;
+      const code = scale.trim().toUpperCase();
+      if (code) seen.add(code);
+    }
+  }
+  return [...seen];
+}
+
+/**
  * Codes a test must cover before publish: a raw score uses every RAW_n, DISC
  * uses 1..40, a pair instrument derives them from its item mappings.
  */
@@ -83,10 +107,12 @@ export function getPatternCodes(
   itemContents?: unknown[],
 ): readonly string[] {
   if (scorerType === "RIGHT_WRONG_NORM") {
-    const total = typeof itemCount === "number" && itemCount > 0 ? itemCount : DEFAULT_RAW_ITEM_COUNT;
+    const total =
+      typeof itemCount === "number" && itemCount > 0 ? itemCount : DEFAULT_RAW_ITEM_COUNT;
     return Array.from({ length: total + 1 }, (_, i) => `RAW_${i}`);
   }
   if (scorerType === "FORCED_CHOICE_PAIR") return pairPatternCodes(itemContents ?? []);
+  if (scorerType === "PAIR_TALLY") return pairTallyPatternCodes(itemContents ?? []);
   if (scorerType === "SCALE_TALLY") return scaleTallyPatternCodes(itemContents ?? []);
   if (scorerType === "CHOICE_TALLY") return choiceTallyPatternCodes(itemContents ?? []);
   return PATTERN_CODES;

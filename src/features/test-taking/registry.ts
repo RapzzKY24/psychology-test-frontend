@@ -11,6 +11,9 @@ import { RightWrongItemView } from "./components/right-wrong-item-view";
 export const ITEM_RENDERERS = {
   FORCED_CHOICE_DISC: DiscItemView,
   FORCED_CHOICE_PAIR: PairItemView,
+  // A pair tally asks the same question ("pick one of two statements"); only
+  // the scoring differs — every statement feeds a named scale.
+  PAIR_TALLY: PairItemView,
   RIGHT_WRONG_NORM: RightWrongItemView,
   // A tally item is a statement with two labels ("Ya"/"Tidak"), which is the
   // same shape the right/wrong view already draws.
@@ -22,15 +25,10 @@ export const ITEM_RENDERERS = {
 export type RendererScorerType = keyof typeof ITEM_RENDERERS;
 
 function isValidScorerType(value: unknown): value is ScorerType {
-  return (
-    typeof value === "string" &&
-    (Object.keys(ITEM_RENDERERS) as string[]).includes(value)
-  );
+  return typeof value === "string" && (Object.keys(ITEM_RENDERERS) as string[]).includes(value);
 }
 
-function sniffScorerType(
-  items: Array<{ content: Record<string, unknown> }>,
-): ScorerType {
+function sniffScorerType(items: Array<{ content: Record<string, unknown> }>): ScorerType {
   const first = items[0]?.content as { words?: unknown; statements?: unknown } | undefined;
   if (Array.isArray(first?.words)) return "FORCED_CHOICE_DISC";
   if (Array.isArray(first?.statements)) return "FORCED_CHOICE_PAIR";

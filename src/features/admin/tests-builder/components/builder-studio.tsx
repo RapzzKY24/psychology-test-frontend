@@ -10,13 +10,39 @@ import { ScaleTallyItemsTab } from "./scale-tally-items-tab";
 import { InterpretationsTab } from "./interpretations-tab";
 import { useBuilderForm } from "../hooks/use-builder-form";
 import { scorerOption } from "../scorers";
-import type { AdminTestDetail } from "@/lib/api/types";
+import type { BuilderController } from "../hooks/use-builder-form";
+import type { AdminTestDetail, ScorerType } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
 const TABS = [
   { key: "soal", label: "Soal" },
   { key: "interpretasi", label: "Interpretasi" },
 ] as const;
+
+/** One item editor per scorer family — the family decides the editor, not the test. */
+function ItemsTabFor({
+  scorerType,
+  builder,
+  testId,
+}: {
+  scorerType: ScorerType;
+  builder: BuilderController;
+  testId: string;
+}) {
+  switch (scorerType) {
+    case "RIGHT_WRONG_NORM":
+      return <RightWrongItemsTab builder={builder} locked={builder.locked} testId={testId} />;
+    case "FORCED_CHOICE_PAIR":
+    case "PAIR_TALLY":
+      return <PairItemsTab builder={builder} locked={builder.locked} />;
+    case "SCALE_TALLY":
+      return <ScaleTallyItemsTab builder={builder} locked={builder.locked} />;
+    case "CHOICE_TALLY":
+      return <ChoiceTallyItemsTab builder={builder} locked={builder.locked} />;
+    default:
+      return <ItemsTab builder={builder} locked={builder.locked} />;
+  }
+}
 
 export function TestBuilderStudio({
   testId,
@@ -84,18 +110,9 @@ export function TestBuilderStudio({
         </p>
       </div>
 
-      {builder.tab === "soal" &&
-        (initialData.scorerType === "RIGHT_WRONG_NORM" ? (
-          <RightWrongItemsTab builder={builder} locked={builder.locked} testId={testId} />
-        ) : initialData.scorerType === "FORCED_CHOICE_PAIR" ? (
-          <PairItemsTab builder={builder} locked={builder.locked} />
-        ) : initialData.scorerType === "SCALE_TALLY" ? (
-          <ScaleTallyItemsTab builder={builder} locked={builder.locked} />
-        ) : initialData.scorerType === "CHOICE_TALLY" ? (
-          <ChoiceTallyItemsTab builder={builder} locked={builder.locked} />
-        ) : (
-          <ItemsTab builder={builder} locked={builder.locked} />
-        ))}
+      {builder.tab === "soal" && (
+        <ItemsTabFor scorerType={initialData.scorerType} builder={builder} testId={testId} />
+      )}
       {builder.tab === "interpretasi" && (
         <InterpretationsTab builder={builder} locked={builder.locked} />
       )}

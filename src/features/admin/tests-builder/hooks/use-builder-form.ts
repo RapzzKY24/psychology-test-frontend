@@ -31,7 +31,9 @@ import {
 
 function itemContentSchemaFor(scorerType: string) {
   if (scorerType === "RIGHT_WRONG_NORM") return RightWrongItemContentSchema;
-  if (scorerType === "FORCED_CHOICE_PAIR") return PairItemContentSchema;
+  if (scorerType === "FORCED_CHOICE_PAIR" || scorerType === "PAIR_TALLY") {
+    return PairItemContentSchema;
+  }
   if (scorerType === "SCALE_TALLY") return ScaleTallyItemContentSchema;
   if (scorerType === "CHOICE_TALLY") return ChoiceTallyItemContentSchema;
   return DiscItemContentSchema;
@@ -83,7 +85,7 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
       content:
         detail.scorerType === "RIGHT_WRONG_NORM"
           ? normalizeItemContent(item.content)
-          : detail.scorerType === "FORCED_CHOICE_PAIR"
+          : detail.scorerType === "FORCED_CHOICE_PAIR" || detail.scorerType === "PAIR_TALLY"
             ? normalizePairContent(item.content)
             : detail.scorerType === "SCALE_TALLY"
               ? normalizeScaleTallyContent(item.content)

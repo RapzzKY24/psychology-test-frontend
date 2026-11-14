@@ -37,6 +37,27 @@ describe("ScoreSummary", () => {
     expect(screen.queryByText("Jawaban benar")).toBeNull();
   });
 
+  it("shows the leading scale of a pair tally instead of calling it a type", () => {
+    render(
+      <ScoreSummary
+        scores={{
+          type: "G",
+          total: 90,
+          answered: 90,
+          scales: {
+            N: { score: 5, max: 9, percent: 56 },
+            G: { score: 7, max: 9, percent: 78 },
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Skala dominan")).toBeTruthy();
+    expect(screen.getByText("G")).toBeTruthy();
+    expect(screen.getByText("90/90")).toBeTruthy();
+    expect(screen.queryByText("Tipe kepribadian")).toBeNull();
+  });
+
   it("draws the DISC profile from graph, not from the M/P counters", () => {
     render(
       <ScoreSummary scores={{ M: { D: 6 }, P: { D: 2 }, graph: { D: 12, I: 8, S: 5, C: 3 } }} />,

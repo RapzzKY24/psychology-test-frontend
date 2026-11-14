@@ -25,6 +25,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
       "Tiap soal berisi dua pernyataan; peserta memilih satu. Tiap pernyataan mewakili satu kutub dimensi, dan tipe akhirnya disusun dari kutub yang menang.",
   },
   {
+    value: "PAIR_TALLY",
+    label: "Pasangan pernyataan berskala (PAPI)",
+    description:
+      "Tiap soal berisi dua pernyataan; peserta memilih satu. Tiap pernyataan menambah skor satu kebutuhan, dan kebutuhan yang paling sering dipilih menjadi hasil.",
+  },
+  {
     value: "FORCED_CHOICE_DISC",
     label: "DISC (4 kata)",
     description:

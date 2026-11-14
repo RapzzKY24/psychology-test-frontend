@@ -22,6 +22,7 @@ export const SCORER_TYPES = [
   "CHOICE_TALLY",
   "FORCED_CHOICE_DISC",
   "FORCED_CHOICE_PAIR",
+  "PAIR_TALLY",
   "RIGHT_WRONG_NORM",
   "SCALE_TALLY",
 ] as const;

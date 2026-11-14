@@ -12,6 +12,7 @@ const AUTO_ADVANCE_MS = {
   CHOICE_TALLY: 300,
   FORCED_CHOICE_DISC: 400,
   FORCED_CHOICE_PAIR: 350,
+  PAIR_TALLY: 350,
   RIGHT_WRONG_NORM: 300,
   SCALE_TALLY: 300,
 } as const;
@@ -51,7 +52,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     scorerType === "RIGHT_WRONG_NORM" ||
     scorerType === "SCALE_TALLY" ||
     scorerType === "CHOICE_TALLY";
-  const isPair = scorerType === "FORCED_CHOICE_PAIR";
+  const isPair = scorerType === "FORCED_CHOICE_PAIR" || scorerType === "PAIR_TALLY";
   const isAnswered = (value: unknown) => isAnsweredValue(scorerType, value);
   const total = attempt.items.length;
   const safeIndex = Math.min(index, Math.max(total - 1, 0));
@@ -174,6 +175,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
 
   return {
     usesChoiceView,
+    isPair,
     total,
     safeIndex,
     item,

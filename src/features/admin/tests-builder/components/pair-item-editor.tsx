@@ -11,6 +11,8 @@ interface PairItemEditorProps {
   active: number;
   total: number;
   locked: boolean;
+  /** "pole" for a dichotomy (MBTI), "need" for a per-statement scale (PAPI). */
+  codeKind?: "pole" | "need";
   onMove: (from: number, to: number) => void;
   onRemove: () => void;
   onDuplicate: () => void;
@@ -25,16 +27,31 @@ type ItemDraft = {
 const STATEMENTS = [0, 1];
 const SIDE_LABEL = ["A", "B"];
 
-/** Right pane: one pair item — stem, two statements, and the hidden pole of each. */
+const CODE_COPY = {
+  pole: {
+    label: "Kutub",
+    placeholders: ["E", "I"] as const,
+    hint: "Dua pernyataan harus mewakili kutub berbeda (mis. E dan I).",
+  },
+  need: {
+    label: "Kebutuhan",
+    placeholders: ["N", "G"] as const,
+    hint: "Tiap pernyataan menambah skor satu kebutuhan; dua pernyataan dalam satu soal harus berbeda.",
+  },
+};
+
+/** Right pane: one pair item — stem, two statements, and the hidden code of each. */
 export function PairItemEditor({
   builder,
   active,
   total,
   locked,
+  codeKind = "pole",
   onMove,
   onRemove,
   onDuplicate,
 }: PairItemEditorProps) {
+  const copy = CODE_COPY[codeKind];
   const { form } = builder;
   const content = form.watch(`items.${active}.content`) as unknown as ItemDraft | undefined;
   const statements = content?.statements ?? ["", ""];
@@ -49,7 +66,10 @@ export function PairItemEditor({
   const setPole = (index: number, value: string) =>
     form.setValue(
       `items.${active}.content.mapping.${index}`,
-      value.replace(/[^a-zA-Z]/g, "").slice(0, 3).toUpperCase() as never,
+      value
+        .replace(/[^a-zA-Z]/g, "")
+        .slice(0, 3)
+        .toUpperCase() as never,
       { shouldDirty: true },
     );
 
@@ -94,7 +114,9 @@ export function PairItemEditor({
                 rows={4}
                 value={statements[index] ?? ""}
                 disabled={locked}
-                placeholder={index === 0 ? "Saya suka bertemu orang baru" : "Saya nyaman bekerja sendiri"}
+                placeholder={
+                  index === 0 ? "Saya suka bertemu orang baru" : "Saya nyaman bekerja sendiri"
+                }
                 onChange={(e) =>
                   form.setValue(
                     `items.${active}.content.statements.${index}`,
@@ -105,14 +127,14 @@ export function PairItemEditor({
               />
             </Field>
             <Field data-invalid={poleError ? true : undefined}>
-              <FieldLabel htmlFor={`pair-pole-${index}`}>Kutub</FieldLabel>
+              <FieldLabel htmlFor={`pair-pole-${index}`}>{copy.label}</FieldLabel>
               <Input
                 id={`pair-pole-${index}`}
                 className="w-20 text-center font-mono uppercase"
                 maxLength={3}
                 value={mapping[index] ?? ""}
                 disabled={locked}
-                placeholder={index === 0 ? "E" : "I"}
+                placeholder={copy.placeholders[index]}
                 aria-invalid={poleError ? true : undefined}
                 onChange={(e) => setPole(index, e.target.value)}
               />
@@ -123,8 +145,8 @@ export function PairItemEditor({
       {poleError && <FieldError errors={[poleError]} />}
 
       <FieldDescription>
-        Peserta hanya melihat pertanyaan dan kedua pernyataan — kode kutub tidak pernah dikirim ke
-        peserta. Dua pernyataan harus mewakili kutub berbeda (mis. E dan I).
+        Peserta hanya melihat pertanyaan dan kedua pernyataan — kode {copy.label.toLowerCase()}{" "}
+        tidak pernah dikirim ke peserta. {copy.hint}
       </FieldDescription>
     </>
   );

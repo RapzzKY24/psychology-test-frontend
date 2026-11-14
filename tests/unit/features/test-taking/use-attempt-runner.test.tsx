@@ -249,6 +249,20 @@ describe("useAttemptRunner", () => {
     expect(result.current.answered).toEqual([true, false]);
   });
 
+  it("treats a pair tally as a pair item", async () => {
+    const { result } = renderRunner({ ...pairAttempt(), scorerType: "PAIR_TALLY" });
+
+    expect(result.current.isPair).toBe(true);
+    expect(result.current.usesChoiceView).toBe(false);
+
+    await act(async () => result.current.choosePair(1));
+
+    await waitFor(() =>
+      expect(putResponse).toHaveBeenCalledWith("attempt-1", "item-1", { chosen: 1 }, undefined),
+    );
+    expect(result.current.answered[0]).toBe(true);
+  });
+
   it("counts a typed answer as answered", async () => {
     const { result } = renderRunner(shortAttempt());
 

@@ -62,6 +62,32 @@ function typeStats(scores: Record<string, unknown>): Stat[] | null {
   return stats;
 }
 
+/**
+ * CHOICE_TALLY / PAIR_TALLY keep every scale one level down under `scales`.
+ * The winning scale is the result, and it is a code — not a personality type.
+ */
+function tallyStats(scores: Record<string, unknown>): Stat[] | null {
+  const type = scores.type;
+  if (typeof type !== "string" || !type.trim()) return null;
+  if (!isRecord(scores.scales)) return null;
+  const first = Object.values(scores.scales)[0];
+  if (!isRecord(first) || typeof first.score !== "number") return null;
+
+  const stats: Stat[] = [
+    { key: "type", label: "Skala dominan", value: type.trim(), icon: Fingerprint },
+  ];
+  const { answered, total } = scores;
+  if (typeof answered === "number" && typeof total === "number") {
+    stats.push({
+      key: "answered",
+      label: "Butir terjawab",
+      value: `${answered}/${total}`,
+      icon: ListChecks,
+    });
+  }
+  return stats;
+}
+
 function barsFrom(values: Record<string, unknown>): Bar[] {
   const bars: Bar[] = [];
   for (const [key, value] of Object.entries(values)) {
@@ -78,7 +104,7 @@ function discBars(scores: Record<string, unknown>): Bar[] | null {
 }
 
 export function ScoreSummary({ scores }: { scores: Record<string, unknown> }) {
-  const stats = rightWrongStats(scores) ?? typeStats(scores);
+  const stats = rightWrongStats(scores) ?? tallyStats(scores) ?? typeStats(scores);
   if (stats) {
     return (
       <div className="flex flex-wrap gap-3">

@@ -4,6 +4,7 @@ import {
   choiceTallyPatternCodes,
   coverage,
   missingPatternCodes,
+  pairTallyPatternCodes,
   scaleTallyPatternCodes,
 } from "@/features/admin/tests-builder/coverage";
 
@@ -64,6 +65,37 @@ describe("scaleTallyPatternCodes", () => {
     ];
     const filled = [{ patternCode: "R", title: "a", body: "x" }];
     expect(missingPatternCodes(filled, "SCALE_TALLY", 2, contents)).toEqual(["I"]);
+  });
+});
+
+describe("pairTallyPatternCodes", () => {
+  it("collects every statement scale in first-appearance order", () => {
+    const contents = [
+      { question: "a", statements: ["x", "y"], mapping: ["N", "G"] },
+      { question: "b", statements: ["x", "y"], mapping: ["g", "A"] },
+    ];
+    expect(pairTallyPatternCodes(contents)).toEqual(["N", "G", "A"]);
+  });
+
+  it("has no cartesian product — one code per scale, not per pair", () => {
+    const contents = [{ question: "a", statements: ["x", "y"], mapping: ["N", "G"] }];
+    expect(pairTallyPatternCodes(contents)).toEqual(["N", "G"]);
+  });
+
+  it("ignores items without a mapping", () => {
+    expect(pairTallyPatternCodes([{ question: "a" }, null])).toEqual([]);
+  });
+
+  it("drives the publish coverage of a pair tally test", () => {
+    const contents = [
+      { question: "a", statements: ["x", "y"], mapping: ["N", "G"] },
+      { question: "b", statements: ["x", "y"], mapping: ["A", "N"] },
+    ];
+    const filled = [
+      { patternCode: "N", title: "a", body: "x" },
+      { patternCode: "G", title: "b", body: "x" },
+    ];
+    expect(missingPatternCodes(filled, "PAIR_TALLY", 2, contents)).toEqual(["A"]);
   });
 });
 

@@ -10,6 +10,7 @@ describe("scorer options", () => {
     expect(SCORER_OPTIONS.map((option) => option.value)).toEqual([
       "RIGHT_WRONG_NORM",
       "FORCED_CHOICE_PAIR",
+      "PAIR_TALLY",
       "FORCED_CHOICE_DISC",
       "SCALE_TALLY",
       "CHOICE_TALLY",

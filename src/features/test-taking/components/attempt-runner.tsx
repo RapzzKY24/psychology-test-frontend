@@ -57,7 +57,7 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
           remainingSeconds={runner.remainingSeconds}
         />
 
-        {scorerType === "FORCED_CHOICE_PAIR" ? (
+        {runner.isPair ? (
           <PairItemView
             order={runner.safeIndex + 1}
             question={(runner.content.question as string | null) ?? null}

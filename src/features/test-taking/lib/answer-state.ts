@@ -39,6 +39,8 @@ export function isAnsweredRightWrong(value: unknown): boolean {
 export function isAnsweredValue(scorerType: ScorerType, value: unknown): boolean {
   if (value === undefined || value === null) return false;
   if (scorerType === "FORCED_CHOICE_DISC") return isAnsweredDisc(value);
-  if (scorerType === "FORCED_CHOICE_PAIR") return toPairChoice(value) !== null;
+  if (scorerType === "FORCED_CHOICE_PAIR" || scorerType === "PAIR_TALLY") {
+    return toPairChoice(value) !== null;
+  }
   return isAnsweredRightWrong(value);
 }

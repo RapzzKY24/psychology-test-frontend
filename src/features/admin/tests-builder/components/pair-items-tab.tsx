@@ -23,13 +23,7 @@ const EMPTY_PAIR = {
   },
 };
 
-export function PairItemsTab({
-  builder,
-  locked,
-}: {
-  builder: BuilderController;
-  locked: boolean;
-}) {
+export function PairItemsTab({ builder, locked }: { builder: BuilderController; locked: boolean }) {
   const { itemsArray } = builder;
   const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
   const watchedItems = builder.form.watch("items");
@@ -86,6 +80,7 @@ export function PairItemsTab({
             active={active}
             total={watchedItems.length}
             locked={locked}
+            codeKind={builder.scorerType === "PAIR_TALLY" ? "need" : "pole"}
             onMove={move}
             onRemove={() => setConfirmRemove(active)}
             onDuplicate={duplicate}
