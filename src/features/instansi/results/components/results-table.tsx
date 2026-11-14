@@ -52,7 +52,7 @@ export function ResultsTable({ rows, meta, pageHref }: ResultsTableProps) {
               <TableRow key={row.resultId}>
                 <TableCell className="font-medium">{row.participantName}</TableCell>
                 <TableCell>{row.testName}</TableCell>
-                <TableCell className="text-muted-foreground max-w-md truncate font-mono text-xs">
+                <TableCell className="max-w-md truncate text-sm text-muted-foreground">
                   {safeRenderScores(row.scores, row.patternCode)}
                 </TableCell>
                 <TableCell className="tabular-nums">{formatIdDate(row.approvedAt)}</TableCell>

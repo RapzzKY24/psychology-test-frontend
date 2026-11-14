@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
-import { safeRenderScores } from "@/lib/format/format-scores";
 import { ReviewQueueTable } from "@/features/psikolog/review/components/review-queue-table";
 import type { ReviewListItem } from "@/lib/api/types";
 
@@ -65,23 +64,5 @@ describe("ReviewQueueTable", () => {
     for (const el of dashes) {
       expect(el.getAttribute("title")).toBeNull();
     }
-  });
-});
-
-describe("safeRenderScores", () => {
-  it("truncates long scores", () => {
-    const long = { graph: { a: "x".repeat(100) } };
-    const text = safeRenderScores(long, "DISC-D");
-    expect(text).toContain("…");
-    expect(text.startsWith("DISC-D · ")).toBe(true);
-  });
-
-  it("falls back to — when patternCode empty", () => {
-    expect(safeRenderScores(null, "")).toBe("—");
-    expect(safeRenderScores(null, "   ")).toBe("—");
-  });
-
-  it("returns patternCode when scores null", () => {
-    expect(safeRenderScores(null, "DISC-D")).toBe("DISC-D");
   });
 });

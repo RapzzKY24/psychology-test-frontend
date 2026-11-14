@@ -44,7 +44,7 @@ export function ReviewQueueDesktopTable({ rows }: { rows: ReviewListItem[] }) {
                 </TableCell>
                 <TableCell>{row.testName}</TableCell>
                 <TableCell
-                  className="max-w-[14rem] truncate font-mono text-xs"
+                  className="max-w-[14rem] truncate text-sm text-muted-foreground"
                   title={scoreText === "—" ? undefined : scoreText}
                 >
                   {scoreText}

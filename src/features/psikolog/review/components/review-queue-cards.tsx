@@ -24,7 +24,10 @@ export function ReviewQueueCards({ rows }: { rows: ReviewListItem[] }) {
             >
               {row.institutionName?.trim() || "—"} · {row.testName}
             </p>
-            <p className="truncate font-mono text-xs" title={scoreText === "—" ? undefined : scoreText}>
+            <p
+              className="truncate text-sm text-muted-foreground"
+              title={scoreText === "—" ? undefined : scoreText}
+            >
               {scoreText}
             </p>
             <p className="text-xs tabular-nums text-muted-foreground">

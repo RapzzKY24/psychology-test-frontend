@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CircleCheck, Clock, FileText } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
-import {
-  fetchMeAttemptsServer,
-  fetchMeResultsServer,
-} from "@/features/participant/api";
+import { fetchMeAttemptsServer, fetchMeResultsServer } from "@/features/participant/api";
 import type { MeAttemptItem, MeResultItem } from "@/lib/api/types";
 import { formatIdDate } from "@/lib/format/format-date";
+import { isRawPatternCode } from "@/lib/format/format-scores";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -21,7 +19,11 @@ function AttemptCard({ attempt }: { attempt: MeAttemptItem }) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
-          {inProgress ? <Clock className="size-4 text-primary" aria-hidden /> : <FileText className="size-4 text-muted-foreground" aria-hidden />}
+          {inProgress ? (
+            <Clock className="size-4 text-primary" aria-hidden />
+          ) : (
+            <FileText className="size-4 text-muted-foreground" aria-hidden />
+          )}
           {attempt.testName}
         </CardTitle>
         <CardDescription>
@@ -46,6 +48,10 @@ function AttemptCard({ attempt }: { attempt: MeAttemptItem }) {
 }
 
 function ResultCard({ result }: { result: MeResultItem }) {
+  // A RAW_n code just repeats the score the detail page already shows; the
+  // MBTI/DISC type codes are the result and stay.
+  const code = isRawPatternCode(result.patternCode) ? "" : result.patternCode;
+
   return (
     <Link href={`/hasil/${result.attemptId}`} className="group">
       <Card className="h-full transition-colors group-hover:border-primary/50">
@@ -55,7 +61,9 @@ function ResultCard({ result }: { result: MeResultItem }) {
             {result.testName}
           </CardTitle>
           <CardDescription className="tabular-nums">
-            Pola {result.patternCode} · {formatIdDate(result.completedAt)}
+            {code
+              ? `${code} · ${formatIdDate(result.completedAt)}`
+              : formatIdDate(result.completedAt)}
           </CardDescription>
         </CardHeader>
         <CardContent>
