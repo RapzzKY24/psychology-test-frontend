@@ -4,6 +4,7 @@ import {
   choiceLabel,
   isShortItem,
   keyLabel,
+  optionsLegend,
   responseLabel,
 } from "@/features/psikolog/review/lib/answer-labels";
 import type { RightWrongItemContent } from "@/lib/api/types";
@@ -51,7 +52,7 @@ describe("answer-labels", () => {
   });
 
   it("labels a multi-answer choice", () => {
-    expect(responseLabel(multiItem, { chosen: [4, 1] })).toBe("E. E, B. B");
+    expect(responseLabel(multiItem, { chosen: [4, 1] })).toBe("E, B");
   });
 
   it("labels a short answer with the typed text", () => {
@@ -63,11 +64,18 @@ describe("answer-labels", () => {
   it("prints the accepted variants as the key", () => {
     expect(keyLabel(shortItem)).toBe("20");
     expect(keyLabel(choiceItem)).toBe("B. 4");
-    expect(keyLabel(multiItem)).toBe("B. B, E. E");
+    expect(keyLabel(multiItem)).toBe("B, E");
   });
 
   it("still prints the legacy single key", () => {
     expect(keyLabel(legacyItem)).toBe("A. 3");
+  });
+
+  it("does not repeat a bare position letter", () => {
+    // CFIT stores "a".."f" as the option, and the letter is already the badge.
+    expect(choiceLabel(["a", "b", "c"], [1, 2])).toBe("b, c");
+    expect(optionsLegend(["a", "b"])).toBe("a · b");
+    expect(optionsLegend(["Jakarta", "Bandung"])).toBe("A. Jakarta · B. Bandung");
   });
 
   it("handles a missing item", () => {

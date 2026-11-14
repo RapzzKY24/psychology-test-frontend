@@ -1,9 +1,17 @@
 "use client";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { RightWrongItemContent } from "@/lib/api/types";
-import { isShortItem, keyLabel, responseLabel } from "../lib/answer-labels";
+import { usesPositionalLabels } from "@/lib/format/option-labels";
+import { isShortItem, keyLabel, optionsLegend, responseLabel } from "../lib/answer-labels";
 
 interface RightWrongItem {
   id: string;
@@ -33,7 +41,8 @@ export function RightWrongDetailTable({ items, responses, scores }: RightWrongDe
         <CardTitle className="text-base">Jawaban per soal</CardTitle>
         {scores && (
           <p className="text-sm text-muted-foreground">
-            {scores.raw} dari {scores.total} benar ({Math.round((scores.raw / scores.total) * 100)}%)
+            {scores.raw} dari {scores.total} benar ({Math.round((scores.raw / scores.total) * 100)}
+            %)
             {typeof scores.iq === "number" && <> · IQ {scores.iq}</>}
           </p>
         )}
@@ -70,16 +79,19 @@ export function RightWrongDetailTable({ items, responses, scores }: RightWrongDe
                           <img
                             src={item.content.imageUrl}
                             alt={`Gambar soal ${item.order}`}
-                            className="max-h-32 rounded border object-contain"
+                            // Wide figure rows (CFIT prints six options on one
+                            // line) would otherwise push the table past the
+                            // card and be clipped by its overflow-hidden.
+                            className="max-h-32 max-w-full rounded border object-contain"
                           />
                         )}
-                        {!short && (item.content.options?.length ?? 0) > 0 && (
-                          <p className="text-xs text-muted-foreground">
-                            {item.content.options
-                              ?.map((option, i) => `${String.fromCharCode(65 + i)}. ${option}`)
-                              .join(" · ")}
-                          </p>
-                        )}
+                        {!short &&
+                          (item.content.options?.length ?? 0) > 0 &&
+                          !usesPositionalLabels(item.content.options) && (
+                            <p className="text-xs text-muted-foreground">
+                              {optionsLegend(item.content.options)}
+                            </p>
+                          )}
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">

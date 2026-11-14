@@ -3,6 +3,7 @@
 import { Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { optionLetter, usesPositionalLabels } from "@/lib/format/option-labels";
 
 interface RightWrongItemViewProps {
   order: number;
@@ -32,6 +33,10 @@ export function RightWrongItemView({
   onChoose,
   onText,
 }: RightWrongItemViewProps) {
+  // Figure instruments print the choices inside the image and keep only the
+  // position label as the option text, so the answer is a label pick.
+  const labelOnly = usesPositionalLabels(options);
+
   const toggle = (idx: number) => {
     if (!multi) {
       onChoose([idx]);
@@ -81,6 +86,33 @@ export function RightWrongItemView({
             Tulis angka atau kata saja, tanpa satuan. Jawaban tersimpan otomatis.
           </p>
         </div>
+      ) : labelOnly ? (
+        <div className="flex flex-wrap gap-2">
+          {options.map((label, idx) => {
+            const selected = chosen.includes(idx);
+            return (
+              <button
+                key={idx}
+                type="button"
+                disabled={disabled}
+                aria-pressed={selected}
+                onClick={() => toggle(idx)}
+                className={cn(
+                  "flex size-12 items-center justify-center rounded-lg border text-sm font-medium transition-colors",
+                  selected
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "text-muted-foreground hover:border-primary/50 hover:text-foreground",
+                )}
+              >
+                {label}
+              </button>
+            );
+          })}
+          <p className="w-full text-xs text-muted-foreground">
+            {multi ? "Pilih semua jawaban yang benar." : "Pilih satu jawaban."} Jawaban tersimpan
+            otomatis.
+          </p>
+        </div>
       ) : (
         <>
           <div className="grid gap-2">
@@ -101,7 +133,7 @@ export function RightWrongItemView({
                   )}
                 >
                   <span className="flex size-7 shrink-0 items-center justify-center rounded-md border text-xs font-medium tabular-nums">
-                    {String.fromCharCode(65 + idx)}
+                    {optionLetter(idx)}
                   </span>
                   <span className="flex-1">{opt}</span>
                   {selected && <Check className="size-4 shrink-0 text-primary" aria-hidden />}

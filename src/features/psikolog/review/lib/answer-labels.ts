@@ -1,10 +1,5 @@
 import type { RightWrongItemContent } from "@/lib/api/types";
-
-const LETTERS = "ABCDEFGH";
-
-function letter(index: number): string {
-  return LETTERS[index] ?? String(index + 1);
-}
+import { optionLetter as letter, usesPositionalLabels } from "@/lib/format/option-labels";
 
 /**
  * Answers arrive in two shapes: `{ chosen: 2 }` from rows written before
@@ -27,15 +22,32 @@ export function isShortItem(content: RightWrongItemContent | undefined): boolean
   return content?.answerMode === "short";
 }
 
-/** "A. Jakarta, C. Bandung"; falls back to the bare letter when an option is gone. */
+/**
+ * "A. Jakarta, C. Bandung" for a written-option item; the bare label for a
+ * figure item, whose option text is already the letter printed in the image.
+ */
 export function choiceLabel(options: string[] | undefined, indexes: number[]): string {
   if (indexes.length === 0) return "—";
+  const positional = usesPositionalLabels(options);
   return indexes
     .map((index) => {
-      const option = options?.[index];
-      return option ? `${letter(index)}. ${option}` : letter(index);
+      const text = options?.[index]?.trim() ?? "";
+      if (positional) return text || letter(index);
+      return text ? `${letter(index)}. ${text}` : letter(index);
     })
     .join(", ");
+}
+
+/** The full option list for the review table: "A. Jakarta · B. Bandung". */
+export function optionsLegend(options: string[] | undefined): string {
+  const list = options ?? [];
+  if (usesPositionalLabels(options)) return list.join(" · ");
+  return list
+    .map((option, index) => {
+      const text = option.trim();
+      return text ? `${letter(index)}. ${text}` : letter(index);
+    })
+    .join(" · ");
 }
 
 export function keyIndexes(content: RightWrongItemContent | undefined): number[] {
@@ -54,10 +66,7 @@ export function keyLabel(content: RightWrongItemContent | undefined): string {
 }
 
 /** What the participant actually answered, as text. */
-export function responseLabel(
-  content: RightWrongItemContent | undefined,
-  value: unknown,
-): string {
+export function responseLabel(content: RightWrongItemContent | undefined, value: unknown): string {
   if (isShortItem(content)) return answerText(value) || "—";
   return choiceLabel(content?.options, chosenIndexes(value));
 }
