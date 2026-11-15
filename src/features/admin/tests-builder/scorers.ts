@@ -90,6 +90,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
     description:
       "Tiap soal adalah satu lajur berisi deretan angka; peserta menulis angka terakhir dari penjumlahan dua angka bersebelahan, secepat mungkin sampai waktu habis. Jawaban benar per lajur membentuk kurva kerja, dan kurva itu dibaca sebagai faktor kecepatan, ketelitian, ketahanan dan keajegan.",
   },
+  {
+    value: "MANUAL",
+    label: "Gambar proyektif (Wartegg)",
+    description:
+      "Tiap kotak sudah berisi satu goresan kecil; peserta melengkapinya menjadi satu gambar. Tidak ada skor otomatis — gambarnya dibaca psikolog, jadi hasilnya hanya bisa disimpulkan pada sesi konsultasi.",
+  },
 ] as const;
 
 export const DEFAULT_SCORER_BY_CATEGORY: Record<TestCategory, ScorerType> = {

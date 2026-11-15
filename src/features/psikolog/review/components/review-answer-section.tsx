@@ -10,6 +10,7 @@ import {
 import type { ReviewDetail, RightWrongItemContent } from "@/lib/api/types";
 import { ChoiceTallyDetailTable } from "./choice-tally-detail-table";
 import { LikertDetailTable } from "./likert-detail-table";
+import { ManualDetailGrid } from "./manual-detail-grid";
 import { OptionScaleDetailTable } from "./option-scale-detail-table";
 import { PairDetailTable, type PairItem, type PairResponseRow } from "./pair-detail-table";
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
@@ -50,8 +51,15 @@ export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps
         scale?: unknown;
         text?: unknown;
         digits?: unknown;
+        mark?: unknown;
       }
     | undefined;
+
+  // A drawing sheet carries a printed mark and nothing else; every branch
+  // below would print the boxes as unanswered questions.
+  if (detail.items.length > 0 && typeof firstContent?.mark === "string") {
+    return <ManualDetailGrid items={detail.items} responses={detail.responses} />;
+  }
 
   // A digit grid is the only family whose item is a row of numbers; every
   // other branch below would print it as an unanswered question.

@@ -12,18 +12,6 @@ import type { ManualMark } from "@/lib/api/types";
  * 5–8 below, marks mostly in the upper half.
  */
 
-/** Short description used as the canvas label and in the builder. */
-export const MANUAL_MARK_LABELS: Record<ManualMark, string> = {
-  DOT: "Satu titik",
-  CURVE: "Garis bergelombang pendek",
-  BARS: "Tiga garis vertikal meninggi",
-  SQUARE: "Kotak hitam kecil",
-  DIAGONALS: "Dua garis miring terputus",
-  AXES: "Garis datar dan garis tegak",
-  DOTTED_ARC: "Busur titik-titik",
-  ARC: "Busur penuh",
-};
-
 type Ctx = CanvasRenderingContext2D;
 
 /** Draw one printed mark into a `width × height` box. Strokes are dark grey, not black — the participant's pen is black. */

@@ -9,8 +9,9 @@ import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import { cn } from "@/lib/utils";
 import type { ManualMark } from "@/lib/api/types";
+import { MANUAL_MARK_LABELS } from "@/lib/manual-marks";
 import { uploadItemImage } from "../api";
-import { MANUAL_MARK_LABELS, paintStimulus } from "../lib/manual-marks";
+import { paintStimulus } from "../lib/manual-marks";
 
 interface ManualItemViewProps {
   attemptId: string;

@@ -21,6 +21,7 @@ describe("scorer options", () => {
       "LIKERT",
       "OPTION_SCALE",
       "TIMED_GRID",
+      "MANUAL",
     ]);
   });
 

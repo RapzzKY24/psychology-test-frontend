@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { MANUAL_MARKS } from "@/lib/api/types";
 import {
   CreateTestSchema,
   DiscItemContentSchema,
   LikertItemContentSchema,
+  ManualItemContentSchema,
   MarkGroupItemContentSchema,
   OptionScaleItemContentSchema,
   PairNormItemContentSchema,
@@ -14,6 +16,7 @@ import {
   normalizePairNormContent,
   normalizeRankGroupContent,
   normalizeStyleGridContent,
+  manualSheet,
   optionScalePresetOf,
   slugify,
 } from "@/features/admin/tests-builder/schemas";
@@ -407,5 +410,23 @@ describe("OptionScaleItemContentSchema", () => {
     expect(optionScalePresetOf([0, 1, 0])).toBe("0-1-0");
     expect(optionScalePresetOf([1, 1, 0])).toBeNull();
     expect(optionScalePresetOf(undefined)).toBe("2-1-0");
+  });
+});
+
+describe("ManualItemContentSchema", () => {
+  it("accepts every printed mark inside a box 1..8", () => {
+    for (const mark of MANUAL_MARKS) {
+      expect(ManualItemContentSchema.safeParse({ box: 1, mark }).success).toBe(true);
+    }
+  });
+
+  it("rejects a box outside the sheet and an unknown mark", () => {
+    expect(ManualItemContentSchema.safeParse({ box: 0, mark: "DOT" }).success).toBe(false);
+    expect(ManualItemContentSchema.safeParse({ box: 9, mark: "DOT" }).success).toBe(false);
+    expect(ManualItemContentSchema.safeParse({ box: 1, mark: "CIRCLE" }).success).toBe(false);
+  });
+
+  it("lays the sheet out in reading order", () => {
+    expect(manualSheet()).toEqual(MANUAL_MARKS.map((mark, index) => ({ box: index + 1, mark })));
   });
 });

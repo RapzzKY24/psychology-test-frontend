@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { MANUAL_MARKS } from "@/lib/api/types";
 import { isAnsweredManual, isAnsweredValue, toManualImage } from "@/features/test-taking/lib/answer-state";
-import { MANUAL_MARK_LABELS, paintStimulus } from "@/features/test-taking/lib/manual-marks";
+import { paintStimulus } from "@/features/test-taking/lib/manual-marks";
+import { MANUAL_MARK_LABELS } from "@/lib/manual-marks";
 
 /** Records what the helper drew, so a missing mark shows up as an empty box. */
 function recordingContext() {

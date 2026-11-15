@@ -5,6 +5,7 @@ import { BuilderHeader } from "./builder-header";
 import { ChoiceTallyItemsTab } from "./choice-tally-items-tab";
 import { ItemsTab } from "./items-tab";
 import { LikertItemsTab } from "./likert-items-tab";
+import { ManualItemsTab } from "./manual-items-tab";
 import { MarkGroupItemsTab } from "./mark-group-items-tab";
 import { OptionScaleItemsTab } from "./option-scale-items-tab";
 import { PairItemsTab } from "./pair-items-tab";
@@ -50,6 +51,8 @@ function ItemsTabFor({
       return <OptionScaleItemsTab builder={builder} locked={builder.locked} />;
     case "TIMED_GRID":
       return <TimedGridItemsTab builder={builder} locked={builder.locked} />;
+    case "MANUAL":
+      return <ManualItemsTab builder={builder} locked={builder.locked} />;
     case "CHOICE_TALLY":
       return <ChoiceTallyItemsTab builder={builder} locked={builder.locked} />;
     case "MARK_GROUP":

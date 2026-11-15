@@ -277,6 +277,9 @@ export function getPatternCodes(
   // A work curve is a score profile, not a typology: publish must not demand an
   // interpretation for a code that never occurs.
   if (scorerType === "TIMED_GRID") return [];
+  // A drawing sheet is read by the psychologist, so there is no pattern to
+  // interpret — the result is the pictures themselves.
+  if (scorerType === "MANUAL") return [];
   return PATTERN_CODES;
 }
 

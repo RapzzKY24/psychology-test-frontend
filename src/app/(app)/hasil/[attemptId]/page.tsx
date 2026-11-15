@@ -23,6 +23,12 @@ export default async function HasilDetailPage({ params }: PageProps<"/hasil/[att
     throw error;
   }
 
+  // Two families produce no score the participant could read: a work curve and
+  // a set of drawings are both interpreted by the psychologist.
+  const isTimedGrid = detail.scorerType === "TIMED_GRID";
+  const isManual = detail.scorerType === "MANUAL";
+  const readByPsychologist = isTimedGrid || isManual;
+
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 p-6">
       <PageHeader
@@ -32,17 +38,20 @@ export default async function HasilDetailPage({ params }: PageProps<"/hasil/[att
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Ringkasan skor</CardTitle>
+          <CardTitle className="text-lg">
+            {readByPsychologist ? "Status hasil" : "Ringkasan skor"}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {detail.scorerType === "TIMED_GRID" ? (
+          {readByPsychologist ? (
             <div className="flex items-start gap-3 rounded-xl border bg-primary/5 p-4">
               <ClipboardCheck className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
               <div className="space-y-1">
                 <p className="text-sm font-medium">Hasil sudah selesai</p>
                 <p className="text-sm text-muted-foreground">
-                  Tes ini dinilai dari kurva kerja Anda, jadi ringkasannya disampaikan
-                  langsung oleh psikolog pada sesi konsultasi.
+                  {isManual
+                    ? "Tes ini dibaca langsung oleh psikolog dari gambar Anda, jadi ringkasannya disampaikan pada sesi konsultasi."
+                    : "Tes ini dinilai dari kurva kerja Anda, jadi ringkasannya disampaikan langsung oleh psikolog pada sesi konsultasi."}
                 </p>
               </div>
             </div>
@@ -60,7 +69,7 @@ export default async function HasilDetailPage({ params }: PageProps<"/hasil/[att
         </CardContent>
       </Card>
 
-      {detail.scorerType === "TIMED_GRID" ? null : detail.interpretation ? (
+      {readByPsychologist ? null : detail.interpretation ? (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">{detail.interpretation.title}</CardTitle>

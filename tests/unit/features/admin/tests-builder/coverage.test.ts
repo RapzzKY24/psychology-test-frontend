@@ -306,3 +306,14 @@ describe("styleGridPatternCodes", () => {
     expect(missingPatternCodes([], "STYLE_GRID", 2, [], config)).toEqual(["E", "CO", "BA"]);
   });
 });
+
+describe("getPatternCodes for families without a typology", () => {
+  it("asks for no interpretation from a work curve", () => {
+    expect(missingPatternCodes([], "TIMED_GRID", 50, [], undefined)).toEqual([]);
+  });
+
+  it("asks for no interpretation from a drawing sheet", () => {
+    // The pictures are the result; there is no code a psychologist could fill.
+    expect(missingPatternCodes([], "MANUAL", 8, [], undefined)).toEqual([]);
+  });
+});

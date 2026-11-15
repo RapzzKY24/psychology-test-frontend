@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SCORER_TYPES, TEST_CATEGORIES } from "@/lib/api/types";
+import { MANUAL_MARKS, SCORER_TYPES, TEST_CATEGORIES } from "@/lib/api/types";
 
 /** Mirrors the backend CreateTestSchema (verified: name 3–100, slug regex, description ≥10). */
 export const CreateTestSchema = z.object({
@@ -620,4 +620,21 @@ export function timedGridLines(items: { content: unknown }[]): string {
     })
     .filter((line) => line.length > 0)
     .join("\n");
+}
+
+/**
+ * One box of a drawing sheet: the printed box number and the mark inside it.
+ * The marks are the eight of the source sheet, in reading order — the box
+ * number only says where on the page it sits.
+ */
+export const ManualItemContentSchema = z.object({
+  box: z.number().int().min(1).max(8),
+  mark: z.enum(MANUAL_MARKS),
+});
+
+export type ManualItemContentInput = z.infer<typeof ManualItemContentSchema>;
+
+/** The sheet as printed: eight boxes, one mark each, in reading order. */
+export function manualSheet(): ManualItemContentInput[] {
+  return MANUAL_MARKS.map((mark, index) => ({ box: index + 1, mark }));
 }

@@ -16,6 +16,10 @@ export function ReviewScoreCards({
   correctedScores,
   correctionReason,
 }: ReviewScoreCardsProps) {
+  // A drawing sheet scores nothing on purpose, so an empty block would read as
+  // a failed computation rather than as "read the pictures".
+  const hasScores = Object.keys(scores).length > 0;
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
@@ -26,9 +30,15 @@ export function ReviewScoreCards({
           <p>
             Pola: <span className="font-mono font-medium">{patternCode}</span>
           </p>
-          <pre className="overflow-x-auto rounded-lg bg-muted/50 p-3 font-mono text-xs">
-            {JSON.stringify(scores, null, 2)}
-          </pre>
+          {hasScores ? (
+            <pre className="overflow-x-auto rounded-lg bg-muted/50 p-3 font-mono text-xs">
+              {JSON.stringify(scores, null, 2)}
+            </pre>
+          ) : (
+            <p className="text-muted-foreground">
+              Tes ini tidak menghasilkan skor otomatis — hasilnya dibaca dari jawaban peserta.
+            </p>
+          )}
         </CardContent>
       </Card>
       <Card>
