@@ -68,7 +68,7 @@ export interface OptionScaleItemDraft {
   text?: string;
   options?: string[];
   scale?: string;
-  reverse?: boolean;
+  points?: number[];
 }
 
 /** A three-option item needs the statement, all three answers and its factor. */

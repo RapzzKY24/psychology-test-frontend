@@ -14,6 +14,7 @@ import {
   normalizePairNormContent,
   normalizeRankGroupContent,
   normalizeStyleGridContent,
+  optionScalePresetOf,
   slugify,
 } from "@/features/admin/tests-builder/schemas";
 
@@ -355,15 +356,15 @@ describe("OptionScaleItemContentSchema", () => {
     text: "Saya suka bekerja dalam kelompok.",
     options: ["Benar", "Ragu-ragu", "Salah"],
     scale: "A",
-    reverse: true,
+    points: [0, 1, 2],
   };
 
-  it("keeps the three options, the factor and the reverse flag on a reload", () => {
+  it("keeps the three options, the factor and the weights on a reload", () => {
     expect(normalizeOptionScaleContent(stored)).toEqual(stored);
     expect(OptionScaleItemContentSchema.parse(stored)).toEqual(stored);
   });
 
-  it("requires exactly three options", () => {
+  it("requires exactly three options and three weights", () => {
     expect(
       OptionScaleItemContentSchema.safeParse({ text: "a", options: ["x", "y"], scale: "A" }).success,
     ).toBe(false);
@@ -374,14 +375,37 @@ describe("OptionScaleItemContentSchema", () => {
         scale: "A",
       }).success,
     ).toBe(false);
+    expect(
+      OptionScaleItemContentSchema.safeParse({
+        text: "a",
+        options: ["x", "y", "z"],
+        scale: "A",
+        points: [1, 0],
+      }).success,
+    ).toBe(false);
+    expect(
+      OptionScaleItemContentSchema.safeParse({
+        text: "a",
+        options: ["x", "y", "z"],
+        scale: "A",
+        points: [0, 0, 0],
+      }).success,
+    ).toBe(false);
   });
 
-  it("pads a short draft so the editor always shows a, b and c", () => {
+  it("defaults a draft to the 2/1/0 weighting and pads the options", () => {
     expect(normalizeOptionScaleContent({ text: "a", options: ["satu"], scale: "md" })).toEqual({
       text: "a",
       options: ["satu", "", ""],
       scale: "MD",
-      reverse: false,
+      points: [2, 1, 0],
     });
+  });
+
+  it("names the preset a stored item uses", () => {
+    expect(optionScalePresetOf([2, 1, 0])).toBe("2-1-0");
+    expect(optionScalePresetOf([0, 1, 0])).toBe("0-1-0");
+    expect(optionScalePresetOf([1, 1, 0])).toBeNull();
+    expect(optionScalePresetOf(undefined)).toBe("2-1-0");
   });
 });

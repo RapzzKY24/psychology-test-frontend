@@ -182,9 +182,11 @@ export const LikertItemContentSchema = z.object({
 export type LikertItemContentInput = z.infer<typeof LikertItemContentSchema>;
 
 /**
- * One statement answered by picking one of three printed options (16PF). The
- * option order is what the participant reads, so `reverse` says the printed
- * order runs low-to-high for this item — `a` is not always the high pole.
+ * One statement answered by picking one of three printed options (16PF).
+ * `points` is the hidden key: what each option is worth. 16PF mixes two kinds —
+ * most items score 2/1/0 with the high pole printed first or last, while its
+ * factor-B items are right/wrong and give one point — so the weights have to
+ * live on the item rather than on the family.
  */
 export const OptionScaleItemContentSchema = z.object({
   text: z.string().trim().min(1, "Pernyataan wajib diisi.").max(2000),
@@ -192,10 +194,37 @@ export const OptionScaleItemContentSchema = z.object({
     .array(z.string().trim().min(1, "Pilihan wajib diisi.").max(500))
     .length(3, "Tepat tiga pilihan: a, b, dan c."),
   scale: LongScaleCodeSchema,
-  reverse: z.boolean().optional(),
+  points: z
+    .array(z.number().int().min(0).max(2))
+    .length(3, "Tepat tiga bobot: a, b, dan c.")
+    .refine((points) => Math.max(...points) > 0, {
+      message: "Minimal satu opsi harus bernilai lebih dari 0.",
+    })
+    .optional(),
 });
 
 export type OptionScaleItemContentInput = z.infer<typeof OptionScaleItemContentSchema>;
+
+/**
+ * The five weightings 16PF actually uses. The editor picks one of these rather
+ * than three free numbers, because a wrong weight silently changes a raw score
+ * and every sten after it.
+ */
+export const OPTION_SCALE_POINT_PRESETS = [
+  { value: "2-1-0", points: [2, 1, 0], label: "a tinggi — a=2, b=1, c=0" },
+  { value: "0-1-2", points: [0, 1, 2], label: "c tinggi — a=0, b=1, c=2" },
+  { value: "1-0-0", points: [1, 0, 0], label: "benar a — a=1, sisanya 0" },
+  { value: "0-1-0", points: [0, 1, 0], label: "benar b — b=1, sisanya 0" },
+  { value: "0-0-1", points: [0, 0, 1], label: "benar c — c=1, sisanya 0" },
+] as const;
+
+/** Which preset a stored item uses; null when its weights are custom. */
+export function optionScalePresetOf(points: number[] | undefined): string | null {
+  const found = OPTION_SCALE_POINT_PRESETS.find(
+    (preset) => preset.points.join() === (points ?? [2, 1, 0]).join(),
+  );
+  return found?.value ?? null;
+}
 
 /**
  * One interest field of a ranking instrument — RMIB spells them OUT, ME, S.S.
@@ -435,14 +464,18 @@ export function normalizeOptionScaleContent(content: unknown): OptionScaleItemCo
     text?: string;
     options?: string[];
     scale?: string;
-    reverse?: boolean;
+    points?: number[];
   };
   const options = raw.options ?? [];
+  const points =
+    Array.isArray(raw.points) && raw.points.length === 3
+      ? raw.points.map((value) => Number(value) || 0)
+      : [2, 1, 0];
   return {
     text: raw.text ?? "",
     options: [0, 1, 2].map((index) => options[index] ?? ""),
     scale: (raw.scale ?? "").toUpperCase(),
-    reverse: raw.reverse === true,
+    points,
   };
 }
 

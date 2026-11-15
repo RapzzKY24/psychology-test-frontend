@@ -2,8 +2,19 @@
 
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { BuilderController } from "../hooks/use-builder-form";
+import {
+  OPTION_SCALE_POINT_PRESETS,
+  optionScalePresetOf,
+} from "../schemas";
 import { ItemToolbar } from "./item-toolbar";
 
 interface OptionScaleItemEditorProps {
@@ -20,15 +31,15 @@ type ItemDraft = {
   text?: string;
   options?: string[];
   scale?: string;
-  reverse?: boolean;
+  points?: number[];
 };
 
 const OPTION_LABEL = ["a", "b", "c"];
 
 /**
  * Right pane: one three-option item — the statement, its printed answers, the
- * hidden factor and the flip flag. The participant sees only the statement and
- * the three options; `scale` and `reverse` stay server-side.
+ * hidden factor and what each option is worth. The participant sees only the
+ * statement and the three options; `scale` and `points` stay server-side.
  */
 export function OptionScaleItemEditor({
   builder,
@@ -41,8 +52,12 @@ export function OptionScaleItemEditor({
 }: OptionScaleItemEditorProps) {
   const { form } = builder;
   const content = form.watch(`items.${active}.content`) as unknown as ItemDraft | undefined;
-  const reverse = content?.reverse === true;
   const options = content?.options ?? [];
+  const points = content?.points ?? [2, 1, 0];
+  const preset = optionScalePresetOf(points);
+  // A seed can ship weights the five presets do not cover; showing them as a
+  // read-only entry keeps the select from silently rewriting the item.
+  const customLabel = `Khusus — a=${points[0]}, b=${points[1]}, c=${points[2]}`;
 
   const contentErrors = form.formState.errors.items?.[active]?.content as unknown as
     | {
@@ -133,31 +148,39 @@ export function OptionScaleItemEditor({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="option-scale-reverse">Arah skor</FieldLabel>
-          <label
-            htmlFor="option-scale-reverse"
-            className="flex h-9 items-center gap-2 text-sm text-muted-foreground"
+          <FieldLabel htmlFor="option-scale-points">Bobot jawaban</FieldLabel>
+          <Select
+            value={preset ?? "custom"}
+            disabled={locked}
+            onValueChange={(value) => {
+              const next = OPTION_SCALE_POINT_PRESETS.find((row) => row.value === value);
+              if (!next) return;
+              form.setValue(
+                `items.${active}.content.points`,
+                [...next.points] as never,
+                { shouldDirty: true },
+              );
+            }}
           >
-            <input
-              id="option-scale-reverse"
-              type="checkbox"
-              className="size-4"
-              checked={reverse}
-              disabled={locked}
-              onChange={(e) =>
-                form.setValue(`items.${active}.content.reverse`, e.target.checked as never, {
-                  shouldDirty: true,
-                })
-              }
-            />
-            Item reverse — pilihan c bernilai tinggi, a bernilai rendah
-          </label>
+            <SelectTrigger id="option-scale-points">
+              <SelectValue placeholder="Pilih bobot" />
+            </SelectTrigger>
+            <SelectContent>
+              {OPTION_SCALE_POINT_PRESETS.map((row) => (
+                <SelectItem key={row.value} value={row.value}>
+                  {row.label}
+                </SelectItem>
+              ))}
+              {preset === null && <SelectItem value="custom">{customLabel}</SelectItem>}
+            </SelectContent>
+          </Select>
         </Field>
       </div>
 
       <FieldDescription>
-        Pilihan a selalu bernilai 2 dan c bernilai 0, kecuali item ditandai reverse. Faktor yang
-        sama mengumpulkan beberapa item menjadi satu skor yang dikonversi ke sten.
+        Item 16PF biasanya bernilai 2/1/0 dengan kutub tinggi di a atau di c; butir faktor B
+        hanya memberi 1 poin untuk jawaban benar. Faktor yang sama mengumpulkan beberapa item
+        menjadi satu skor yang dikonversi ke sten.
       </FieldDescription>
     </>
   );
