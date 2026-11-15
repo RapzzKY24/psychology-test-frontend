@@ -8,10 +8,10 @@ import type { BuilderController } from "../hooks/use-builder-form";
 import { parseTimedGridLines, timedGridLines } from "../schemas";
 
 /**
- * A Pauli or Kraepelin sheet is 50 lajur of 26 gaps. Typing that into a
- * per-item editor would be 1.300 boxes, so the tab works the way the source
- * does: paste the whole sheet, one lajur per line, and the tab turns each line
- * into one item.
+ * A timed sheet runs from 50 lajur of 26 gaps (Kraepelin) to 80 lajur of 50
+ * (Pauli). Typing that into a per-item editor would be thousands of boxes, so
+ * the tab works the way the source does: paste the whole sheet, one lajur per
+ * line, and the tab turns each line into one item.
  */
 export function TimedGridItemsTab({
   builder,
