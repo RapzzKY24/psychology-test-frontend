@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,12 +15,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { isApiError } from "@/lib/api/client";
 import { qk } from "@/lib/api/query-keys";
 import type { AdminTest, AdminTestDetail } from "@/lib/api/types";
-import { updateTest } from "../api";
 import { TestSettingsSchema } from "../schemas";
 import type { TestSettingsInput } from "../schemas";
+import { useUpdateTestSettings } from "../hooks/use-update-test-settings";
 import { CoverImageUpload } from "./cover-image-upload";
 import { SettingsFields } from "./settings-fields";
 import { SettingsMetaFields } from "./settings-meta-fields";
@@ -64,27 +63,11 @@ export function SettingsModal({ detail, locked, onSaved, children }: SettingsMod
     });
   }, [detail, form]);
 
-  const mutation = useMutation({
-    mutationFn: async ({ timeLimitMin, ...values }: TestSettingsInput) => {
-      const { data } = await updateTest(detail.id, {
-        ...values,
-        timeLimitMin: timeLimitMin > 0 ? timeLimitMin : null,
-      });
-      return data;
-    },
-    meta: { silentError: true },
-    onSuccess: (updated) => {
-      void queryClient.invalidateQueries({ queryKey: qk.admin.tests.all });
-      toast.success("Pengaturan tes tersimpan.");
-      onSaved(updated);
-    },
-    onError: (error) => {
-      if (isApiError(error) && error.code === "slug already exists") {
-        form.setError("slug", { message: "Slug sudah dipakai tes lain." });
-        return;
-      }
-      toast.error(error instanceof Error ? error.message : "Terjadi kesalahan — coba lagi.");
-    },
+  const mutation = useUpdateTestSettings({
+    testId: detail.id,
+    onSlugTaken: () =>
+      form.setError("slug", { message: "Slug sudah dipakai tes lain." }),
+    onSaved,
   });
 
   return (

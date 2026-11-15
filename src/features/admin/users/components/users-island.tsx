@@ -1,10 +1,9 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import type { QueryKey } from "@tanstack/react-query";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
-import type { AdminUser, UserRole } from "@/lib/api/types";
-import { fetchAdminUsers } from "../api";
+import type { AdminUser } from "@/lib/api/types";
+import { useUsersList } from "../hooks/use-users-list";
 import { UsersTable } from "./users-table";
 
 /**
@@ -24,18 +23,12 @@ export function UsersIsland({
   role?: string;
   currentUserId: string;
 }) {
-  const { data } = useQuery({
-    queryKey: listKey,
-    queryFn: () => fetchAdminUsers({ page, role: role as UserRole | undefined }),
-    initialData: initial,
-  });
-
-  const tableMeta = data.meta ?? { page, limit: 10, total: data.data.length, totalPages: 1 };
+  const { rows, meta } = useUsersList({ listKey, initial, page, role });
 
   return (
     <UsersTable
-      rows={data.data}
-      meta={tableMeta}
+      rows={rows}
+      meta={meta}
       currentUserId={currentUserId}
       role={role}
       listKey={listKey}

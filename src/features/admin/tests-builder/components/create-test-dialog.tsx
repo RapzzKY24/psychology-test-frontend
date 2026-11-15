@@ -4,8 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,17 +15,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { isApiError } from "@/lib/api/client";
-import { qk } from "@/lib/api/query-keys";
-import { createTest } from "../api";
 import { CreateTestSchema, slugify } from "../schemas";
 import { DEFAULT_SCORER_BY_CATEGORY } from "../scorers";
 import type { CreateTestInput } from "../schemas";
+import { useCreateTest } from "../hooks/use-create-test";
 import { CreateTestFields } from "./create-test-fields";
 
 export function CreateTestButton() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [slugEdited, setSlugEdited] = useState(false);
   const [scorerEdited, setScorerEdited] = useState(false);
@@ -60,27 +55,15 @@ export function CreateTestButton() {
     }
   }, [category, scorerEdited, form]);
 
-  const mutation = useMutation({
-    mutationFn: async (values: CreateTestInput) => {
-      const { data } = await createTest(values);
-      return data;
-    },
-    meta: { silentError: true },
-    onSuccess: (created) => {
-      toast.success("Tes dibuat — lengkapi soal dan interpretasi.");
-      void queryClient.invalidateQueries({ queryKey: qk.admin.tests.all });
+  const mutation = useCreateTest({
+    onSlugTaken: () =>
+      form.setError("slug", { message: "Slug sudah dipakai tes lain." }),
+    onCreated: (created) => {
       setOpen(false);
       form.reset();
       setSlugEdited(false);
       setScorerEdited(false);
       router.push(`/admin/tes/${created.id}`);
-    },
-    onError: (error) => {
-      if (isApiError(error) && error.code === "slug already exists") {
-        form.setError("slug", { message: "Slug sudah dipakai tes lain." });
-        return;
-      }
-      toast.error(error instanceof Error ? error.message : "Terjadi kesalahan — coba lagi.");
     },
   });
 

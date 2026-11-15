@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import type { QueryKey } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -18,8 +17,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { AdminArticleListItem } from "@/lib/api/types";
-import { qk } from "@/lib/api/query-keys";
-import { fetchAdminArticleDetail } from "../api";
 import {
   ArticleFormSchema,
   buildArticlePayload,
@@ -28,6 +25,7 @@ import {
   toArticleFormDefaults,
 } from "../schemas";
 import type { ArticleFormInput } from "../schemas";
+import { useArticleDetail } from "../hooks/use-article-detail";
 import { useCreateArticle, useUpdateArticle } from "../hooks/use-article-mutations";
 import { ArticleFormFields } from "./article-form-fields";
 
@@ -53,18 +51,17 @@ export function ArticleFormDialog({ mode, listKey, article, trigger }: ArticleFo
   });
 
   // Edit mode needs the full body (list rows omit `content`).
-  const detail = useQuery({
-    queryKey: qk.admin.articles.detail(article?.id ?? ""),
-    queryFn: async () => (await fetchAdminArticleDetail(article?.id ?? "")).data,
-    enabled: open && mode === "edit" && Boolean(article),
-  });
+  const { data: detail, isLoading: detailLoading } = useArticleDetail(
+    article?.id,
+    open && mode === "edit",
+  );
 
   useEffect(() => {
-    if (mode !== "edit" || !detail.data) return;
-    form.reset(toArticleFormDefaults(detail.data));
-    setCoverPreview(detail.data.coverUrl);
+    if (mode !== "edit" || !detail) return;
+    form.reset(toArticleFormDefaults(detail));
+    setCoverPreview(detail.coverUrl);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset only when detail arrives
-  }, [detail.data, mode]);
+  }, [detail, mode]);
 
   const onSaved = () => {
     setOpen(false);
@@ -94,7 +91,7 @@ export function ArticleFormDialog({ mode, listKey, article, trigger }: ArticleFo
     mutation.mutate({ payload: buildArticlePayload(values), cover: coverFile });
   });
 
-  const loadingDetail = mode === "edit" && detail.isLoading;
+  const loadingDetail = mode === "edit" && detailLoading;
 
   return (
     <Dialog
@@ -108,7 +105,7 @@ export function ArticleFormDialog({ mode, listKey, article, trigger }: ArticleFo
           setCoverPreview(null);
         } else if (mode === "edit" && article) {
           // Prefer the cached detail (has content); fall back to list fields.
-          const d = detail.data;
+          const d = detail;
           form.reset({
             title: d?.title ?? article.title,
             slug: d?.slug ?? article.slug,

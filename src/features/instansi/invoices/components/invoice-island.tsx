@@ -2,23 +2,19 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CheckCircle2, Clock, Download, ExternalLink, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CopyInviteButton } from "@/components/shared/copy-invite-button";
-import { fetchInstansiSessionDetail } from "@/features/instansi/sessions/api";
 import { formatIdr } from "@/lib/format/format-idr";
-import { qk } from "@/lib/api/query-keys";
 import type { InstansiInvoice } from "@/lib/api/types";
-import { fetchInstansiInvoice } from "../api";
+import { useInvoiceCheckout } from "../hooks/use-invoice-checkout";
 import { useDownloadInstansiInvoicePdf } from "../hooks/use-download-instansi-invoice-pdf";
 import { useRetryInvoicePayment } from "../hooks/use-retry-invoice-payment";
 import { useShowAfterMs } from "../hooks/use-show-after-ms";
 import {
-  INVOICE_POLL_MS,
   INVOICE_RETRY_AFTER_MS,
   INVOICE_STATUS_LABEL,
   bankLabel,
@@ -31,16 +27,10 @@ import { InvoiceCountdown } from "./invoice-countdown";
  * then reveals the shareable invite link (token from the session detail).
  */
 export function InvoiceIsland({ initial }: { initial: InstansiInvoice }) {
-  const invoiceQuery = useQuery({
-    queryKey: qk.instansi.invoices.detail(initial.id),
-    queryFn: async () => (await fetchInstansiInvoice(initial.id)).data,
-    initialData: initial,
-    refetchInterval: (query) => (query.state.data?.status === "UNPAID" ? INVOICE_POLL_MS : false),
-  });
+  const { invoice, token } = useInvoiceCheckout(initial);
 
   const router = useRouter();
   const download = useDownloadInstansiInvoicePdf();
-  const invoice = invoiceQuery.data;
   const isPaid = invoice.status === "PAID";
   const wasPaid = useRef(initial.status === "PAID");
   const retry = useRetryInvoicePayment(invoice.id);
@@ -59,15 +49,6 @@ export function InvoiceIsland({ initial }: { initial: InstansiInvoice }) {
     toast.success("Pembayaran diterima — sesi aktif.");
     router.push("/instansi");
   }, [isPaid, router]);
-
-  const sessionQuery = useQuery({
-    queryKey: qk.instansi.sessions.detail(invoice.sessionId ?? "none"),
-    queryFn: async () => (await fetchInstansiSessionDetail(invoice.sessionId as string)).data,
-    enabled: isPaid && invoice.sessionId !== null,
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const token = sessionQuery.data?.session.token;
 
   return (
     <Card className="max-w-xl">
