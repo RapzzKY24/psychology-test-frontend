@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { TEST_CATEGORIES, type TestCategory } from "@/lib/api/types";
 import { fetchPublicTestsServer } from "@/features/public/api";
 import { TestBuyCta } from "@/features/public/components/test-buy-cta";
 import { TestCard } from "@/features/public/components/test-card";
 import { TestCategoryFilters } from "@/features/public/components/test-category-filters";
+import { TestPagination } from "@/features/public/components/test-pagination";
 import { getServerSession } from "@/lib/api/server";
 
 export const metadata: Metadata = {
@@ -20,14 +19,6 @@ function parseCategory(value: string | string[] | undefined): TestCategory | und
   return first && (TEST_CATEGORIES as readonly string[]).includes(first)
     ? (first as TestCategory)
     : undefined;
-}
-
-function pageHref(category: TestCategory | undefined, page: number): string {
-  const params = new URLSearchParams();
-  if (category) params.set("category", category);
-  if (page > 1) params.set("page", String(page));
-  const qs = params.toString();
-  return qs ? `/tes?${qs}` : "/tes";
 }
 
 export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">) {
@@ -73,25 +64,7 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
       )}
 
       {meta && meta.totalPages > 1 ? (
-        <nav className="flex items-center justify-between gap-4" aria-label="Navigasi halaman">
-          {page > 1 ? (
-            <Button asChild variant="outline" className="rounded-full">
-              <Link href={pageHref(category, page - 1)}>Sebelumnya</Link>
-            </Button>
-          ) : (
-            <span />
-          )}
-          <span className="text-sm text-muted-foreground">
-            Halaman {meta.page} dari {meta.totalPages}
-          </span>
-          {page < meta.totalPages ? (
-            <Button asChild variant="outline" className="rounded-full">
-              <Link href={pageHref(category, page + 1)}>Berikutnya</Link>
-            </Button>
-          ) : (
-            <span />
-          )}
-        </nav>
+        <TestPagination page={page} totalPages={meta.totalPages} category={category} />
       ) : null}
     </main>
   );

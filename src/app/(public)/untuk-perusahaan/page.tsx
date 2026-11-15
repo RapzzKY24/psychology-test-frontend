@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Building2, MessageCircle, ShieldCheck, Users } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { CompanyCta } from "@/features/public/components/company-cta";
+import { CompanyPerks } from "@/features/public/components/company-perks";
+import { CompanySteps } from "@/features/public/components/company-steps";
 import { buildWhatsAppLink } from "@/features/public/whatsapp";
 import { getServerSession } from "@/lib/api/server";
 import { whatsappNumber } from "@/lib/env";
@@ -22,31 +24,6 @@ const WA_TEMPLATE = "Saya dari [nama perusahaan] ingin mengkonsultasikan [topik]
 export default async function UntukPerusahaanPage() {
   const session = await getServerSession();
   const waLink = buildWhatsAppLink(whatsappNumber, WA_TEMPLATE);
-
-  const perks = [
-    {
-      icon: Users,
-      title: "Pemetaan tim",
-      body: "Kepribadian, gaya kerja, dan minat tiap karyawan dalam satu sesi terjadwal.",
-    },
-    {
-      icon: ShieldCheck,
-      title: "Hasil terlulusi",
-      body: "Laporan psikolog resmi + verifikasi QR, cocok untuk kebutuhan HR & compliance.",
-    },
-    {
-      icon: Building2,
-      title: "Slot prabayar",
-      body: "Beli kuota slot instansi, lalu daftarkan peserta kapan saja.",
-    },
-  ];
-
-  const steps = [
-    { title: "Daftar instansi", body: "Isi data instansi dan akun akuntabilitas (PIC HR)." },
-    { title: "Pilih paket & beli slot", body: "Pilih paket sesuai jumlah peserta & durasi." },
-    { title: "Daftarkan peserta", body: "Masukkan data peserta; admin bisa mengirim undangan." },
-    { title: "Terima hasil", body: "Bagi hasil per orang atau kelompok, verifikasi psikolog." },
-  ];
 
   return (
     <main className="mx-auto w-full max-w-5xl space-y-12 px-4 py-12 sm:px-6">
@@ -72,59 +49,9 @@ export default async function UntukPerusahaanPage() {
         </div>
       </section>
 
-      <section className="grid gap-5 sm:grid-cols-3">
-        {perks.map((perk) => (
-          <Card key={perk.title} className="rounded-2xl">
-            <CardContent className="space-y-3 p-6">
-              <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <perk.icon className="size-5" aria-hidden />
-              </span>
-              <h2 className="font-semibold">{perk.title}</h2>
-              <p className="text-sm text-muted-foreground">{perk.body}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </section>
-
-      <section className="space-y-5">
-        <h2 className="text-2xl font-semibold tracking-tight">Alur Paket Instansi</h2>
-        <ol className="space-y-4">
-          {steps.map((step, index) => (
-            <li key={step.title} className="flex gap-4">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                {index + 1}
-              </span>
-              <div>
-                <p className="font-medium">{step.title}</p>
-                <p className="text-sm text-muted-foreground">{step.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-        >
-          Kembali ke beranda
-          <ArrowRight className="size-4" aria-hidden />
-        </Link>
-      </section>
-
-      <section className="rounded-2xl border bg-card p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
-        <div className="space-y-1">
-          <h2 className="font-semibold">Belum yakin paketnya?</h2>
-          <p className="text-sm text-muted-foreground">
-            Ceritakan kebutuhan tim Anda — jumlah peserta, jenis posisi, dan tenggatnya. Kami bantu
-            pilih paket yang paling pas.
-          </p>
-        </div>
-        <Button asChild className="mt-4 shrink-0 rounded-full sm:mt-0">
-          <a href={waLink} target="_blank" rel="noopener noreferrer">
-            <MessageCircle className="size-4" aria-hidden />
-            Konsultasi via WhatsApp
-          </a>
-        </Button>
-      </section>
+      <CompanyPerks />
+      <CompanySteps />
+      <CompanyCta waLink={waLink} />
     </main>
   );
 }
