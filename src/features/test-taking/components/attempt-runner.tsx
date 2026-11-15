@@ -3,6 +3,7 @@
 import { AttemptCompleteScreen } from "./attempt-complete-screen";
 import { DiscItemView } from "./disc-item-view";
 import { LikertItemView } from "./likert-item-view";
+import { ManualItemView } from "./manual-item-view";
 import { MarkGroupItemView } from "./mark-group-item-view";
 import { OptionScaleItemView } from "./option-scale-item-view";
 import { PairItemView } from "./pair-item-view";
@@ -14,7 +15,7 @@ import { RunnerNavPanel } from "./runner-nav-panel";
 import { TimedGridItemView } from "./timed-grid-item-view";
 import { useAttemptRunner } from "../hooks/use-attempt-runner";
 import { resolveScorerType } from "../registry";
-import type { AttemptRead } from "@/lib/api/types";
+import type { AttemptRead, ManualMark } from "@/lib/api/types";
 
 interface AttemptRunnerProps {
   attempt: AttemptRead;
@@ -76,6 +77,18 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
             disabled={runner.timeUp}
             onChange={runner.answerTimedGrid}
             onComplete={runner.finishTimedGridColumn}
+          />
+        ) : runner.usesManualView && runner.item ? (
+          <ManualItemView
+            key={runner.item.id}
+            attemptId={attempt.id}
+            itemId={runner.item.id}
+            box={typeof runner.content.box === "number" ? runner.content.box : 1}
+            mark={runner.content.mark as ManualMark}
+            imageUrl={runner.manualImageUrl}
+            participantToken={participantToken}
+            disabled={runner.timeUp}
+            onSaved={runner.saveManualDrawing}
           />
         ) : runner.usesMarkView ? (
           <MarkGroupItemView

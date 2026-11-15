@@ -94,6 +94,20 @@ export function isAnsweredRanks(value: unknown): boolean {
   return ranks.length >= 2 && ranks.every((rank) => rank > 0);
 }
 
+/**
+ * A drawing answer holds the server path of one PNG. There is no partial
+ * state: the box is answered once an upload succeeded, and a failed upload
+ * leaves the item blank.
+ */
+export function toManualImage(value: unknown): string | null {
+  const v = value as { imageUrl?: unknown } | undefined;
+  return typeof v?.imageUrl === "string" && v.imageUrl.length > 0 ? v.imageUrl : null;
+}
+
+export function isAnsweredManual(value: unknown): boolean {
+  return toManualImage(value) !== null;
+}
+
 export function isAnsweredDisc(value: unknown): value is DiscResponse {
   const v = value as DiscResponse | undefined;
   return v !== undefined && v.most >= 0 && v.least >= 0;
@@ -119,6 +133,7 @@ export function isAnsweredValue(scorerType: ScorerType, value: unknown): boolean
   if (scorerType === "OPTION_SCALE") return toOptionChoice(value) !== null;
   if (scorerType === "RANK_GROUP") return isAnsweredRanks(value);
   if (scorerType === "MARK_GROUP") return isAnsweredMarks(value);
+  if (scorerType === "MANUAL") return isAnsweredManual(value);
   if (scorerType === "TIMED_GRID") return isAnsweredTimedGrid(value);
   return isAnsweredRightWrong(value);
 }

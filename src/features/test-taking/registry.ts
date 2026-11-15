@@ -1,6 +1,7 @@
 import type { ScorerType } from "@/lib/api/types";
 import { DiscItemView } from "./components/disc-item-view";
 import { LikertItemView } from "./components/likert-item-view";
+import { ManualItemView } from "./components/manual-item-view";
 import { MarkGroupItemView } from "./components/mark-group-item-view";
 import { OptionScaleItemView } from "./components/option-scale-item-view";
 import { PairItemView } from "./components/pair-item-view";
@@ -18,6 +19,9 @@ export const ITEM_RENDERERS = {
   FORCED_CHOICE_PAIR: PairItemView,
   // A Likert item is one statement plus a rating scale — its own view.
   LIKERT: LikertItemView,
+  // A drawing box is a canvas with a printed mark under it — the answer is a
+  // picture, not a value, so no other view can stand in for it.
+  MANUAL: ManualItemView,
   // A marked list draws one row per activity with a + and a - column — the
   // shape of the answer sheet, not of any other family.
   MARK_GROUP: MarkGroupItemView,
@@ -55,10 +59,12 @@ function isValidScorerType(value: unknown): value is ScorerType {
 
 function sniffScorerType(items: Array<{ content: Record<string, unknown> }>): ScorerType {
   const first = items[0]?.content as
-    | { words?: unknown; statements?: unknown; digits?: unknown }
+    | { words?: unknown; statements?: unknown; digits?: unknown; mark?: unknown }
     | undefined;
   if (Array.isArray(first?.words)) return "FORCED_CHOICE_DISC";
   if (Array.isArray(first?.digits)) return "TIMED_GRID";
+  // A drawing box carries the printed mark instead of any text to answer.
+  if (typeof first?.mark === "string") return "MANUAL";
   if (Array.isArray(first?.statements)) return "FORCED_CHOICE_PAIR";
   return "RIGHT_WRONG_NORM";
 }

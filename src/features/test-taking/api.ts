@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
+import { parseErrorResponse, unwrapEnvelope } from "@/lib/api/error";
 import type { AttemptRead, AttemptComplete, Education, Gender } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 
@@ -45,4 +46,35 @@ export function completeAttempt(
     method: "POST",
     participantToken: participantToken ?? undefined,
   });
+}
+
+/**
+ * Multipart drawing upload. `apiFetch` serialises the body as JSON and sets
+ * that header, which would break a `FormData` upload, so this call goes out
+ * through plain `fetch` — same cookie + guest-token rules as the other
+ * attempt routes.
+ */
+export async function uploadItemImage(
+  attemptId: string,
+  itemId: string,
+  file: File,
+  participantToken?: string | undefined,
+): Promise<ApiSuccess<{ imageUrl: string }>> {
+  const body = new FormData();
+  body.append("file", file, file.name || "drawing.png");
+  const headers: Record<string, string> = {};
+  if (participantToken) headers["x-participant-token"] = participantToken;
+
+  const response = await fetch(`/api/v1/public/attempts/${attemptId}/items/${itemId}/image`, {
+    method: "POST",
+    headers,
+    credentials: "include",
+    body,
+  });
+  const text = await response.text();
+  const payload: unknown = text ? JSON.parse(text) : null;
+  if (!response.ok) {
+    throw parseErrorResponse(response.status, payload);
+  }
+  return unwrapEnvelope<{ imageUrl: string }>(payload);
 }

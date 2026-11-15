@@ -61,11 +61,34 @@ export interface PairItemContent {
   mapping: string[];
 }
 
+/**
+ * Printed mark inside a projective drawing box (MANUAL family). One mark per
+ * box, in reading order — the participant completes it rather than starting
+ * from an empty square.
+ */
+export const MANUAL_MARKS = [
+  "DOT",
+  "CURVE",
+  "BARS",
+  "SQUARE",
+  "DIAGONALS",
+  "AXES",
+  "DOTTED_ARC",
+  "ARC",
+] as const;
+export type ManualMark = (typeof MANUAL_MARKS)[number];
+
+/** Drawing-box item (ManualItemContentSchema). `mark` says what is printed in the box. */
+export interface ManualItemContent {
+  box: number;
+  mark: ManualMark;
+}
+
 /** Builder payload (`GET /api/v1/admin/tests/:id` — merged 2026-09-05, PR #6). */
 export interface AdminTestItem {
   id: string;
   order: number;
-  content: DiscItemContent | RightWrongItemContent | PairItemContent;
+  content: DiscItemContent | ManualItemContent | RightWrongItemContent | PairItemContent;
 }
 
 export interface AdminTestDetail extends AdminTest {
@@ -106,7 +129,9 @@ export interface DiscItemContent {
 
 /** Body of `PUT /api/v1/admin/tests/:id/items` (PutItemsSchema — content validated per scorerType in the service). */
 export interface PutItemsInput {
-  items: Array<{ content: DiscItemContent | RightWrongItemContent | PairItemContent }>;
+  items: Array<{
+    content: DiscItemContent | ManualItemContent | RightWrongItemContent | PairItemContent;
+  }>;
 }
 
 /** Body of `PUT /api/v1/admin/tests/:id/interpretations` (keyed by patternCode). */

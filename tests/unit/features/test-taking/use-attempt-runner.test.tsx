@@ -195,6 +195,19 @@ function timedAttempt(remainingSeconds: number): AttemptRead {
   };
 }
 
+function manualAttempt(responses: AttemptRead["responses"] = []): AttemptRead {
+  const attempt = rightWrongAttempt();
+  return {
+    ...attempt,
+    scorerType: "MANUAL",
+    responses,
+    items: [
+      { id: "item-1", order: 1, content: { box: 1, mark: "DOT" } },
+      { id: "item-2", order: 2, content: { box: 2, mark: "CURVE" } },
+    ],
+  };
+}
+
 function wrapper({ children }: { children: ReactNode }) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -452,6 +465,36 @@ describe("useAttemptRunner", () => {
     );
 
     expect(result.current.marks).toEqual({ liked: [0], disliked: [2] });
+    expect(result.current.answered).toEqual([true, false]);
+  });
+
+  it("records a saved drawing as the answer without moving on", async () => {
+    const { result } = renderRunner(manualAttempt());
+
+    expect(result.current.usesManualView).toBe(true);
+    expect(result.current.discValue).toBeUndefined();
+    expect(result.current.answered[0]).toBe(false);
+
+    const imageUrl = "/api/v1/public/attempts/attempt-1/items/item-1/image";
+    await act(async () => result.current.saveManualDrawing(imageUrl));
+
+    await waitFor(() =>
+      expect(putResponse).toHaveBeenCalledWith("attempt-1", "item-1", { imageUrl }, undefined),
+    );
+    expect(result.current.answered[0]).toBe(true);
+    // The participant presses Lanjut themselves — a drawing has no last stroke
+    // that completes the answer.
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 400)));
+    expect(result.current.safeIndex).toBe(0);
+  });
+
+  it("prefills a drawing saved earlier", () => {
+    const imageUrl = "/api/v1/public/attempts/attempt-1/items/item-1/image";
+    const { result } = renderRunner(
+      manualAttempt([{ itemId: "item-1", value: { imageUrl } }]),
+    );
+
+    expect(result.current.manualImageUrl).toBe(imageUrl);
     expect(result.current.answered).toEqual([true, false]);
   });
 

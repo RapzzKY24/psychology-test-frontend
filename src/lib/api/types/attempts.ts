@@ -45,6 +45,15 @@ export type Gender = "MALE" | "FEMALE";
 export type Education = "SMP_SMA" | "S1" | "UMUM";
 
 /**
+ * Drawing answer: the server-owned path of the saved PNG. The participant
+ * never sends a path of their own — the upload route writes the file and
+ * returns this value, so a row can only point at its own attempt.
+ */
+export interface ManualResponse {
+  imageUrl: string;
+}
+
+/**
  * Body of `PUT /api/v1/public/attempts/:id/responses` (PutResponseSchema).
  * `value` is scorer-specific.
  */
@@ -53,6 +62,7 @@ export interface PutResponseInput {
   value:
     | DiscResponse
     | LikertResponse
+    | ManualResponse
     | MarkGroupResponse
     | OptionScaleResponse
     | RankGroupResponse

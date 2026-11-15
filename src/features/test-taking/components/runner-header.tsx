@@ -25,6 +25,14 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       ada jawaban benar atau salah; jawaban tersimpan otomatis.
     </>
   ),
+  MANUAL: (
+    <>
+      Tiap kotak sudah berisi satu goresan kecil. Lengkapi menjadi{" "}
+      <span className="font-medium text-foreground">satu gambar utuh</span> — gambar apa saja, sesuai
+      yang pertama terlintas. Gambar baru terkirim setelah Anda menekan{" "}
+      <span className="font-medium text-foreground">Simpan gambar</span>.
+    </>
+  ),
   PAIR_TALLY: (
     <>
       Tiap soal berisi dua pernyataan — pilih{" "}

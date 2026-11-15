@@ -6,6 +6,7 @@ import { useRemainingSeconds } from "./use-remaining-seconds";
 import {
   isAnsweredValue,
   toChosen,
+  toManualImage,
   toMarks,
   toOptionChoice,
   toPairChoice,
@@ -24,6 +25,9 @@ const AUTO_ADVANCE_MS = {
   FORCED_CHOICE_DISC: 400,
   FORCED_CHOICE_PAIR: 350,
   LIKERT: 250,
+  // A drawing is saved with an explicit button, then the participant moves on
+  // themselves — there is no "the last stroke completed the answer" moment.
+  MANUAL: 0,
   MARK_GROUP: 300,
   OPTION_SCALE: 300,
   PAIR_NORM: 350,
@@ -91,6 +95,8 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   const usesOptionView = scorerType === "OPTION_SCALE";
   // A timed grid shows one lajur at a time and moves on by itself.
   const usesTimedGridView = scorerType === "TIMED_GRID";
+  // A drawing box holds one picture, uploaded by the view itself.
+  const usesManualView = scorerType === "MANUAL";
   const isAnswered = (value: unknown) => isAnsweredValue(scorerType, value);
   const total = attempt.items.length;
   const safeIndex = Math.min(index, Math.max(total - 1, 0));
@@ -271,6 +277,19 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     if (!isLast) goNext();
   }, [answers, goNext, isLast]);
 
+  /**
+   * The upload already happened inside the view, which answers with the path
+   * the server stored. Recording it here is what makes the box count as
+   * answered — the PNG itself never travels through this hook.
+   */
+  const saveManualDrawing = useCallback(
+    (imageUrl: string) => {
+      if (!item) return;
+      answers.answer(item.id, { imageUrl });
+    },
+    [answers, item],
+  );
+
   // Partial DISC picks must still render on return, so the raw value goes
   // through as-is; the view already treats a missing half as "not picked".
   const discValue =
@@ -280,6 +299,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     usesRankView ||
     usesMarkView ||
     usesOptionView ||
+    usesManualView ||
     usesTimedGridView
       ? undefined
       : (rawValue as DiscResponse | undefined);
@@ -291,12 +311,14 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     usesMarkView,
     usesOptionView,
     usesTimedGridView,
+    usesManualView,
     isPair,
     total,
     safeIndex,
     item,
     discValue,
     timedGridAnswers: toTimedGridAnswers(rawValue),
+    manualImageUrl: toManualImage(rawValue),
     pairChoice: toPairChoice(rawValue),
     optionChoice: toOptionChoice(rawValue),
     rating: toRating(rawValue),
@@ -327,6 +349,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     typeRightWrong,
     answerTimedGrid,
     finishTimedGridColumn,
+    saveManualDrawing,
     goNext,
     goPrev,
     finish,
