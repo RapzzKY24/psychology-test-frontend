@@ -3,6 +3,7 @@ import {
   isChoiceTallyItemReady,
   isMarkGroupItemReady,
   isPairItemReady,
+  isPairNormItemReady,
   isRankGroupItemReady,
   isRightWrongItemReady,
   isScaleTallyItemReady,
@@ -271,5 +272,29 @@ describe("isStyleGridItemReady", () => {
 
   it("is not ready while a code is missing", () => {
     expect(isStyleGridItemReady({ statements: ["kiri", "kanan"], mapping: ["DS", ""] })).toBe(false);
+  });
+});
+
+describe("isPairNormItemReady", () => {
+  it("is ready with two statements and two needs", () => {
+    expect(isPairNormItemReady({ statements: ["kiri", "kanan"], mapping: ["ACH", "DEF"] })).toBe(
+      true,
+    );
+  });
+
+  it("is ready when both statements score the same need", () => {
+    expect(isPairNormItemReady({ statements: ["kiri", "kanan"], mapping: ["ACH", "ACH"] })).toBe(
+      true,
+    );
+  });
+
+  it("is not ready while a statement is empty", () => {
+    expect(isPairNormItemReady({ statements: ["kiri", " "], mapping: ["ACH", "DEF"] })).toBe(false);
+  });
+
+  it("is not ready while a code is missing", () => {
+    expect(isPairNormItemReady({ statements: ["kiri", "kanan"], mapping: ["ACH", ""] })).toBe(
+      false,
+    );
   });
 });

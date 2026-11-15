@@ -24,6 +24,7 @@ export const SCORER_TYPES = [
   "FORCED_CHOICE_PAIR",
   "LIKERT",
   "MARK_GROUP",
+  "PAIR_NORM",
   "PAIR_TALLY",
   "RANK_GROUP",
   "RIGHT_WRONG_NORM",

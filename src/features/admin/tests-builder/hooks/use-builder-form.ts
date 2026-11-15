@@ -20,6 +20,7 @@ import {
   MarkGroupItemContentSchema,
   RankGroupItemContentSchema,
   RightWrongItemContentSchema,
+  PairNormItemContentSchema,
   ScaleTallyItemContentSchema,
   StyleGridItemContentSchema,
   normalizeChoiceTallyContent,
@@ -27,6 +28,7 @@ import {
   normalizeLikertContent,
   normalizePairContent,
   normalizeMarkGroupContent,
+  normalizePairNormContent,
   normalizeRankGroupContent,
   normalizeScaleTallyContent,
   normalizeStyleGridContent,
@@ -34,6 +36,7 @@ import {
   type DiscItemContentInput,
   type LikertItemContentInput,
   type PairItemContentInput,
+  type PairNormItemContentInput,
   type MarkGroupItemContentInput,
   type RankGroupItemContentInput,
   type RightWrongItemContentInput,
@@ -47,6 +50,7 @@ function itemContentSchemaFor(scorerType: string) {
     return PairItemContentSchema;
   }
   if (scorerType === "STYLE_GRID") return StyleGridItemContentSchema;
+  if (scorerType === "PAIR_NORM") return PairNormItemContentSchema;
   if (scorerType === "LIKERT") return LikertItemContentSchema;
   if (scorerType === "RANK_GROUP") return RankGroupItemContentSchema;
   if (scorerType === "MARK_GROUP") return MarkGroupItemContentSchema;
@@ -89,6 +93,7 @@ export type BuilderFormValues = {
       | DiscItemContentInput
       | LikertItemContentInput
       | PairItemContentInput
+      | PairNormItemContentInput
       | MarkGroupItemContentInput
       | RankGroupItemContentInput
       | RightWrongItemContentInput
@@ -107,6 +112,8 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
           ? normalizeItemContent(item.content)
           : detail.scorerType === "STYLE_GRID"
             ? normalizeStyleGridContent(item.content)
+            : detail.scorerType === "PAIR_NORM"
+            ? normalizePairNormContent(item.content)
             : detail.scorerType === "FORCED_CHOICE_PAIR" || detail.scorerType === "PAIR_TALLY"
             ? normalizePairContent(item.content)
             : detail.scorerType === "LIKERT"

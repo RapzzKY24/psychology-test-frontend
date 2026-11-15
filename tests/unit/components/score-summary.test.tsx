@@ -251,6 +251,55 @@ describe("ScoreSummary", () => {
     expect(screen.getByText("0/4 · Rendah")).toBeTruthy();
   });
 
+  it("names the dominant need and prints its percentile, not the raw count", () => {
+    render(
+      <ScoreSummary
+        scores={{
+          type: "ACH",
+          total: 225,
+          answered: 225,
+          normSet: "college",
+          gender: "FEMALE",
+          scales: {
+            ACH: { label: "Achievement", score: 17, max: 28, percent: 84, band: "Sedang" },
+            DEF: { label: "Deference", score: 9, max: 28, percent: 21, band: "Sedang" },
+          },
+          consistency: { raw: 12, max: 15, band: "Konsisten", valid: true },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Kebutuhan dominan")).toBeTruthy();
+    // The percentile heads the card and fills the bar of the same need.
+    expect(screen.getAllByText("84%")).toHaveLength(2);
+    expect(screen.getByText("225/225")).toBeTruthy();
+    // The bar is named after the need, not after its three-letter code.
+    expect(screen.getAllByText("Achievement").length).toBeGreaterThan(0);
+    expect(screen.queryByText("ACH")).toBeNull();
+    expect(screen.getByText("Konsistensi jawaban 12/15")).toBeTruthy();
+    expect(screen.getByText("Konsisten")).toBeTruthy();
+  });
+
+  it("flags an inconsistent protocol without a band name to guess", () => {
+    render(
+      <ScoreSummary
+        scores={{
+          type: "NUR",
+          total: 225,
+          answered: 225,
+          normSet: "college",
+          scales: {
+            NUR: { label: "Nurturance", score: 20, max: 28, percent: 88, band: "Tinggi" },
+          },
+          consistency: { raw: 6, max: 15, band: "Meragukan", valid: false },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Konsistensi jawaban 6/15")).toBeTruthy();
+    expect(screen.getByText("Meragukan")).toBeTruthy();
+  });
+
   it("draws the DISC profile from graph, not from the M/P counters", () => {
     render(
       <ScoreSummary scores={{ M: { D: 6 }, P: { D: 2 }, graph: { D: 12, I: 8, S: 5, C: 3 } }} />,

@@ -4,10 +4,12 @@ import {
   DiscItemContentSchema,
   LikertItemContentSchema,
   MarkGroupItemContentSchema,
+  PairNormItemContentSchema,
   RankGroupItemContentSchema,
   StyleGridItemContentSchema,
   normalizeLikertContent,
   normalizeMarkGroupContent,
+  normalizePairNormContent,
   normalizeRankGroupContent,
   normalizeStyleGridContent,
   slugify,
@@ -308,5 +310,40 @@ describe("StyleGridItemContentSchema", () => {
         mapping: ["DS", "MI"],
       }),
     ).toEqual({ statements: ["kiri", "kanan"], mapping: ["DS", "MI"] });
+  });
+});
+
+describe("PairNormItemContentSchema", () => {
+  it("accepts two statements that score the same need", () => {
+    expect(
+      PairNormItemContentSchema.safeParse({
+        statements: ["kiri", "kanan"],
+        mapping: ["ACH", "ACH"],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("accepts an item without a stem", () => {
+    expect(
+      PairNormItemContentSchema.safeParse({
+        statements: ["kiri", "kanan"],
+        mapping: ["ACH", "DEF"],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects two identical statements", () => {
+    expect(
+      PairNormItemContentSchema.safeParse({
+        statements: ["sama", "Sama"],
+        mapping: ["ACH", "DEF"],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("uppercases the codes and keeps a missing stem missing", () => {
+    expect(normalizePairNormContent({ statements: ["kiri", "kanan"], mapping: ["ach", "def"] })).toEqual(
+      { statements: ["kiri", "kanan"], mapping: ["ACH", "DEF"] },
+    );
   });
 });

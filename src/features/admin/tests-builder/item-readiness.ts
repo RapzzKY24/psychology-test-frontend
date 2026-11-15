@@ -86,6 +86,14 @@ export function isStyleGridItemReady(content: PairItemDraft | undefined): boolea
   return mapping.length === 2 && Boolean(mapping[0]) && Boolean(mapping[1]);
 }
 
+/**
+ * A normed pair needs both statements and both need codes, and the codes may be
+ * the same — EPPS's diagonal item scores one need on both sides on purpose.
+ */
+export function isPairNormItemReady(content: PairItemDraft | undefined): boolean {
+  return isStyleGridItemReady(content);
+}
+
 export interface RankGroupItemDraft {
   question?: string;
   options?: string[];

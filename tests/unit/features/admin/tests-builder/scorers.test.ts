@@ -11,6 +11,7 @@ describe("scorer options", () => {
       "RIGHT_WRONG_NORM",
       "FORCED_CHOICE_PAIR",
       "PAIR_TALLY",
+      "PAIR_NORM",
       "STYLE_GRID",
       "FORCED_CHOICE_DISC",
       "SCALE_TALLY",

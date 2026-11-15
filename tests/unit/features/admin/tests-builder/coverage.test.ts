@@ -8,6 +8,7 @@ import {
   likertSections,
   missingPatternCodes,
   markGroupPatternCodes,
+  pairNormPatternCodes,
   pairTallyPatternCodes,
   rankGroupPatternCodes,
   scaleTallyPatternCodes,
@@ -257,6 +258,25 @@ describe("markGroupPatternCodes", () => {
       "COMP",
       "S.S",
     ]);
+  });
+});
+
+describe("pairNormPatternCodes", () => {
+  const config = {
+    scales: [{ code: "ACH", label: "Achievement" }, { code: "def" }, { code: "ORD" }],
+  };
+
+  it("reads the declared scales, in config order", () => {
+    expect(pairNormPatternCodes(config)).toEqual(["ACH", "DEF", "ORD"]);
+  });
+
+  it("is empty when the config has no scale list", () => {
+    expect(pairNormPatternCodes(undefined)).toEqual([]);
+    expect(pairNormPatternCodes({})).toEqual([]);
+  });
+
+  it("feeds getPatternCodes for the family", () => {
+    expect(missingPatternCodes([], "PAIR_NORM", 2, [], config)).toEqual(["ACH", "DEF", "ORD"]);
   });
 });
 

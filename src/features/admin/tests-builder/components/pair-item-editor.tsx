@@ -15,7 +15,7 @@ interface PairItemEditorProps {
    * "pole" for a dichotomy (MBTI), "need" for a per-statement scale (PAPI),
    * "style" for a grid whose two statements may share one style (MSDT).
    */
-  codeKind?: "pole" | "need" | "style";
+  codeKind?: "pole" | "need" | "norm" | "style";
   onMove: (from: number, to: number) => void;
   onRemove: () => void;
   onDuplicate: () => void;
@@ -40,6 +40,11 @@ const CODE_COPY = {
     label: "Kebutuhan",
     placeholders: ["N", "G"] as const,
     hint: "Tiap pernyataan menambah skor satu kebutuhan; dua pernyataan dalam satu soal harus berbeda.",
+  },
+  norm: {
+    label: "Kebutuhan",
+    placeholders: ["ACH", "DEF"] as const,
+    hint: "Tiap pernyataan menambah skor satu kebutuhan; kedua pernyataan boleh menunjuk kebutuhan yang sama — butir seperti itu tidak dinilai.",
   },
   style: {
     label: "Gaya",

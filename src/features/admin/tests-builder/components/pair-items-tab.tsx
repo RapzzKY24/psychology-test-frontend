@@ -28,9 +28,11 @@ export function PairItemsTab({ builder, locked }: { builder: BuilderController; 
   const codeKind =
     builder.scorerType === "PAIR_TALLY"
       ? "need"
-      : builder.scorerType === "STYLE_GRID"
-        ? "style"
-        : "pole";
+      : builder.scorerType === "PAIR_NORM"
+        ? "norm"
+        : builder.scorerType === "STYLE_GRID"
+          ? "style"
+          : "pole";
   const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
   const watchedItems = builder.form.watch("items");
   const active = Math.min(builder.activeItem, Math.max(watchedItems.length - 1, 0));

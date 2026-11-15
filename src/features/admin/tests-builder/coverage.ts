@@ -218,6 +218,21 @@ export function styleGridPatternCodes(scoringConfig?: unknown): readonly string[
 }
 
 /**
+ * A normed pair's pattern codes are its declared needs — the highest percentile
+ * wins, so every need needs an interpretation.
+ */
+export function pairNormPatternCodes(scoringConfig?: unknown): readonly string[] {
+  const scales = (scoringConfig as { scales?: unknown } | undefined)?.scales;
+  if (!Array.isArray(scales)) return [];
+  const codes: string[] = [];
+  for (const scale of scales) {
+    const code = (scale as { code?: unknown } | undefined)?.code;
+    if (typeof code === "string" && code.trim()) codes.push(code.trim().toUpperCase());
+  }
+  return codes;
+}
+
+/**
  * Codes a test must cover before publish: a raw score uses every RAW_n, DISC
  * uses 1..40, a pair instrument derives them from its item mappings.
  */
@@ -237,6 +252,7 @@ export function getPatternCodes(
   // A style grid's codes are its profile table — the items only feed the
   // scales, so nothing can be derived from them.
   if (scorerType === "STYLE_GRID") return styleGridPatternCodes(scoringConfig);
+  if (scorerType === "PAIR_NORM") return pairNormPatternCodes(scoringConfig);
   if (scorerType === "RANK_GROUP") return rankGroupPatternCodes(itemContents ?? []);
   if (scorerType === "MARK_GROUP") return markGroupPatternCodes(itemContents ?? []);
   if (scorerType === "LIKERT") return likertPatternCodes(itemContents ?? [], scoringConfig);

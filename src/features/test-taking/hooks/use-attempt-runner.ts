@@ -23,6 +23,7 @@ const AUTO_ADVANCE_MS = {
   FORCED_CHOICE_PAIR: 350,
   LIKERT: 250,
   MARK_GROUP: 300,
+  PAIR_NORM: 350,
   PAIR_TALLY: 350,
   RANK_GROUP: 400,
   RIGHT_WRONG_NORM: 300,
@@ -67,6 +68,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     scorerType === "CHOICE_TALLY";
   const isPair =
     scorerType === "FORCED_CHOICE_PAIR" ||
+    scorerType === "PAIR_NORM" ||
     scorerType === "PAIR_TALLY" ||
     scorerType === "STYLE_GRID";
   const usesRatingView = scorerType === "LIKERT";

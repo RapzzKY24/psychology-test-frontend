@@ -144,19 +144,36 @@ interface Validity {
   max: number;
   band: string | null;
   valid: boolean;
+  /** What the count measures: KUDER's marked activities, EPPS's repeats. */
+  label: string;
 }
 
 /**
- * KUDER bands the count of marks on its flagged activities. The workbook calls
- * the protocol unusable when too few of them carry a mark, so the result page
- * says so instead of letting the reader take the percentiles at face value.
+ * KUDER bands the count of marks on its flagged activities and EPPS bands the
+ * count of repeated items answered the same way. Both decide whether the
+ * protocol is usable, so the result page says so instead of letting the reader
+ * take the percentiles at face value.
  */
 function validityOf(scores: Record<string, unknown>): Validity | null {
-  const value = scores.verification;
-  if (!isRecord(value)) return null;
+  const source = isRecord(scores.verification)
+    ? { value: scores.verification, label: "Skala validitas" }
+    : isRecord(scores.consistency)
+      ? { value: scores.consistency, label: "Konsistensi jawaban" }
+      : null;
+  if (!source) return null;
+
+  const { value } = source;
   if (typeof value.raw !== "number" || typeof value.max !== "number") return null;
   const band = typeof value.band === "string" && value.band.trim() ? value.band.trim() : null;
-  return { raw: value.raw, max: value.max, band, valid: band === "Valid" };
+  return {
+    raw: value.raw,
+    max: value.max,
+    band,
+    label: source.label,
+    // Families that know their own threshold say so; KUDER names the usable
+    // band "Valid", so its label is the fallback.
+    valid: typeof value.valid === "boolean" ? value.valid : band === "Valid",
+  };
 }
 
 function ValidityNote({ validity }: { validity: Validity }) {
@@ -177,12 +194,48 @@ function ValidityNote({ validity }: { validity: Validity }) {
       </span>
       <div className="min-w-0">
         <p className="font-medium tabular-nums">
-          Skala validitas {validity.raw}/{validity.max}
+          {validity.label} {validity.raw}/{validity.max}
         </p>
         {validity.band && <p className="text-muted-foreground">{validity.band}</p>}
       </div>
     </div>
   );
+}
+
+/**
+ * PAIR_NORM (EPPS) keeps the same per-scale shape as a tally but reads every
+ * score against its own percentile table, so the headline names the need whose
+ * percentile is highest and prints that percentile — not the raw count.
+ */
+function pairNormStats(scores: Record<string, unknown>): Stat[] | null {
+  // `normSet` is the family's own marker: it is always present on a PAIR_NORM
+  // result (null when the test ships no table) and never on a plain tally.
+  if (!("normSet" in scores)) return null;
+  const type = scores.type;
+  if (typeof type !== "string" || !type.trim()) return null;
+  if (!isRecord(scores.scales)) return null;
+  const top = scores.scales[type.trim()];
+  if (!isRecord(top) || typeof top.percent !== "number") return null;
+
+  const stats: Stat[] = [
+    {
+      key: "type",
+      label: "Kebutuhan dominan",
+      value: typeof top.label === "string" && top.label.trim() ? top.label.trim() : type.trim(),
+      icon: Fingerprint,
+    },
+    { key: "percent", label: "Persentil", value: `${top.percent}%`, icon: TrendingUp },
+  ];
+  const { answered, total } = scores;
+  if (typeof answered === "number" && typeof total === "number") {
+    stats.push({
+      key: "answered",
+      label: "Butir terjawab",
+      value: `${answered}/${total}`,
+      icon: ListChecks,
+    });
+  }
+  return stats;
 }
 
 /**
@@ -322,10 +375,12 @@ interface ScaleBar {
 function scaleBars(scores: Record<string, unknown>): ScaleBar[] | null {
   if (!isRecord(scores.scales)) return null;
   const bars: ScaleBar[] = [];
-  for (const [label, value] of Object.entries(scores.scales)) {
+  for (const [key, value] of Object.entries(scores.scales)) {
     if (!isRecord(value) || typeof value.percent !== "number") continue;
     bars.push({
-      label,
+      // A normed family prints the scale's own name (EPPS: "Achievement");
+      // the others only ship the code the workbook uses.
+      label: typeof value.label === "string" && value.label.trim() ? value.label.trim() : key,
       value: value.percent,
       band: typeof value.band === "string" ? value.band : undefined,
     });
@@ -466,6 +521,7 @@ export function ScoreSummary({ scores }: { scores: Record<string, unknown> }) {
     rightWrongStats(scores) ??
     likertStats(scores) ??
     styleGridStats(scores) ??
+    pairNormStats(scores) ??
     markStats(scores) ??
     rankStats(scores) ??
     tallyStats(scores) ??

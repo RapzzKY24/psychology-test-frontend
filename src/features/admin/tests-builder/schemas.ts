@@ -98,6 +98,15 @@ export const StyleGridItemContentSchema = z
 
 export type StyleGridItemContentInput = z.infer<typeof StyleGridItemContentSchema>;
 
+/**
+ * A normed pair (EPPS) is the same shape as a style-grid row: the stem is
+ * optional and both statements may score the **same** need — the 15 diagonal
+ * items of EPPS's answer grid do exactly that, and the scorer drops them
+ * instead of letting one pick add two points.
+ */
+export const PairNormItemContentSchema = StyleGridItemContentSchema;
+export type PairNormItemContentInput = StyleGridItemContentInput;
+
 /** One scale of a tally instrument — RIASEC uses R/I/A/S/E/C. */
 const ScaleCodeSchema = z
   .string()
@@ -491,4 +500,9 @@ export function slugify(name: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+/** EPPS items carry no stem, so a missing one stays missing instead of `""`. */
+export function normalizePairNormContent(content: unknown): PairNormItemContentInput {
+  return normalizeStyleGridContent(content);
 }

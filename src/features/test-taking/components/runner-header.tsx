@@ -66,6 +66,13 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       tidak disukai. Tidak ada jawaban benar atau salah; jawaban tersimpan otomatis.
     </>
   ),
+  PAIR_NORM: (
+    <>
+      Tiap soal berisi dua pernyataan — pilih{" "}
+      <span className="font-medium text-foreground">satu</span> yang lebih menggambarkan diri Anda.
+      Tidak ada jawaban benar atau salah; jawaban tersimpan otomatis.
+    </>
+  ),
   STYLE_GRID: (
     <>
       Tiap soal berisi dua pernyataan tentang cara Anda memimpin — pilih{" "}

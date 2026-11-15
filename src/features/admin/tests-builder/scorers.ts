@@ -31,6 +31,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
       "Tiap soal berisi dua pernyataan; peserta memilih satu. Tiap pernyataan menambah skor satu kebutuhan, dan kebutuhan yang paling sering dipilih menjadi hasil.",
   },
   {
+    value: "PAIR_NORM",
+    label: "Pasangan pernyataan bernorma (EPPS)",
+    description:
+      "Tiap soal berisi dua pernyataan; peserta memilih satu. Tiap pilihan menambah skor satu kebutuhan, lalu skor tiap kebutuhan dibaca sebagai persentil dari norma sesuai jenis kelamin. Butir yang kedua pernyataannya menunjuk kebutuhan yang sama tidak dinilai, dan jawaban pada butir berulang dipakai untuk menilai konsistensi.",
+  },
+  {
     value: "STYLE_GRID",
     label: "Pasangan pernyataan bergaya (MSDT)",
     description:

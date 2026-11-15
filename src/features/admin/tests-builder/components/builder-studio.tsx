@@ -36,6 +36,7 @@ function ItemsTabFor({
     case "RIGHT_WRONG_NORM":
       return <RightWrongItemsTab builder={builder} locked={builder.locked} testId={testId} />;
     case "FORCED_CHOICE_PAIR":
+    case "PAIR_NORM":
     case "PAIR_TALLY":
     case "STYLE_GRID":
       return <PairItemsTab builder={builder} locked={builder.locked} />;

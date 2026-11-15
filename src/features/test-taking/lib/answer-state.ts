@@ -87,6 +87,7 @@ export function isAnsweredValue(scorerType: ScorerType, value: unknown): boolean
   if (scorerType === "FORCED_CHOICE_DISC") return isAnsweredDisc(value);
   if (
     scorerType === "FORCED_CHOICE_PAIR" ||
+    scorerType === "PAIR_NORM" ||
     scorerType === "PAIR_TALLY" ||
     scorerType === "STYLE_GRID"
   ) {

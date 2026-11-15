@@ -22,6 +22,9 @@ export const ITEM_RENDERERS = {
   // A pair tally asks the same question ("pick one of two statements"); only
   // the scoring differs — every statement feeds a named scale.
   PAIR_TALLY: PairItemView,
+  // A normed pair tally is the same screen: EPPS picks one of two statements
+  // and the percentile table is read server-side.
+  PAIR_NORM: PairItemView,
   // A style grid is the same pick-one-of-two screen; the tally behind it rolls
   // the scales up into dimensions before it names a style.
   STYLE_GRID: PairItemView,

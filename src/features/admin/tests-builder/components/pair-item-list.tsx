@@ -3,14 +3,18 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { isPairItemReady, isStyleGridItemReady } from "../item-readiness";
+import {
+  isPairItemReady,
+  isPairNormItemReady,
+  isStyleGridItemReady,
+} from "../item-readiness";
 
 interface PairItemListProps {
   items: Array<{ content?: { question?: string; statements?: string[]; mapping?: string[] } }>;
   active: number;
   locked: boolean;
-  /** "style" rows may score the same code twice, so they read differently. */
-  codeKind?: "pole" | "need" | "style";
+  /** "style" and "norm" rows may score the same code twice. */
+  codeKind?: "pole" | "need" | "norm" | "style";
   onSelect: (index: number) => void;
   onAdd: () => void;
 }
@@ -41,7 +45,11 @@ export function PairItemList({
           const label =
             content?.question?.trim() || content?.statements?.[0]?.trim() || "(kosong)";
           const filled =
-            codeKind === "style" ? isStyleGridItemReady(content) : isPairItemReady(content);
+            codeKind === "style"
+              ? isStyleGridItemReady(content)
+              : codeKind === "norm"
+                ? isPairNormItemReady(content)
+                : isPairItemReady(content);
           return (
             <li key={idx}>
               <button
