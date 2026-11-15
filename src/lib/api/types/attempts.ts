@@ -24,6 +24,11 @@ export interface LikertResponse {
   rating: number;
 }
 
+/** Three-option answer: the index of the picked option (0 = a). */
+export interface OptionScaleResponse {
+  chosen: number;
+}
+
 /**
  * Ranking answer: one rank per option, `ranks[optionIndex]` counting from 1.
  * Every number from 1..N appears exactly once, so a half-filled group is not a
@@ -36,13 +41,22 @@ export interface RankGroupResponse {
 /** `MALE` / `FEMALE` — declared once when the instrument ships two item lists. */
 export type Gender = "MALE" | "FEMALE";
 
+/** Schooling level — declared once when the norm is banded by education (16PF). */
+export type Education = "SMP_SMA" | "S1" | "UMUM";
+
 /**
  * Body of `PUT /api/v1/public/attempts/:id/responses` (PutResponseSchema).
  * `value` is scorer-specific.
  */
 export interface PutResponseInput {
   itemId: string;
-  value: DiscResponse | LikertResponse | MarkGroupResponse | RankGroupResponse | RightWrongResponse;
+  value:
+    | DiscResponse
+    | LikertResponse
+    | MarkGroupResponse
+    | OptionScaleResponse
+    | RankGroupResponse
+    | RightWrongResponse;
 }
 
 /** `GET /api/v1/public/attempts/:id` (AttemptReadDto, verified). Items arrive sanitized: content only — never `mapping`/`correctIndex`. */
@@ -63,6 +77,10 @@ export interface AttemptRead {
   requiresGender: boolean;
   /** Declared sex; null on a test that does not ask. */
   gender: Gender | null;
+  /** The norm is banded by schooling, so the client must declare one first. */
+  requiresEducation: boolean;
+  /** Declared schooling; null on a test that does not ask. */
+  education: Education | null;
   items: Array<{ id: string; order: number; content: Record<string, unknown> }>;
   responses: Array<{ itemId: string; value: unknown }>;
 }

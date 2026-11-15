@@ -4,11 +4,13 @@ import {
   DiscItemContentSchema,
   LikertItemContentSchema,
   MarkGroupItemContentSchema,
+  OptionScaleItemContentSchema,
   PairNormItemContentSchema,
   RankGroupItemContentSchema,
   StyleGridItemContentSchema,
   normalizeLikertContent,
   normalizeMarkGroupContent,
+  normalizeOptionScaleContent,
   normalizePairNormContent,
   normalizeRankGroupContent,
   normalizeStyleGridContent,
@@ -345,5 +347,41 @@ describe("PairNormItemContentSchema", () => {
     expect(normalizePairNormContent({ statements: ["kiri", "kanan"], mapping: ["ach", "def"] })).toEqual(
       { statements: ["kiri", "kanan"], mapping: ["ACH", "DEF"] },
     );
+  });
+});
+
+describe("OptionScaleItemContentSchema", () => {
+  const stored = {
+    text: "Saya suka bekerja dalam kelompok.",
+    options: ["Benar", "Ragu-ragu", "Salah"],
+    scale: "A",
+    reverse: true,
+  };
+
+  it("keeps the three options, the factor and the reverse flag on a reload", () => {
+    expect(normalizeOptionScaleContent(stored)).toEqual(stored);
+    expect(OptionScaleItemContentSchema.parse(stored)).toEqual(stored);
+  });
+
+  it("requires exactly three options", () => {
+    expect(
+      OptionScaleItemContentSchema.safeParse({ text: "a", options: ["x", "y"], scale: "A" }).success,
+    ).toBe(false);
+    expect(
+      OptionScaleItemContentSchema.safeParse({
+        text: "a",
+        options: ["x", "y", "z", "w"],
+        scale: "A",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("pads a short draft so the editor always shows a, b and c", () => {
+    expect(normalizeOptionScaleContent({ text: "a", options: ["satu"], scale: "md" })).toEqual({
+      text: "a",
+      options: ["satu", "", ""],
+      scale: "MD",
+      reverse: false,
+    });
   });
 });

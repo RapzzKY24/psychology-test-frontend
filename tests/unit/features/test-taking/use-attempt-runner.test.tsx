@@ -26,6 +26,8 @@ function discAttempt(responses: AttemptRead["responses"] = [], itemCount = 3): A
     remainingSeconds: null,
     requiresGender: false,
     gender: null,
+    requiresEducation: false,
+    education: null,
     items: Array.from({ length: itemCount }, (_, i) => ({
       id: `item-${i + 1}`,
       order: i + 1,

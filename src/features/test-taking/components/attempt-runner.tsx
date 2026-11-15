@@ -4,6 +4,7 @@ import { AttemptCompleteScreen } from "./attempt-complete-screen";
 import { DiscItemView } from "./disc-item-view";
 import { LikertItemView } from "./likert-item-view";
 import { MarkGroupItemView } from "./mark-group-item-view";
+import { OptionScaleItemView } from "./option-scale-item-view";
 import { PairItemView } from "./pair-item-view";
 import { RankGroupItemView } from "./rank-group-item-view";
 import { RightWrongItemView } from "./right-wrong-item-view";
@@ -77,6 +78,15 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
             ranks={runner.ranks}
             disabled={runner.timeUp}
             onRank={runner.rank}
+          />
+        ) : runner.usesOptionView ? (
+          <OptionScaleItemView
+            order={runner.safeIndex + 1}
+            text={(runner.content.text as string | null) ?? ""}
+            options={(runner.content.options as string[]) ?? []}
+            chosen={runner.optionChoice}
+            disabled={runner.timeUp}
+            onChoose={runner.chooseOption}
           />
         ) : runner.usesRatingView ? (
           <LikertItemView

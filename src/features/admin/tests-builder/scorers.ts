@@ -78,6 +78,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
     description:
       "Tiap pernyataan dinilai pada skala angka (mis. 1–5). Skor tiap trait adalah jumlah nilai, dan trait dengan persentase tertinggi menjadi hasil — bisa diberi kategori Rendah/Sedang/Tinggi.",
   },
+  {
+    value: "OPTION_SCALE",
+    label: "Tiga pilihan berskala (16PF)",
+    description:
+      "Tiap pernyataan punya tiga pilihan jawaban (a/b/c). Tiap pilihan menambah skor satu faktor, lalu skor faktor dibaca sebagai sten dari tabel norma sesuai jenis kelamin dan jenjang pendidikan.",
+  },
 ] as const;
 
 export const DEFAULT_SCORER_BY_CATEGORY: Record<TestCategory, ScorerType> = {

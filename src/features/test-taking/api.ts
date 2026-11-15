@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import type { AttemptRead, AttemptComplete, Gender } from "@/lib/api/types";
+import type { AttemptRead, AttemptComplete, Education, Gender } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 
 /**
@@ -12,12 +12,14 @@ export function fetchAttempt(
   participantToken?: string | undefined,
   birthDate?: string | null,
   gender?: Gender | null,
+  education?: Education | null,
 ): Promise<ApiSuccess<AttemptRead>> {
-  // Only needed the first time a banded or gendered test is opened; the API
-  // stores both and later calls ignore the parameters.
+  // Only needed the first time a banded, gendered or education-banded test is
+  // opened; the API stores all three and later calls ignore the parameters.
   const params = new URLSearchParams();
   if (birthDate) params.set("birthDate", birthDate);
   if (gender) params.set("gender", gender);
+  if (education) params.set("education", education);
   const query = params.size > 0 ? `?${params.toString()}` : "";
   return apiFetch<AttemptRead>(`/public/attempts/${attemptId}${query}`, { participantToken });
 }

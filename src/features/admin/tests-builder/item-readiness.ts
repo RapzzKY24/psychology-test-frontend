@@ -64,8 +64,23 @@ export function isLikertItemReady(content: LikertItemDraft | undefined): boolean
   return /^[A-Za-z]{1,12}$/.test(content.scale?.trim() ?? "");
 }
 
-/** Both statements filled and mapped to two different poles. */
-export function isPairItemReady(content: PairItemDraft | undefined): boolean {
+export interface OptionScaleItemDraft {
+  text?: string;
+  options?: string[];
+  scale?: string;
+  reverse?: boolean;
+}
+
+/** A three-option item needs the statement, all three answers and its factor. */
+export function isOptionScaleItemReady(content: OptionScaleItemDraft | undefined): boolean {
+  if (!content) return false;
+  if (!content.text?.trim()) return false;
+  const options = content.options ?? [];
+  if (options.length !== 3 || !options.every((option) => option.trim().length > 0)) return false;
+  return /^[A-Za-z][A-Za-z0-9]{0,11}$/.test(content.scale?.trim() ?? "");
+}
+
+/** Both statements filled and mapped to two different poles. */export function isPairItemReady(content: PairItemDraft | undefined): boolean {
   if (!content) return false;
   if (!content.question?.trim()) return false;
   const statements = content.statements ?? [];

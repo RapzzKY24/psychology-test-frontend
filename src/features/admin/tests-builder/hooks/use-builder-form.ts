@@ -18,6 +18,7 @@ import {
   LikertItemContentSchema,
   PairItemContentSchema,
   MarkGroupItemContentSchema,
+  OptionScaleItemContentSchema,
   RankGroupItemContentSchema,
   RightWrongItemContentSchema,
   PairNormItemContentSchema,
@@ -28,6 +29,7 @@ import {
   normalizeLikertContent,
   normalizePairContent,
   normalizeMarkGroupContent,
+  normalizeOptionScaleContent,
   normalizePairNormContent,
   normalizeRankGroupContent,
   normalizeScaleTallyContent,
@@ -38,6 +40,7 @@ import {
   type PairItemContentInput,
   type PairNormItemContentInput,
   type MarkGroupItemContentInput,
+  type OptionScaleItemContentInput,
   type RankGroupItemContentInput,
   type RightWrongItemContentInput,
   type ScaleTallyItemContentInput,
@@ -52,6 +55,7 @@ function itemContentSchemaFor(scorerType: string) {
   if (scorerType === "STYLE_GRID") return StyleGridItemContentSchema;
   if (scorerType === "PAIR_NORM") return PairNormItemContentSchema;
   if (scorerType === "LIKERT") return LikertItemContentSchema;
+  if (scorerType === "OPTION_SCALE") return OptionScaleItemContentSchema;
   if (scorerType === "RANK_GROUP") return RankGroupItemContentSchema;
   if (scorerType === "MARK_GROUP") return MarkGroupItemContentSchema;
   if (scorerType === "SCALE_TALLY") return ScaleTallyItemContentSchema;
@@ -95,6 +99,7 @@ export type BuilderFormValues = {
       | PairItemContentInput
       | PairNormItemContentInput
       | MarkGroupItemContentInput
+      | OptionScaleItemContentInput
       | RankGroupItemContentInput
       | RightWrongItemContentInput
       | ScaleTallyItemContentInput
@@ -118,6 +123,8 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
             ? normalizePairContent(item.content)
             : detail.scorerType === "LIKERT"
               ? normalizeLikertContent(item.content)
+              : detail.scorerType === "OPTION_SCALE"
+              ? normalizeOptionScaleContent(item.content)
               : detail.scorerType === "SCALE_TALLY"
               ? normalizeScaleTallyContent(item.content)
               : detail.scorerType === "CHOICE_TALLY"

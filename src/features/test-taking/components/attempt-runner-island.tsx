@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AttemptAgeBlocked, AttemptAgeGate } from "./attempt-age-gate";
+import { AttemptEducationGate } from "./attempt-education-gate";
 import { AttemptGenderGate } from "./attempt-gender-gate";
 import { AttemptRunner } from "./attempt-runner";
 import { useAttempt } from "../hooks/use-attempt";
 import { isApiError } from "@/lib/api/client";
 import { getGuestTokenForAttempt } from "@/lib/guest-token";
-import type { Gender } from "@/lib/api/types";
+import type { Education, Gender } from "@/lib/api/types";
 
 const emptySubscribe = () => () => {};
 
@@ -30,10 +31,17 @@ export function AttemptRunnerIsland({ attemptId }: { attemptId: string }) {
   const token = mounted ? getGuestTokenForAttempt(attemptId) : null;
 
   // The API stores the first date it accepts, so this only has to survive the
-  // retry that unlocks a banded attempt. Same for the declared sex.
+  // retry that unlocks a banded attempt. Same for the declared sex and schooling.
   const [birthDate, setBirthDate] = useState<string | null>(null);
   const [gender, setGender] = useState<Gender | null>(null);
-  const query = useAttempt(attemptId, mounted ? token : null, birthDate, gender);
+  const [education, setEducation] = useState<Education | null>(null);
+  const query = useAttempt(
+    attemptId,
+    mounted ? token : null,
+    birthDate,
+    gender,
+    education,
+  );
 
   if (!mounted || query.isPending) {
     return (
@@ -65,6 +73,18 @@ export function AttemptRunnerIsland({ attemptId }: { attemptId: string }) {
             invalid={query.error.code === "gender_invalid"}
             initialValue={gender}
             onSubmit={setGender}
+          />
+        );
+      }
+      if (
+        query.error.code === "education_required" ||
+        query.error.code === "education_invalid"
+      ) {
+        return (
+          <AttemptEducationGate
+            invalid={query.error.code === "education_invalid"}
+            initialValue={education}
+            onSubmit={setEducation}
           />
         );
       }

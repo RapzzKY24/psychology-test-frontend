@@ -51,7 +51,7 @@ describe("AttemptRunnerIsland age gate", () => {
     fireEvent.click(screen.getByRole("button", { name: "Lanjutkan" }));
 
     await waitFor(() => {
-      expect(fetchAttempt).toHaveBeenCalledWith("attempt-1", "tok", "2012-08-01", null);
+      expect(fetchAttempt).toHaveBeenCalledWith("attempt-1", "tok", "2012-08-01", null, null);
     });
   });
 

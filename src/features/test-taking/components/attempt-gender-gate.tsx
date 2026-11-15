@@ -7,16 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import type { Gender } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
-const OPTIONS: { value: Gender; label: string; hint: string }[] = [
-  { value: "MALE", label: "Laki-laki", hint: "Daftar pekerjaan kolom kiri" },
-  { value: "FEMALE", label: "Perempuan", hint: "Daftar pekerjaan kolom kanan" },
+const OPTIONS: { value: Gender; label: string }[] = [
+  { value: "MALE", label: "Laki-laki" },
+  { value: "FEMALE", label: "Perempuan" },
 ];
 
 /**
- * Shown when the instrument ships two item lists (RMIB) and the attempt has no
- * gender yet. The API rejects the read with `gender_required`, so this screen
- * is the only way forward; the value is stored server-side on the first
- * successful read and cannot be changed afterwards.
+ * Shown when the instrument needs the participant's sex before it can be
+ * scored — RMIB prints two item lists, 16PF reads a different sten table. The
+ * API rejects the read with `gender_required`, so this screen is the only way
+ * forward; the value is stored server-side on the first successful read and
+ * cannot be changed afterwards.
  */
 export function AttemptGenderGate({
   invalid,
@@ -39,8 +40,9 @@ export function AttemptGenderGate({
           </span>
           <CardTitle>Konfirmasi jenis kelamin peserta</CardTitle>
           <CardDescription>
-            Tes ini memakai dua daftar pekerjaan yang berbeda. Pilih jenis kelamin peserta supaya
-            daftar yang tampil sesuai — pilihan ini tidak bisa diubah setelah tes dimulai.
+            Tes ini memakai materi dan norma yang berbeda untuk laki-laki dan perempuan. Pilih
+            jenis kelamin peserta supaya penilaiannya tepat — pilihan ini tidak bisa diubah
+            setelah tes dimulai.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -67,7 +69,6 @@ export function AttemptGenderGate({
                   )}
                 >
                   <span className="font-medium">{option.label}</span>
-                  <span className="text-xs text-muted-foreground">{option.hint}</span>
                 </button>
               ))}
             </div>

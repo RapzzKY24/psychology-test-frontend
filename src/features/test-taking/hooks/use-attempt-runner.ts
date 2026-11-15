@@ -7,6 +7,7 @@ import {
   isAnsweredValue,
   toChosen,
   toMarks,
+  toOptionChoice,
   toPairChoice,
   toRanks,
   toRating,
@@ -23,6 +24,7 @@ const AUTO_ADVANCE_MS = {
   FORCED_CHOICE_PAIR: 350,
   LIKERT: 250,
   MARK_GROUP: 300,
+  OPTION_SCALE: 300,
   PAIR_NORM: 350,
   PAIR_TALLY: 350,
   RANK_GROUP: 400,
@@ -74,6 +76,8 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   const usesRatingView = scorerType === "LIKERT";
   const usesRankView = scorerType === "RANK_GROUP";
   const usesMarkView = scorerType === "MARK_GROUP";
+  // A three-option statement draws text buttons (a/b/c), not a rating row.
+  const usesOptionView = scorerType === "OPTION_SCALE";
   const isAnswered = (value: unknown) => isAnsweredValue(scorerType, value);
   const total = attempt.items.length;
   const safeIndex = Math.min(index, Math.max(total - 1, 0));
@@ -190,6 +194,16 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     [advance, answers, isLast, item],
   );
 
+  /** A three-option item holds one pick, so a single click is complete too. */
+  const chooseOption = useCallback(
+    (chosen: number) => {
+      if (!item) return;
+      answers.answer(item.id, { chosen });
+      if (!isLast) advance();
+    },
+    [advance, answers, isLast, item],
+  );
+
   const typeRightWrong = useCallback(
     (text: string) => {
       if (!item) return;
@@ -228,7 +242,12 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   // Partial DISC picks must still render on return, so the raw value goes
   // through as-is; the view already treats a missing half as "not picked".
   const discValue =
-    usesChoiceView || isPair || usesRatingView || usesRankView || usesMarkView
+    usesChoiceView ||
+    isPair ||
+    usesRatingView ||
+    usesRankView ||
+    usesMarkView ||
+    usesOptionView
       ? undefined
       : (rawValue as DiscResponse | undefined);
 
@@ -237,12 +256,14 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     usesRatingView,
     usesRankView,
     usesMarkView,
+    usesOptionView,
     isPair,
     total,
     safeIndex,
     item,
     discValue,
     pairChoice: toPairChoice(rawValue),
+    optionChoice: toOptionChoice(rawValue),
     rating: toRating(rawValue),
     ranks: toRanks(rawValue),
     marks: toMarks(rawValue),
@@ -264,6 +285,7 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     selectDisc,
     chooseRightWrong,
     choosePair,
+    chooseOption,
     rate,
     rank,
     mark,

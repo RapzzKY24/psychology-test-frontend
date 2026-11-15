@@ -182,6 +182,22 @@ export const LikertItemContentSchema = z.object({
 export type LikertItemContentInput = z.infer<typeof LikertItemContentSchema>;
 
 /**
+ * One statement answered by picking one of three printed options (16PF). The
+ * option order is what the participant reads, so `reverse` says the printed
+ * order runs low-to-high for this item — `a` is not always the high pole.
+ */
+export const OptionScaleItemContentSchema = z.object({
+  text: z.string().trim().min(1, "Pernyataan wajib diisi.").max(2000),
+  options: z
+    .array(z.string().trim().min(1, "Pilihan wajib diisi.").max(500))
+    .length(3, "Tepat tiga pilihan: a, b, dan c."),
+  scale: LongScaleCodeSchema,
+  reverse: z.boolean().optional(),
+});
+
+export type OptionScaleItemContentInput = z.infer<typeof OptionScaleItemContentSchema>;
+
+/**
  * One interest field of a ranking instrument — RMIB spells them OUT, ME, S.S.
  * The dot is allowed because the workbook keeps it in "s.s" (social service).
  */
@@ -410,6 +426,23 @@ export function normalizeLikertContent(content: unknown): LikertItemContentInput
     // Preserved, not edited: dropping it here would silently move every MSAI
     // item out of its section the first time an admin saves the test.
     ...(section ? { section } : {}),
+  };
+}
+
+/** A three-option row always has three slots, so the form never loses one. */
+export function normalizeOptionScaleContent(content: unknown): OptionScaleItemContentInput {
+  const raw = (content ?? {}) as {
+    text?: string;
+    options?: string[];
+    scale?: string;
+    reverse?: boolean;
+  };
+  const options = raw.options ?? [];
+  return {
+    text: raw.text ?? "",
+    options: [0, 1, 2].map((index) => options[index] ?? ""),
+    scale: (raw.scale ?? "").toUpperCase(),
+    reverse: raw.reverse === true,
   };
 }
 

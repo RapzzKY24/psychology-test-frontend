@@ -388,6 +388,25 @@ function scaleBars(scores: Record<string, unknown>): ScaleBar[] | null {
   return bars.length > 0 ? bars : null;
 }
 
+/**
+ * 16PF reports a sten (1–10) per factor instead of a percent, so the bar is the
+ * sten against its own ceiling and the number next to it is the sten itself.
+ */
+function stenBars(scores: Record<string, unknown>): ScaleBar[] | null {
+  if (!isRecord(scores.scales)) return null;
+  const max = typeof scores.stenMax === "number" && scores.stenMax > 0 ? scores.stenMax : 10;
+  const bars: ScaleBar[] = [];
+  for (const [key, value] of Object.entries(scores.scales)) {
+    if (!isRecord(value) || typeof value.sten !== "number") continue;
+    bars.push({
+      label: key,
+      value: Math.round((value.sten / max) * 100),
+      display: `sten ${value.sten}`,
+    });
+  }
+  return bars.length > 0 ? bars : null;
+}
+
 interface SectionRow {
   label: string;
   /** Percent per section, in the same order as the table's columns. */
@@ -526,7 +545,7 @@ export function ScoreSummary({ scores }: { scores: Record<string, unknown> }) {
     rankStats(scores) ??
     tallyStats(scores) ??
     typeStats(scores);
-  const scales = styleGridBars(scores) ?? scaleBars(scores);
+  const scales = styleGridBars(scores) ?? stenBars(scores) ?? scaleBars(scores);
   const table = sectionTable(scores);
   const validity = validityOf(scores);
 

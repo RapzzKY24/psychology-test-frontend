@@ -203,6 +203,21 @@ export function likertPatternCodes(
 }
 
 /**
+ * A three-option inventory names one factor per item, and the profile has no
+ * band suffix — the pattern code is the factor itself (16PF's 17 codes).
+ */
+export function optionScalePatternCodes(contents: unknown[]): readonly string[] {
+  const scales = new Set<string>();
+  for (const content of contents) {
+    const raw = content as { scale?: unknown } | undefined;
+    if (typeof raw?.scale !== "string") continue;
+    const code = raw.scale.trim().toUpperCase();
+    if (code) scales.add(code);
+  }
+  return [...scales];
+}
+
+/**
  * A style grid's pattern codes are the profile table it was seeded with — one
  * code per high/low combination, in the order the config lists them.
  */
@@ -256,6 +271,7 @@ export function getPatternCodes(
   if (scorerType === "RANK_GROUP") return rankGroupPatternCodes(itemContents ?? []);
   if (scorerType === "MARK_GROUP") return markGroupPatternCodes(itemContents ?? []);
   if (scorerType === "LIKERT") return likertPatternCodes(itemContents ?? [], scoringConfig);
+  if (scorerType === "OPTION_SCALE") return optionScalePatternCodes(itemContents ?? []);
   if (scorerType === "SCALE_TALLY") return scaleTallyPatternCodes(itemContents ?? []);
   if (scorerType === "CHOICE_TALLY") return choiceTallyPatternCodes(itemContents ?? []);
   return PATTERN_CODES;

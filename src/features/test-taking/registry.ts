@@ -2,6 +2,7 @@ import type { ScorerType } from "@/lib/api/types";
 import { DiscItemView } from "./components/disc-item-view";
 import { LikertItemView } from "./components/likert-item-view";
 import { MarkGroupItemView } from "./components/mark-group-item-view";
+import { OptionScaleItemView } from "./components/option-scale-item-view";
 import { PairItemView } from "./components/pair-item-view";
 import { RankGroupItemView } from "./components/rank-group-item-view";
 import { RightWrongItemView } from "./components/right-wrong-item-view";
@@ -19,6 +20,9 @@ export const ITEM_RENDERERS = {
   // A marked list draws one row per activity with a + and a - column — the
   // shape of the answer sheet, not of any other family.
   MARK_GROUP: MarkGroupItemView,
+  // A three-option statement draws its answers as text buttons (a/b/c) — the
+  // pair view only has two sides and the right/wrong view sends an array.
+  OPTION_SCALE: OptionScaleItemView,
   // A pair tally asks the same question ("pick one of two statements"); only
   // the scoring differs — every statement feeds a named scale.
   PAIR_TALLY: PairItemView,

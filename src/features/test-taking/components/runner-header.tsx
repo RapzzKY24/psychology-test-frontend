@@ -73,6 +73,16 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       Tidak ada jawaban benar atau salah; jawaban tersimpan otomatis.
     </>
   ),
+  OPTION_SCALE: (
+    <>
+      Tiap soal berisi satu pernyataan dengan tiga pilihan jawaban. Pilih{" "}
+      <span className="font-medium text-foreground">satu</span> yang paling menggambarkan diri
+      Anda — usahakan memilih <span className="font-medium text-foreground">a</span> atau{" "}
+      <span className="font-medium text-foreground">c</span>, dan pilih{" "}
+      <span className="font-medium text-foreground">b</span> hanya bila benar-benar ragu. Jawaban
+      tersimpan otomatis.
+    </>
+  ),
   STYLE_GRID: (
     <>
       Tiap soal berisi dua pernyataan tentang cara Anda memimpin — pilih{" "}

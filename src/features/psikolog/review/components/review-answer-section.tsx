@@ -10,6 +10,7 @@ import {
 import type { ReviewDetail, RightWrongItemContent } from "@/lib/api/types";
 import { ChoiceTallyDetailTable } from "./choice-tally-detail-table";
 import { LikertDetailTable } from "./likert-detail-table";
+import { OptionScaleDetailTable } from "./option-scale-detail-table";
 import { PairDetailTable, type PairItem, type PairResponseRow } from "./pair-detail-table";
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
 import { ScaleTallyDetailTable } from "./scale-tally-detail-table";
@@ -48,6 +49,22 @@ export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps
         text?: unknown;
       }
     | undefined;
+
+  // A three-option item also carries `text`, so it has to be recognised before
+  // the Likert branch — otherwise every rating column prints "—".
+  const isOptionScale =
+    detail.items.length > 0 &&
+    typeof firstContent?.text === "string" &&
+    Array.isArray(firstContent?.options);
+
+  if (isOptionScale) {
+    return (
+      <OptionScaleDetailTable
+        items={detail.items as unknown as Parameters<typeof OptionScaleDetailTable>[0]["items"]}
+        responses={detail.responses}
+      />
+    );
+  }
 
   // Likert items carry `text` + `scale`; they must be checked before the
   // scale-tally branch, which would otherwise claim them by their scale.

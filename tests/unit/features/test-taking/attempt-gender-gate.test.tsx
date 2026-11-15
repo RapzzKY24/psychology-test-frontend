@@ -51,7 +51,7 @@ describe("AttemptRunnerIsland gender gate", () => {
     fireEvent.click(screen.getByRole("button", { name: "Lanjutkan" }));
 
     await waitFor(() => {
-      expect(fetchAttempt).toHaveBeenCalledWith("attempt-1", "tok", null, "FEMALE");
+      expect(fetchAttempt).toHaveBeenCalledWith("attempt-1", "tok", null, "FEMALE", null);
     });
   });
 

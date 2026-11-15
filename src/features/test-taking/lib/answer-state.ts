@@ -26,6 +26,12 @@ export function toPairChoice(value: unknown): number | null {
   return typeof v?.chosen === "number" && v.chosen >= 0 && v.chosen <= 1 ? v.chosen : null;
 }
 
+/** A three-option answer stores the picked index (0, 1 or 2); anything else is blank. */
+export function toOptionChoice(value: unknown): number | null {
+  const v = value as { chosen?: number } | undefined;
+  return typeof v?.chosen === "number" && v.chosen >= 0 && v.chosen <= 2 ? v.chosen : null;
+}
+
 /** Likert answers store the picked rating; a non-number is blank. */
 export function toRating(value: unknown): number | null {
   const v = value as { rating?: number } | undefined;
@@ -94,6 +100,7 @@ export function isAnsweredValue(scorerType: ScorerType, value: unknown): boolean
     return toPairChoice(value) !== null;
   }
   if (scorerType === "LIKERT") return toRating(value) !== null;
+  if (scorerType === "OPTION_SCALE") return toOptionChoice(value) !== null;
   if (scorerType === "RANK_GROUP") return isAnsweredRanks(value);
   if (scorerType === "MARK_GROUP") return isAnsweredMarks(value);
   return isAnsweredRightWrong(value);
