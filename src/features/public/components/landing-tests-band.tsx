@@ -4,8 +4,8 @@ import { TEST_CATEGORIES, TEST_CATEGORY_LABELS } from "@/lib/api/types";
 import type { PublicTest } from "@/lib/api/types";
 import { TestCard } from "./test-card";
 
-/** Gray band: category pills plus the first three published tests. */
-export function LandingTestsBand({ tests }: { tests: PublicTest[] }) {
+/** Gray band: category pills plus the three newest published tests. */
+export function LandingTestsBand({ tests, total }: { tests: PublicTest[]; total: number }) {
   return (
     <section className="bg-muted/50 border-y">
       <div className="mx-auto w-full max-w-6xl space-y-10 px-4 py-14 sm:px-6 sm:py-16">
@@ -24,8 +24,19 @@ export function LandingTestsBand({ tests }: { tests: PublicTest[] }) {
         </section>
 
         <section className="space-y-5">
-          <div className="flex items-end justify-between gap-4">
-            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Tes Populer</h2>
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+            <div>
+              {/*
+                Not "populer": the list is the default createdAt ordering, so a
+                popularity claim would be unsupported until attempts are counted.
+              */}
+              <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Pilih Tes Anda</h2>
+              {total > 0 ? (
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {total} tes tersedia dalam {TEST_CATEGORIES.length} kategori.
+                </p>
+              ) : null}
+            </div>
             <Link
               href="/tes"
               className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"

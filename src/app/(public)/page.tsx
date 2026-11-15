@@ -14,7 +14,7 @@ export default async function LandingPage() {
   return (
     <main className="w-full">
       <LandingHero />
-      <LandingTestsBand tests={tests?.data ?? []} />
+      <LandingTestsBand tests={tests?.data ?? []} total={tests?.meta?.total ?? 0} />
       <LandingArticlesBand articles={articles?.data ?? []} />
       <LandingB2bBand />
     </main>
