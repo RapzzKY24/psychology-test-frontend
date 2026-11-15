@@ -6,6 +6,7 @@ import type {
   PublicArticleListItem,
   PublicArticle,
   PublicPsychologist,
+  PublicStats,
   InvoiceVerification,
   ReportVerification,
   CertificateVerification,
@@ -47,6 +48,11 @@ export const fetchPublicPsychologistsServer = cache(
     apiFetchServer<PublicPsychologist[]>("/psychologists", {
       revalidate: PUBLIC_REVALIDATE,
     }),
+);
+
+/** Counts for the landing page's proof band — always derived, never typed in. */
+export const fetchPublicStatsServer = cache((): Promise<ApiSuccess<PublicStats>> =>
+  apiFetchServer<PublicStats>("/public/stats", { revalidate: PUBLIC_REVALIDATE }),
 );
 
 export const fetchPublicArticlesServer = cache(

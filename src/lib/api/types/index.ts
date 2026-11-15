@@ -2,6 +2,7 @@ export * from "./pagination";
 export * from "./enums";
 export * from "./auth";
 export * from "./tests";
+export * from "./stats";
 export * from "./articles";
 export * from "./sessions";
 export * from "./attempts";
