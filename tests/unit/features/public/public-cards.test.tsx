@@ -51,11 +51,11 @@ describe("TestCard", () => {
     expect(cover.getAttribute("src")).toContain("test-covers");
   });
 
-  it("keeps the media strip with a placeholder when the cover is empty", () => {
+  it("replaces the empty media strip with the category band", () => {
     render(<TestCard test={test} />);
 
     expect(screen.queryByRole("img", { name: "Tes DISC" })).toBeNull();
-    expect(screen.getByTestId("cover-placeholder")).toBeTruthy();
+    expect(screen.getByTestId("category-band")).toBeTruthy();
   });
 });
 
@@ -65,5 +65,21 @@ describe("ArticleCard", () => {
     expect(screen.getByText("Mengelola Stres Kerja")).toBeTruthy();
     expect(screen.getByText(article.excerpt)).toBeTruthy();
     expect(screen.getByRole("link").getAttribute("href")).toBe("/artikel/stres-kerja");
+  });
+
+  it("prints the category on the band when the article has no cover", () => {
+    render(<ArticleCard article={article} />);
+
+    expect(document.querySelector("img")).toBeNull();
+    expect(screen.getByTestId("article-cover-fallback")).toBeTruthy();
+    // The band carries the category, so the badge below would repeat it.
+    expect(screen.getAllByText("Kesehatan Mental")).toHaveLength(1);
+  });
+
+  it("shows the cover and the category badge when the article has a cover", () => {
+    render(<ArticleCard article={{ ...article, coverUrl: "/uploads/covers/stres.jpg" }} />);
+
+    expect(screen.queryByTestId("article-cover-fallback")).toBeNull();
+    expect(screen.getByText("Kesehatan Mental")).toBeTruthy();
   });
 });
