@@ -280,6 +280,9 @@ export function getPatternCodes(
   // A drawing sheet is read by the psychologist, so there is no pattern to
   // interpret — the result is the pictures themselves.
   if (scorerType === "MANUAL") return [];
+  // A battery reports an IQ and a profile, not a typology: its interpretation
+  // is written per participant, so publish must not demand a code for it.
+  if (scorerType === "MULTI_SUBTEST") return [];
   return PATTERN_CODES;
 }
 

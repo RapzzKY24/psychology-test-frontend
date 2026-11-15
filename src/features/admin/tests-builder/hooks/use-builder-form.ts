@@ -17,6 +17,7 @@ import {
   DiscItemContentSchema,
   LikertItemContentSchema,
   ManualItemContentSchema,
+  MultiSubtestItemContentSchema,
   PairItemContentSchema,
   MarkGroupItemContentSchema,
   OptionScaleItemContentSchema,
@@ -39,6 +40,7 @@ import {
   type DiscItemContentInput,
   type LikertItemContentInput,
   type ManualItemContentInput,
+  type MultiSubtestItemContentInput,
   type PairItemContentInput,
   type PairNormItemContentInput,
   type MarkGroupItemContentInput,
@@ -63,6 +65,7 @@ function itemContentSchemaFor(scorerType: string) {
   if (scorerType === "SCALE_TALLY") return ScaleTallyItemContentSchema;
   if (scorerType === "CHOICE_TALLY") return ChoiceTallyItemContentSchema;
   if (scorerType === "MANUAL") return ManualItemContentSchema;
+  if (scorerType === "MULTI_SUBTEST") return MultiSubtestItemContentSchema;
   return DiscItemContentSchema;
 }
 
@@ -103,6 +106,7 @@ export type BuilderFormValues = {
       | PairItemContentInput
       | PairNormItemContentInput
       | MarkGroupItemContentInput
+      | MultiSubtestItemContentInput
       | OptionScaleItemContentInput
       | RankGroupItemContentInput
       | RightWrongItemContentInput
@@ -139,6 +143,8 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
                     ? normalizeMarkGroupContent(item.content)
                   : detail.scorerType === "MANUAL"
                     ? (item.content as ManualItemContentInput)
+                  : detail.scorerType === "MULTI_SUBTEST"
+                    ? (item.content as unknown as MultiSubtestItemContentInput)
                   : (item.content as DiscItemContentInput),
     })),
     interpretations: detail.interpretations.map((row) => ({

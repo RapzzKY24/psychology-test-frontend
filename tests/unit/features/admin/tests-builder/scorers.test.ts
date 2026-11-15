@@ -19,6 +19,7 @@ describe("scorer options", () => {
       "MARK_GROUP",
       "RANK_GROUP",
       "LIKERT",
+      "MULTI_SUBTEST",
       "OPTION_SCALE",
       "TIMED_GRID",
       "MANUAL",

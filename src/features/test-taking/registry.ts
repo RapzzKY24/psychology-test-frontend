@@ -3,6 +3,7 @@ import { DiscItemView } from "./components/disc-item-view";
 import { LikertItemView } from "./components/likert-item-view";
 import { ManualItemView } from "./components/manual-item-view";
 import { MarkGroupItemView } from "./components/mark-group-item-view";
+import { MultiSubtestItemView } from "./components/multi-subtest-item-view";
 import { OptionScaleItemView } from "./components/option-scale-item-view";
 import { PairItemView } from "./components/pair-item-view";
 import { RankGroupItemView } from "./components/rank-group-item-view";
@@ -25,6 +26,9 @@ export const ITEM_RENDERERS = {
   // A marked list draws one row per activity with a + and a - column — the
   // shape of the answer sheet, not of any other family.
   MARK_GROUP: MarkGroupItemView,
+  // A battery prints four shapes of item under one cover; the runner picks the
+  // shape from the item's own `kind`, so one view covers all nine subtests.
+  MULTI_SUBTEST: MultiSubtestItemView,
   // A three-option statement draws its answers as text buttons (a/b/c) — the
   // pair view only has two sides and the right/wrong view sends an array.
   OPTION_SCALE: OptionScaleItemView,

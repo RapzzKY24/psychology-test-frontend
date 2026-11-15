@@ -6,6 +6,10 @@ import { ReviewAnswerSection } from "@/features/psikolog/review/components/revie
 import { ReviewDetailActions } from "@/features/psikolog/review/components/review-detail-actions";
 import { ReviewScoreCards } from "@/features/psikolog/review/components/review-score-cards";
 import {
+  MultiSubtestProfileCard,
+  isMultiSubtestScores,
+} from "@/features/psikolog/review/components/multi-subtest-profile-card";
+import {
   WorkCurveChart,
   isTimedGridScores,
 } from "@/features/psikolog/review/components/work-curve-chart";
@@ -48,6 +52,10 @@ export default async function ReviewDetailPage({
         correctedScores={result.correctedScores}
         correctionReason={result.correctionReason}
       />
+
+      {isMultiSubtestScores(result.scores) && (
+        <MultiSubtestProfileCard scores={result.scores} />
+      )}
 
       {detail.interpretation && (
         <Card>

@@ -7,6 +7,7 @@ import { ItemsTab } from "./items-tab";
 import { LikertItemsTab } from "./likert-items-tab";
 import { ManualItemsTab } from "./manual-items-tab";
 import { MarkGroupItemsTab } from "./mark-group-items-tab";
+import { MultiSubtestItemsTab } from "./multi-subtest-items-tab";
 import { OptionScaleItemsTab } from "./option-scale-items-tab";
 import { PairItemsTab } from "./pair-items-tab";
 import { RankGroupItemsTab } from "./rank-group-items-tab";
@@ -30,10 +31,12 @@ function ItemsTabFor({
   scorerType,
   builder,
   testId,
+  scoringConfig,
 }: {
   scorerType: ScorerType;
   builder: BuilderController;
   testId: string;
+  scoringConfig?: unknown;
 }) {
   switch (scorerType) {
     case "RIGHT_WRONG_NORM":
@@ -53,6 +56,8 @@ function ItemsTabFor({
       return <TimedGridItemsTab builder={builder} locked={builder.locked} />;
     case "MANUAL":
       return <ManualItemsTab builder={builder} locked={builder.locked} />;
+    case "MULTI_SUBTEST":
+      return <MultiSubtestItemsTab builder={builder} scoringConfig={scoringConfig} />;
     case "CHOICE_TALLY":
       return <ChoiceTallyItemsTab builder={builder} locked={builder.locked} />;
     case "MARK_GROUP":
@@ -131,7 +136,12 @@ export function TestBuilderStudio({
       </div>
 
       {builder.tab === "soal" && (
-        <ItemsTabFor scorerType={initialData.scorerType} builder={builder} testId={testId} />
+        <ItemsTabFor
+          scorerType={initialData.scorerType}
+          builder={builder}
+          testId={testId}
+          scoringConfig={initialData.scoringConfig}
+        />
       )}
       {builder.tab === "interpretasi" && (
         <InterpretationsTab builder={builder} locked={builder.locked} />

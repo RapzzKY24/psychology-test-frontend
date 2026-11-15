@@ -79,6 +79,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
       "Tiap pernyataan dinilai pada skala angka (mis. 1–5). Skor tiap trait adalah jumlah nilai, dan trait dengan persentase tertinggi menjadi hasil — bisa diberi kategori Rendah/Sedang/Tinggi.",
   },
   {
+    value: "MULTI_SUBTEST",
+    label: "Baterai subtes berwaktu (IST)",
+    description:
+      "Satu tes berisi beberapa subtes, masing-masing dengan jumlah soal, batas waktu, dan norma sendiri. Skor tiap subtes dibaca dari tabel norma sesuai kelompok umur, lalu jumlahnya dibaca sebagai IQ.",
+  },
+  {
     value: "OPTION_SCALE",
     label: "Tiga pilihan berskala (16PF)",
     description:

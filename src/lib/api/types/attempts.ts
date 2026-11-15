@@ -54,6 +54,39 @@ export interface ManualResponse {
 }
 
 /**
+ * One answer for every shape of a multi-subtest battery: the letter that was
+ * crossed, the number that was written, or the word that was typed. The scorer
+ * compares it against the item's own key, so the client never says what kind of
+ * answer it is.
+ */
+export interface MultiSubtestResponse {
+  answer: string;
+}
+
+/**
+ * One subtest of a battery, with the window its answers are accepted in.
+ * Offsets count seconds from `startedAt`, so the client can place the clock
+ * without knowing the battery's own layout.
+ */
+export interface AttemptSubtest {
+  code: string;
+  name: string;
+  kind: string;
+  instruction: string;
+  /** Item order range, both inclusive. */
+  itemFrom: number;
+  itemTo: number;
+  /** Seconds after `startedAt` when the answering window opens. */
+  startOffsetSec: number;
+  /** Seconds the answering window lasts. */
+  durationSec: number;
+  /** Seconds of printed-list study before the window opens (ME only). */
+  memorizeSec: number;
+  /** The printed list itself, shown during `memorizeSec`. */
+  memorizeList: Array<{ label: string; words: string[] }>;
+}
+
+/**
  * Body of `PUT /api/v1/public/attempts/:id/responses` (PutResponseSchema).
  * `value` is scorer-specific.
  */
@@ -64,6 +97,7 @@ export interface PutResponseInput {
     | LikertResponse
     | ManualResponse
     | MarkGroupResponse
+    | MultiSubtestResponse
     | OptionScaleResponse
     | RankGroupResponse
     | RightWrongResponse;
@@ -91,6 +125,11 @@ export interface AttemptRead {
   requiresEducation: boolean;
   /** Declared schooling; null on a test that does not ask. */
   education: Education | null;
+  /**
+   * Windows of a multi-subtest battery, in printed order. Empty for every other
+   * family — a single-clock test has nothing to place.
+   */
+  subtests: AttemptSubtest[];
   items: Array<{ id: string; order: number; content: Record<string, unknown> }>;
   responses: Array<{ itemId: string; value: unknown }>;
 }

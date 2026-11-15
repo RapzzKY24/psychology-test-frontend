@@ -9,7 +9,9 @@ import { AttemptAgeBlocked, AttemptAgeGate } from "./attempt-age-gate";
 import { AttemptEducationGate } from "./attempt-education-gate";
 import { AttemptGenderGate } from "./attempt-gender-gate";
 import { AttemptRunner } from "./attempt-runner";
+import { MultiSubtestRunner } from "./multi-subtest-runner";
 import { useAttempt } from "../hooks/use-attempt";
+import { resolveScorerType } from "../registry";
 import { isApiError } from "@/lib/api/client";
 import { getGuestTokenForAttempt } from "@/lib/guest-token";
 import type { Education, Gender } from "@/lib/api/types";
@@ -115,5 +117,13 @@ export function AttemptRunnerIsland({ attemptId }: { attemptId: string }) {
     );
   }
 
-  return <AttemptRunner attempt={query.data.data} participantToken={token} homeHref="/" />;
+  const attempt = query.data.data;
+
+  // A battery closes its own subtests, so it owns its screen: the generic
+  // runner would let the participant walk into a window that already shut.
+  if (resolveScorerType(attempt) === "MULTI_SUBTEST") {
+    return <MultiSubtestRunner attempt={attempt} participantToken={token} homeHref="/" />;
+  }
+
+  return <AttemptRunner attempt={attempt} participantToken={token} homeHref="/" />;
 }

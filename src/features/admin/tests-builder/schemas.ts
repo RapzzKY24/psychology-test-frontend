@@ -638,3 +638,42 @@ export type ManualItemContentInput = z.infer<typeof ManualItemContentSchema>;
 export function manualSheet(): ManualItemContentInput[] {
   return MANUAL_MARKS.map((mark, index) => ({ box: index + 1, mark }));
 }
+
+/**
+ * One printed item of a battery. A battery is seeded from its workbook, so the
+ * builder never types these one at a time — but the form still has to hold the
+ * items it loaded, and the four printed shapes are the only ones it can hold.
+ */
+const SubtestLetterSchema = z.enum(["a", "b", "c", "d", "e"]);
+
+export const MultiSubtestItemContentSchema = z.union([
+  z.object({
+    kind: z.literal("CHOICE"),
+    prompt: z.string(),
+    options: z.object({
+      a: z.string(),
+      b: z.string(),
+      c: z.string(),
+      d: z.string(),
+      e: z.string(),
+    }),
+    key: SubtestLetterSchema,
+  }),
+  z.object({
+    kind: z.literal("IMAGE"),
+    imageUrl: z.string(),
+    key: SubtestLetterSchema,
+  }),
+  z.object({
+    kind: z.literal("PAIR"),
+    words: z.tuple([z.string(), z.string()]),
+  }),
+  z.object({
+    kind: z.literal("NUMBER"),
+    prompt: z.string().optional(),
+    series: z.array(z.number()).optional(),
+    key: z.number(),
+  }),
+]);
+
+export type MultiSubtestItemContentInput = z.infer<typeof MultiSubtestItemContentSchema>;

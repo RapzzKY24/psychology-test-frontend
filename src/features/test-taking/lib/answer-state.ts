@@ -113,6 +113,17 @@ export function isAnsweredDisc(value: unknown): value is DiscResponse {
   return v !== undefined && v.most >= 0 && v.least >= 0;
 }
 
+/** A battery answer is one word, one number or one letter, kept as typed. */
+export function toSubtestAnswer(value: unknown): string {
+  const v = value as { answer?: unknown } | undefined;
+  return typeof v?.answer === "string" ? v.answer : "";
+}
+
+/** A subtest item is answered once anything was written or picked. */
+export function isAnsweredSubtest(value: unknown): boolean {
+  return toSubtestAnswer(value).trim().length > 0;
+}
+
 export function isAnsweredRightWrong(value: unknown): boolean {
   return toChosen(value).length > 0 || toText(value).trim().length > 0;
 }
@@ -135,5 +146,6 @@ export function isAnsweredValue(scorerType: ScorerType, value: unknown): boolean
   if (scorerType === "MARK_GROUP") return isAnsweredMarks(value);
   if (scorerType === "MANUAL") return isAnsweredManual(value);
   if (scorerType === "TIMED_GRID") return isAnsweredTimedGrid(value);
+  if (scorerType === "MULTI_SUBTEST") return isAnsweredSubtest(value);
   return isAnsweredRightWrong(value);
 }

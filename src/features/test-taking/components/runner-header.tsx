@@ -67,6 +67,13 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       atau salah; jawaban tersimpan otomatis.
     </>
   ),
+  MULTI_SUBTEST: (
+    <>
+      Tiap subtes punya waktunya sendiri dan{" "}
+      <span className="font-medium text-foreground">tidak bisa dibuka kembali</span> setelah
+      ditutup. Kerjakan secepat mungkin; jawaban tersimpan otomatis.
+    </>
+  ),
   RANK_GROUP: (
     <>
       Urutkan tiap daftar pekerjaan dari yang{" "}

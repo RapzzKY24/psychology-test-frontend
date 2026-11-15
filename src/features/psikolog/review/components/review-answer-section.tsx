@@ -11,6 +11,7 @@ import type { ReviewDetail, RightWrongItemContent } from "@/lib/api/types";
 import { ChoiceTallyDetailTable } from "./choice-tally-detail-table";
 import { LikertDetailTable } from "./likert-detail-table";
 import { ManualDetailGrid } from "./manual-detail-grid";
+import { MultiSubtestDetailTable } from "./multi-subtest-detail-table";
 import { OptionScaleDetailTable } from "./option-scale-detail-table";
 import { PairDetailTable, type PairItem, type PairResponseRow } from "./pair-detail-table";
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
@@ -40,6 +41,19 @@ interface ReviewAnswerSectionProps {
  * word/most/least table built from `itemsDetailed`.
  */
 export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps) {
+  // A battery prints four different shapes of item under one cover, so content
+  // sniffing cannot tell its rows apart from a right/wrong item — the family
+  // name is the only reliable marker.
+  if (detail.test.scorerType === "MULTI_SUBTEST") {
+    return (
+      <MultiSubtestDetailTable
+        items={detail.items}
+        responses={detail.responses}
+        scoringConfig={detail.test.scoringConfig}
+      />
+    );
+  }
+
   // DISC items carry `words`; every right/wrong item carries options or an
   // accepted-answer list, so the key field is not a reliable marker any more.
   const firstContent = detail.items[0]?.content as unknown as

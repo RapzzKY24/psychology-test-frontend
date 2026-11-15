@@ -37,7 +37,14 @@ export interface QueryResultsItem {
 /** `GET /api/v1/psychologist/reviews/:id` (ReviewDetail incl. per-item raw answers). */
 export interface ReviewDetail {
   result: TestResultRow;
-  test: { id: string; name: string; slug: string; scorerType: string };
+  test: {
+    id: string;
+    name: string;
+    slug: string;
+    scorerType: string;
+    /** Seed-owned settings — a battery's subtest split lives here. */
+    scoringConfig?: unknown;
+  };
   session: { id: string; title: string };
   participant: { name: string; email?: string | null; candidateNumber?: string | null };
   attempt: { id: string; startedAt: string; completedAt: string | null };

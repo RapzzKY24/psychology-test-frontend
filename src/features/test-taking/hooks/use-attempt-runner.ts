@@ -29,6 +29,8 @@ const AUTO_ADVANCE_MS = {
   // themselves — there is no "the last stroke completed the answer" moment.
   MANUAL: 0,
   MARK_GROUP: 300,
+  // A battery runs its own screen; the entry only keeps the map complete.
+  MULTI_SUBTEST: 0,
   OPTION_SCALE: 300,
   PAIR_NORM: 350,
   PAIR_TALLY: 350,

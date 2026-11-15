@@ -25,6 +25,7 @@ export const SCORER_TYPES = [
   "LIKERT",
   "MANUAL",
   "MARK_GROUP",
+  "MULTI_SUBTEST",
   "OPTION_SCALE",
   "PAIR_NORM",
   "PAIR_TALLY",

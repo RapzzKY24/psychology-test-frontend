@@ -23,11 +23,19 @@ export default async function HasilDetailPage({ params }: PageProps<"/hasil/[att
     throw error;
   }
 
-  // Two families produce no score the participant could read: a work curve and
-  // a set of drawings are both interpreted by the psychologist.
+  // Three families produce no score the participant could read: a work curve,
+  // a set of drawings, and a battery whose IQ belongs in the psychologist's
+  // report rather than on a result screen.
   const isTimedGrid = detail.scorerType === "TIMED_GRID";
   const isManual = detail.scorerType === "MANUAL";
-  const readByPsychologist = isTimedGrid || isManual;
+  const isMultiSubtest = detail.scorerType === "MULTI_SUBTEST";
+  const readByPsychologist = isTimedGrid || isManual || isMultiSubtest;
+
+  const statusCopy = isManual
+    ? "Tes ini dibaca langsung oleh psikolog dari gambar Anda, jadi ringkasannya disampaikan pada sesi konsultasi."
+    : isTimedGrid
+      ? "Tes ini dinilai dari kurva kerja Anda, jadi ringkasannya disampaikan langsung oleh psikolog pada sesi konsultasi."
+      : "Tes ini menghasilkan IQ dan profil struktur berpikir, jadi ringkasannya disampaikan langsung oleh psikolog pada sesi konsultasi.";
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 p-6">
@@ -49,9 +57,7 @@ export default async function HasilDetailPage({ params }: PageProps<"/hasil/[att
               <div className="space-y-1">
                 <p className="text-sm font-medium">Hasil sudah selesai</p>
                 <p className="text-sm text-muted-foreground">
-                  {isManual
-                    ? "Tes ini dibaca langsung oleh psikolog dari gambar Anda, jadi ringkasannya disampaikan pada sesi konsultasi."
-                    : "Tes ini dinilai dari kurva kerja Anda, jadi ringkasannya disampaikan langsung oleh psikolog pada sesi konsultasi."}
+                  {statusCopy}
                 </p>
               </div>
             </div>
