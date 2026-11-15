@@ -207,6 +207,50 @@ describe("ScoreSummary", () => {
     ).toBeTruthy();
   });
 
+  it("names the leadership style and draws its dimension levels", () => {
+    render(
+      <ScoreSummary
+        scores={{
+          total: 64,
+          answered: 64,
+          maxLevel: 4,
+          profile: { code: "DV", label: "Developer" },
+          dimensions: {
+            TO: { label: "Task orientation", score: 31, level: 0.6, high: false },
+            RO: { label: "Relationship orientation", score: 34, level: 2.4, high: true },
+            EF: { label: "Effectiveness", score: 36, level: 3.6, high: true },
+            O: { label: "Other", score: 8, level: 0, high: false },
+          },
+          scales: { DS: { score: 8, max: 16, correction: 1 } },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Gaya kepemimpinan")).toBeTruthy();
+    expect(screen.getByText("Developer")).toBeTruthy();
+    expect(screen.getByText("64/64")).toBeTruthy();
+    // The bar carries the level itself, not a percent of an unknown ceiling.
+    expect(screen.getByText("Task orientation")).toBeTruthy();
+    expect(screen.getByText("0.6/4 · Rendah")).toBeTruthy();
+    expect(screen.getByText("3.6/4 · Tinggi")).toBeTruthy();
+    expect(screen.getByText("2.4")).toBeTruthy();
+  });
+
+  it("falls back to the dimension code when the config carries no label", () => {
+    render(
+      <ScoreSummary
+        scores={{
+          maxLevel: 4,
+          profile: { code: "MI", label: "Missionary" },
+          dimensions: { TO: { score: 20, level: 0, high: false } },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("TO")).toBeTruthy();
+    expect(screen.getByText("0/4 · Rendah")).toBeTruthy();
+  });
+
   it("draws the DISC profile from graph, not from the M/P counters", () => {
     render(
       <ScoreSummary scores={{ M: { D: 6 }, P: { D: 2 }, graph: { D: 12, I: 8, S: 5, C: 3 } }} />,

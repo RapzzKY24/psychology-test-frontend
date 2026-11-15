@@ -5,9 +5,11 @@ import {
   LikertItemContentSchema,
   MarkGroupItemContentSchema,
   RankGroupItemContentSchema,
+  StyleGridItemContentSchema,
   normalizeLikertContent,
   normalizeMarkGroupContent,
   normalizeRankGroupContent,
+  normalizeStyleGridContent,
   slugify,
 } from "@/features/admin/tests-builder/schemas";
 
@@ -261,5 +263,50 @@ describe("MarkGroupItemContentSchema", () => {
         verification: [0, 4],
       }).verification,
     ).toEqual([0]);
+  });
+});
+
+describe("StyleGridItemContentSchema", () => {
+  it("accepts two statements that score the same style", () => {
+    expect(
+      StyleGridItemContentSchema.safeParse({
+        statements: ["kiri", "kanan"],
+        mapping: ["DS", "DS"],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("accepts an item with no stem", () => {
+    expect(
+      StyleGridItemContentSchema.safeParse({
+        statements: ["kiri", "kanan"],
+        mapping: ["DS", "MI"],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects two identical statements", () => {
+    expect(
+      StyleGridItemContentSchema.safeParse({
+        statements: ["sama", "Sama"],
+        mapping: ["DS", "MI"],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("uppercases the codes when a draft is normalized", () => {
+    expect(
+      normalizeStyleGridContent({ statements: ["kiri", "kanan"], mapping: ["ds", "mi"] }),
+    ).toEqual({ statements: ["kiri", "kanan"], mapping: ["DS", "MI"] });
+  });
+
+  it("drops an empty stem when a draft is normalized", () => {
+    expect(
+      normalizeStyleGridContent({
+        question: "   ",
+        statements: ["kiri", "kanan"],
+        mapping: ["DS", "MI"],
+      }),
+    ).toEqual({ statements: ["kiri", "kanan"], mapping: ["DS", "MI"] });
   });
 });

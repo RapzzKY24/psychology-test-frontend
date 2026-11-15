@@ -11,8 +11,11 @@ interface PairItemEditorProps {
   active: number;
   total: number;
   locked: boolean;
-  /** "pole" for a dichotomy (MBTI), "need" for a per-statement scale (PAPI). */
-  codeKind?: "pole" | "need";
+  /**
+   * "pole" for a dichotomy (MBTI), "need" for a per-statement scale (PAPI),
+   * "style" for a grid whose two statements may share one style (MSDT).
+   */
+  codeKind?: "pole" | "need" | "style";
   onMove: (from: number, to: number) => void;
   onRemove: () => void;
   onDuplicate: () => void;
@@ -37,6 +40,11 @@ const CODE_COPY = {
     label: "Kebutuhan",
     placeholders: ["N", "G"] as const,
     hint: "Tiap pernyataan menambah skor satu kebutuhan; dua pernyataan dalam satu soal harus berbeda.",
+  },
+  style: {
+    label: "Gaya",
+    placeholders: ["DS", "MI"] as const,
+    hint: "Tiap pernyataan menambah skor satu gaya; kedua pernyataan boleh menunjuk gaya yang sama.",
   },
 };
 

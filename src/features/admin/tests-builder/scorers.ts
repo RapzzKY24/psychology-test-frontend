@@ -31,6 +31,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
       "Tiap soal berisi dua pernyataan; peserta memilih satu. Tiap pernyataan menambah skor satu kebutuhan, dan kebutuhan yang paling sering dipilih menjadi hasil.",
   },
   {
+    value: "STYLE_GRID",
+    label: "Pasangan pernyataan bergaya (MSDT)",
+    description:
+      "Tiap soal berisi dua pernyataan; peserta memilih satu. Tiap pernyataan menambah skor satu gaya, gaya-gaya itu dijumlahkan menjadi beberapa dimensi, tiap dimensi dikonversi ke tingkat, dan pola tingkatnya menentukan gaya kepemimpinan.",
+  },
+  {
     value: "FORCED_CHOICE_DISC",
     label: "DISC (4 kata)",
     description:

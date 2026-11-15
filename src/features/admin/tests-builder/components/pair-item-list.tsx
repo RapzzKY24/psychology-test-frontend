@@ -3,18 +3,27 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { isPairItemReady } from "../item-readiness";
+import { isPairItemReady, isStyleGridItemReady } from "../item-readiness";
 
 interface PairItemListProps {
   items: Array<{ content?: { question?: string; statements?: string[]; mapping?: string[] } }>;
   active: number;
   locked: boolean;
+  /** "style" rows may score the same code twice, so they read differently. */
+  codeKind?: "pole" | "need" | "style";
   onSelect: (index: number) => void;
   onAdd: () => void;
 }
 
 /** Left rail of the pair tab: one row per item, plus the add button. */
-export function PairItemList({ items, active, locked, onSelect, onAdd }: PairItemListProps) {
+export function PairItemList({
+  items,
+  active,
+  locked,
+  codeKind = "pole",
+  onSelect,
+  onAdd,
+}: PairItemListProps) {
   return (
     <aside className="border-b p-4 lg:border-b-0 lg:border-r">
       <div className="mb-3 space-y-2">
@@ -31,7 +40,8 @@ export function PairItemList({ items, active, locked, onSelect, onAdd }: PairIte
           const content = item?.content;
           const label =
             content?.question?.trim() || content?.statements?.[0]?.trim() || "(kosong)";
-          const filled = isPairItemReady(content);
+          const filled =
+            codeKind === "style" ? isStyleGridItemReady(content) : isPairItemReady(content);
           return (
             <li key={idx}>
               <button

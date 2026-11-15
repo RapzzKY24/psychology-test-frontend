@@ -21,6 +21,7 @@ import {
   RankGroupItemContentSchema,
   RightWrongItemContentSchema,
   ScaleTallyItemContentSchema,
+  StyleGridItemContentSchema,
   normalizeChoiceTallyContent,
   normalizeItemContent,
   normalizeLikertContent,
@@ -28,6 +29,7 @@ import {
   normalizeMarkGroupContent,
   normalizeRankGroupContent,
   normalizeScaleTallyContent,
+  normalizeStyleGridContent,
   type ChoiceTallyItemContentInput,
   type DiscItemContentInput,
   type LikertItemContentInput,
@@ -36,6 +38,7 @@ import {
   type RankGroupItemContentInput,
   type RightWrongItemContentInput,
   type ScaleTallyItemContentInput,
+  type StyleGridItemContentInput,
 } from "../schemas";
 
 function itemContentSchemaFor(scorerType: string) {
@@ -43,6 +46,7 @@ function itemContentSchemaFor(scorerType: string) {
   if (scorerType === "FORCED_CHOICE_PAIR" || scorerType === "PAIR_TALLY") {
     return PairItemContentSchema;
   }
+  if (scorerType === "STYLE_GRID") return StyleGridItemContentSchema;
   if (scorerType === "LIKERT") return LikertItemContentSchema;
   if (scorerType === "RANK_GROUP") return RankGroupItemContentSchema;
   if (scorerType === "MARK_GROUP") return MarkGroupItemContentSchema;
@@ -88,7 +92,8 @@ export type BuilderFormValues = {
       | MarkGroupItemContentInput
       | RankGroupItemContentInput
       | RightWrongItemContentInput
-      | ScaleTallyItemContentInput;
+      | ScaleTallyItemContentInput
+      | StyleGridItemContentInput;
   }[];
   interpretations: { patternCode: string; title: string; body: string }[];
 };
@@ -100,7 +105,9 @@ function toFormValues(detail: AdminTestDetail): BuilderFormValues {
       content:
         detail.scorerType === "RIGHT_WRONG_NORM"
           ? normalizeItemContent(item.content)
-          : detail.scorerType === "FORCED_CHOICE_PAIR" || detail.scorerType === "PAIR_TALLY"
+          : detail.scorerType === "STYLE_GRID"
+            ? normalizeStyleGridContent(item.content)
+            : detail.scorerType === "FORCED_CHOICE_PAIR" || detail.scorerType === "PAIR_TALLY"
             ? normalizePairContent(item.content)
             : detail.scorerType === "LIKERT"
               ? normalizeLikertContent(item.content)

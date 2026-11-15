@@ -203,6 +203,21 @@ export function likertPatternCodes(
 }
 
 /**
+ * A style grid's pattern codes are the profile table it was seeded with — one
+ * code per high/low combination, in the order the config lists them.
+ */
+export function styleGridPatternCodes(scoringConfig?: unknown): readonly string[] {
+  const profiles = (scoringConfig as { profiles?: unknown } | undefined)?.profiles;
+  if (!Array.isArray(profiles)) return [];
+  const codes: string[] = [];
+  for (const profile of profiles) {
+    const code = (profile as { code?: unknown } | undefined)?.code;
+    if (typeof code === "string" && code.trim()) codes.push(code.trim().toUpperCase());
+  }
+  return codes;
+}
+
+/**
  * Codes a test must cover before publish: a raw score uses every RAW_n, DISC
  * uses 1..40, a pair instrument derives them from its item mappings.
  */
@@ -219,6 +234,9 @@ export function getPatternCodes(
   }
   if (scorerType === "FORCED_CHOICE_PAIR") return pairPatternCodes(itemContents ?? []);
   if (scorerType === "PAIR_TALLY") return pairTallyPatternCodes(itemContents ?? []);
+  // A style grid's codes are its profile table — the items only feed the
+  // scales, so nothing can be derived from them.
+  if (scorerType === "STYLE_GRID") return styleGridPatternCodes(scoringConfig);
   if (scorerType === "RANK_GROUP") return rankGroupPatternCodes(itemContents ?? []);
   if (scorerType === "MARK_GROUP") return markGroupPatternCodes(itemContents ?? []);
   if (scorerType === "LIKERT") return likertPatternCodes(itemContents ?? [], scoringConfig);

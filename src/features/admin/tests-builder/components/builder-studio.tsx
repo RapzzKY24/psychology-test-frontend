@@ -37,6 +37,7 @@ function ItemsTabFor({
       return <RightWrongItemsTab builder={builder} locked={builder.locked} testId={testId} />;
     case "FORCED_CHOICE_PAIR":
     case "PAIR_TALLY":
+    case "STYLE_GRID":
       return <PairItemsTab builder={builder} locked={builder.locked} />;
     case "SCALE_TALLY":
       return <ScaleTallyItemsTab builder={builder} locked={builder.locked} />;

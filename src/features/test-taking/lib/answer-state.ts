@@ -85,7 +85,11 @@ export function isAnsweredRightWrong(value: unknown): boolean {
 export function isAnsweredValue(scorerType: ScorerType, value: unknown): boolean {
   if (value === undefined || value === null) return false;
   if (scorerType === "FORCED_CHOICE_DISC") return isAnsweredDisc(value);
-  if (scorerType === "FORCED_CHOICE_PAIR" || scorerType === "PAIR_TALLY") {
+  if (
+    scorerType === "FORCED_CHOICE_PAIR" ||
+    scorerType === "PAIR_TALLY" ||
+    scorerType === "STYLE_GRID"
+  ) {
     return toPairChoice(value) !== null;
   }
   if (scorerType === "LIKERT") return toRating(value) !== null;

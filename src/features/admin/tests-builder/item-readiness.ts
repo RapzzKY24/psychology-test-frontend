@@ -74,6 +74,18 @@ export function isPairItemReady(content: PairItemDraft | undefined): boolean {
   return mapping.length === 2 && Boolean(mapping[0]) && Boolean(mapping[1]) && mapping[0] !== mapping[1];
 }
 
+/**
+ * A style-grid row needs both statements and both keys, but the keys may be the
+ * same — MSDT's diagonal item scores one style on both sides.
+ */
+export function isStyleGridItemReady(content: PairItemDraft | undefined): boolean {
+  if (!content) return false;
+  const statements = content.statements ?? [];
+  if (statements.length !== 2 || !statements.every((s) => s.trim().length > 0)) return false;
+  const mapping = (content.mapping ?? []).map((p) => p.trim().toUpperCase());
+  return mapping.length === 2 && Boolean(mapping[0]) && Boolean(mapping[1]);
+}
+
 export interface RankGroupItemDraft {
   question?: string;
   options?: string[];

@@ -237,6 +237,59 @@ function likertStats(scores: Record<string, unknown>): Stat[] | null {
   return stats;
 }
 
+/**
+ * STYLE_GRID (MSDT) names a leadership style from the high/low pattern of its
+ * dimensions, so the headline is the style — the dimension bars below it show
+ * why that style won.
+ */
+function styleGridStats(scores: Record<string, unknown>): Stat[] | null {
+  const profile = scores.profile;
+  if (!isRecord(profile) || typeof profile.label !== "string" || !profile.label.trim()) {
+    return null;
+  }
+
+  const stats: Stat[] = [
+    {
+      key: "profile",
+      label: "Gaya kepemimpinan",
+      value: profile.label.trim(),
+      icon: Fingerprint,
+    },
+  ];
+  const { answered, total } = scores;
+  if (typeof answered === "number" && typeof total === "number") {
+    stats.push({
+      key: "answered",
+      label: "Butir terjawab",
+      value: `${answered}/${total}`,
+      icon: ListChecks,
+    });
+  }
+  return stats;
+}
+
+/**
+ * Every dimension of a style grid is converted to a level (0–4 for MSDT), and
+ * the cut decides whether it counts as high. The bar draws the level against
+ * the table's own top, so a different instrument's scale still fits.
+ */
+function styleGridBars(scores: Record<string, unknown>): ScaleBar[] | null {
+  if (!isRecord(scores.dimensions)) return null;
+  const maxLevel = typeof scores.maxLevel === "number" && scores.maxLevel > 0 ? scores.maxLevel : 4;
+
+  const bars: ScaleBar[] = [];
+  for (const [code, value] of Object.entries(scores.dimensions)) {
+    if (!isRecord(value) || typeof value.level !== "number") continue;
+    bars.push({
+      label: typeof value.label === "string" && value.label.trim() ? value.label : code,
+      value: (value.level / maxLevel) * 100,
+      band: `${value.level}/${maxLevel} · ${value.high ? "Tinggi" : "Rendah"}`,
+      display: value.level.toString(),
+    });
+  }
+  return bars.length > 0 ? bars : null;
+}
+
 function barsFrom(values: Record<string, unknown>): Bar[] {
   const bars: Bar[] = [];
   for (const [key, value] of Object.entries(values)) {
@@ -257,6 +310,8 @@ interface ScaleBar {
   /** Percent of the scale's own ceiling, so scales of different length compare. */
   value: number;
   band?: string;
+  /** What the number next to the bar reads; the bar still uses `value`. */
+  display?: string;
 }
 
 /**
@@ -390,7 +445,9 @@ function ScaleBars({ bars }: { bars: ScaleBar[] }) {
                 <span className="ml-2 text-xs font-normal text-muted-foreground">{bar.band}</span>
               )}
             </span>
-            <span className="tabular-nums text-muted-foreground">{bar.value}%</span>
+            <span className="tabular-nums text-muted-foreground">
+              {bar.display ?? `${bar.value}%`}
+            </span>
           </div>
           <div className="h-2 rounded-full bg-muted">
             <div
@@ -408,11 +465,12 @@ export function ScoreSummary({ scores }: { scores: Record<string, unknown> }) {
   const stats =
     rightWrongStats(scores) ??
     likertStats(scores) ??
+    styleGridStats(scores) ??
     markStats(scores) ??
     rankStats(scores) ??
     tallyStats(scores) ??
     typeStats(scores);
-  const scales = scaleBars(scores);
+  const scales = styleGridBars(scores) ?? scaleBars(scores);
   const table = sectionTable(scores);
   const validity = validityOf(scores);
 

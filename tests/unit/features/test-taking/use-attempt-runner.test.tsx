@@ -328,6 +328,20 @@ describe("useAttemptRunner", () => {
     expect(result.current.answered[0]).toBe(true);
   });
 
+  it("treats a style grid as a pair item", async () => {
+    const { result } = renderRunner({ ...pairAttempt(), scorerType: "STYLE_GRID" });
+
+    expect(result.current.isPair).toBe(true);
+    expect(result.current.usesChoiceView).toBe(false);
+
+    await act(async () => result.current.choosePair(0));
+
+    await waitFor(() =>
+      expect(putResponse).toHaveBeenCalledWith("attempt-1", "item-1", { chosen: 0 }, undefined),
+    );
+    expect(result.current.answered[0]).toBe(true);
+  });
+
   it("counts a typed answer as answered", async () => {
     const { result } = renderRunner(shortAttempt());
 

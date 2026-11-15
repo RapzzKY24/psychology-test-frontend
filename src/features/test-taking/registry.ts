@@ -22,6 +22,9 @@ export const ITEM_RENDERERS = {
   // A pair tally asks the same question ("pick one of two statements"); only
   // the scoring differs — every statement feeds a named scale.
   PAIR_TALLY: PairItemView,
+  // A style grid is the same pick-one-of-two screen; the tally behind it rolls
+  // the scales up into dimensions before it names a style.
+  STYLE_GRID: PairItemView,
   // A ranking group shows one list of occupations per item and asks for an
   // order, not a pick — it needs its own view.
   RANK_GROUP: RankGroupItemView,

@@ -6,6 +6,7 @@ import {
   isRankGroupItemReady,
   isRightWrongItemReady,
   isScaleTallyItemReady,
+  isStyleGridItemReady,
 } from "@/features/admin/tests-builder/item-readiness";
 
 describe("isRightWrongItemReady", () => {
@@ -242,5 +243,33 @@ describe("isMarkGroupItemReady", () => {
 
   it("is not ready when the mapping has fewer rows than activities", () => {
     expect(isMarkGroupItemReady({ ...ready, mapping: [["OUT"]] })).toBe(false);
+  });
+});
+
+describe("isStyleGridItemReady", () => {
+  it("is ready with two statements and two codes", () => {
+    expect(isStyleGridItemReady({ statements: ["kiri", "kanan"], mapping: ["DS", "MI"] })).toBe(
+      true,
+    );
+  });
+
+  it("is ready when both statements score the same style", () => {
+    expect(isStyleGridItemReady({ statements: ["kiri", "kanan"], mapping: ["DS", "DS"] })).toBe(
+      true,
+    );
+  });
+
+  it("does not need a question stem", () => {
+    expect(isStyleGridItemReady({ statements: ["kiri", "kanan"], mapping: ["DS", "DS"] })).toBe(
+      true,
+    );
+  });
+
+  it("is not ready while a statement is empty", () => {
+    expect(isStyleGridItemReady({ statements: ["kiri", " "], mapping: ["DS", "MI"] })).toBe(false);
+  });
+
+  it("is not ready while a code is missing", () => {
+    expect(isStyleGridItemReady({ statements: ["kiri", "kanan"], mapping: ["DS", ""] })).toBe(false);
   });
 });

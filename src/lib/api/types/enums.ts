@@ -28,6 +28,7 @@ export const SCORER_TYPES = [
   "RANK_GROUP",
   "RIGHT_WRONG_NORM",
   "SCALE_TALLY",
+  "STYLE_GRID",
 ] as const;
 export type ScorerType = (typeof SCORER_TYPES)[number];
 

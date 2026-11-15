@@ -73,6 +73,31 @@ export const PairItemContentSchema = z
 
 export type PairItemContentInput = z.infer<typeof PairItemContentSchema>;
 
+/**
+ * A style-grid pair (MSDT): same two statements, but the stem is optional and
+ * both statements may score the **same** scale — the diagonal item of an 8x8
+ * grid pairs two statements of one style on purpose.
+ */
+export const StyleGridItemContentSchema = z
+  .object({
+    question: z.string().trim().max(2000).optional(),
+    statements: z
+      .array(z.string().trim().min(1, "Pernyataan wajib diisi.").max(500))
+      .length(2),
+    mapping: z.array(PoleSchema).length(2),
+  })
+  .superRefine((data, ctx) => {
+    if (data.statements[0].toLowerCase() === data.statements[1].toLowerCase()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Dua pernyataan tidak boleh sama.",
+        path: ["statements", 1],
+      });
+    }
+  });
+
+export type StyleGridItemContentInput = z.infer<typeof StyleGridItemContentSchema>;
+
 /** One scale of a tally instrument — RIASEC uses R/I/A/S/E/C. */
 const ScaleCodeSchema = z
   .string()
@@ -304,6 +329,24 @@ export function normalizePairContent(content: unknown): PairItemContentInput {
   };
   return {
     question: raw.question ?? "",
+    statements: [raw.statements?.[0] ?? "", raw.statements?.[1] ?? ""],
+    mapping: [
+      (raw.mapping?.[0] ?? "").toUpperCase(),
+      (raw.mapping?.[1] ?? "").toUpperCase(),
+    ],
+  };
+}
+
+/** A style-grid row keeps its stem only when it has one. */
+export function normalizeStyleGridContent(content: unknown): StyleGridItemContentInput {
+  const raw = (content ?? {}) as {
+    question?: string;
+    statements?: string[];
+    mapping?: string[];
+  };
+  const question = raw.question?.trim();
+  return {
+    ...(question ? { question } : {}),
     statements: [raw.statements?.[0] ?? "", raw.statements?.[1] ?? ""],
     mapping: [
       (raw.mapping?.[0] ?? "").toUpperCase(),

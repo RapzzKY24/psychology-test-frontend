@@ -25,6 +25,12 @@ const EMPTY_PAIR = {
 
 export function PairItemsTab({ builder, locked }: { builder: BuilderController; locked: boolean }) {
   const { itemsArray } = builder;
+  const codeKind =
+    builder.scorerType === "PAIR_TALLY"
+      ? "need"
+      : builder.scorerType === "STYLE_GRID"
+        ? "style"
+        : "pole";
   const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
   const watchedItems = builder.form.watch("items");
   const active = Math.min(builder.activeItem, Math.max(watchedItems.length - 1, 0));
@@ -65,6 +71,7 @@ export function PairItemsTab({ builder, locked }: { builder: BuilderController; 
         items={watchedItems as never}
         active={active}
         locked={locked}
+        codeKind={codeKind}
         onSelect={builder.setActiveItem}
         onAdd={add}
       />
@@ -80,7 +87,7 @@ export function PairItemsTab({ builder, locked }: { builder: BuilderController; 
             active={active}
             total={watchedItems.length}
             locked={locked}
-            codeKind={builder.scorerType === "PAIR_TALLY" ? "need" : "pole"}
+            codeKind={codeKind}
             onMove={move}
             onRemove={() => setConfirmRemove(active)}
             onDuplicate={duplicate}

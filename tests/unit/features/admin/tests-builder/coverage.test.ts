@@ -11,6 +11,7 @@ import {
   pairTallyPatternCodes,
   rankGroupPatternCodes,
   scaleTallyPatternCodes,
+  styleGridPatternCodes,
 } from "@/features/admin/tests-builder/coverage";
 
 describe("PATTERN_CODES", () => {
@@ -256,5 +257,32 @@ describe("markGroupPatternCodes", () => {
       "COMP",
       "S.S",
     ]);
+  });
+});
+
+describe("styleGridPatternCodes", () => {
+  const config = {
+    profiles: [
+      { code: "E", label: "Executive" },
+      { code: "CO", label: "Compromiser" },
+      { code: "BA", label: "Benevolent autocrat" },
+    ],
+  };
+
+  it("reads the profile table, in config order", () => {
+    expect(styleGridPatternCodes(config)).toEqual(["E", "CO", "BA"]);
+  });
+
+  it("uppercases a code written in mixed case", () => {
+    expect(styleGridPatternCodes({ profiles: [{ code: "dv" }] })).toEqual(["DV"]);
+  });
+
+  it("is empty when the config has no profile table", () => {
+    expect(styleGridPatternCodes(undefined)).toEqual([]);
+    expect(styleGridPatternCodes({})).toEqual([]);
+  });
+
+  it("feeds getPatternCodes for the family", () => {
+    expect(missingPatternCodes([], "STYLE_GRID", 2, [], config)).toEqual(["E", "CO", "BA"]);
   });
 });

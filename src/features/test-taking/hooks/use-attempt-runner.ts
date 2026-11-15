@@ -27,6 +27,7 @@ const AUTO_ADVANCE_MS = {
   RANK_GROUP: 400,
   RIGHT_WRONG_NORM: 300,
   SCALE_TALLY: 300,
+  STYLE_GRID: 350,
 } as const;
 
 /**
@@ -64,7 +65,10 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     scorerType === "RIGHT_WRONG_NORM" ||
     scorerType === "SCALE_TALLY" ||
     scorerType === "CHOICE_TALLY";
-  const isPair = scorerType === "FORCED_CHOICE_PAIR" || scorerType === "PAIR_TALLY";
+  const isPair =
+    scorerType === "FORCED_CHOICE_PAIR" ||
+    scorerType === "PAIR_TALLY" ||
+    scorerType === "STYLE_GRID";
   const usesRatingView = scorerType === "LIKERT";
   const usesRankView = scorerType === "RANK_GROUP";
   const usesMarkView = scorerType === "MARK_GROUP";
