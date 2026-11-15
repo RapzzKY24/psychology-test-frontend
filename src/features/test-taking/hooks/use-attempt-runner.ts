@@ -12,6 +12,7 @@ import {
   toRanks,
   toRating,
   toText,
+  toTimedGridAnswers,
 } from "../lib/answer-state";
 import type { MarkState } from "../lib/answer-state";
 import type { AttemptRead, ScorerType } from "@/lib/api/types";
@@ -31,7 +32,17 @@ const AUTO_ADVANCE_MS = {
   RIGHT_WRONG_NORM: 300,
   SCALE_TALLY: 300,
   STYLE_GRID: 350,
+  // The lajur view moves on itself once the last gap is filled; a delay here
+  // would advance a second time while the next lajur is still rendering.
+  TIMED_GRID: 0,
 } as const;
+
+/**
+ * Long enough that a lajur's 27 keystrokes collapse into one PUT, short enough
+ * that a lajur abandoned mid-typing still reaches the server before the clock
+ * runs out.
+ */
+const TIMED_GRID_SAVE_MS = 1200;
 
 /**
  * Half-filled picks must survive navigation, so a partial answer is read back
@@ -78,6 +89,8 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   const usesMarkView = scorerType === "MARK_GROUP";
   // A three-option statement draws text buttons (a/b/c), not a rating row.
   const usesOptionView = scorerType === "OPTION_SCALE";
+  // A timed grid shows one lajur at a time and moves on by itself.
+  const usesTimedGridView = scorerType === "TIMED_GRID";
   const isAnswered = (value: unknown) => isAnsweredValue(scorerType, value);
   const total = attempt.items.length;
   const safeIndex = Math.min(index, Math.max(total - 1, 0));
@@ -239,6 +252,25 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     if (missingIndex !== -1) setIndex(missingIndex);
   }, [answers, attempt.items]);
 
+  /**
+   * One lajur is one answer, saved on a pause. The view keeps the draft locally
+   * and only reports a filled row, so a lajur of 27 gaps is one PUT instead of
+   * 27 — and a lajur abandoned at the buzzer still keeps its first digits.
+   */
+  const answerTimedGrid = useCallback(
+    (next: (number | null)[]) => {
+      if (!item) return;
+      answers.answerDebounced(item.id, { answers: next }, TIMED_GRID_SAVE_MS);
+    },
+    [answers, item],
+  );
+
+  /** The last gap filled: push the lajur to the server and open the next one. */
+  const finishTimedGridColumn = useCallback(() => {
+    answers.flushPendingText();
+    if (!isLast) goNext();
+  }, [answers, goNext, isLast]);
+
   // Partial DISC picks must still render on return, so the raw value goes
   // through as-is; the view already treats a missing half as "not picked".
   const discValue =
@@ -247,7 +279,8 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     usesRatingView ||
     usesRankView ||
     usesMarkView ||
-    usesOptionView
+    usesOptionView ||
+    usesTimedGridView
       ? undefined
       : (rawValue as DiscResponse | undefined);
 
@@ -257,11 +290,13 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     usesRankView,
     usesMarkView,
     usesOptionView,
+    usesTimedGridView,
     isPair,
     total,
     safeIndex,
     item,
     discValue,
+    timedGridAnswers: toTimedGridAnswers(rawValue),
     pairChoice: toPairChoice(rawValue),
     optionChoice: toOptionChoice(rawValue),
     rating: toRating(rawValue),
@@ -290,6 +325,8 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     rank,
     mark,
     typeRightWrong,
+    answerTimedGrid,
+    finishTimedGridColumn,
     goNext,
     goPrev,
     finish,

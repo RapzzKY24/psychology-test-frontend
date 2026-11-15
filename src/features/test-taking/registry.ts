@@ -6,6 +6,7 @@ import { OptionScaleItemView } from "./components/option-scale-item-view";
 import { PairItemView } from "./components/pair-item-view";
 import { RankGroupItemView } from "./components/rank-group-item-view";
 import { RightWrongItemView } from "./components/right-wrong-item-view";
+import { TimedGridItemView } from "./components/timed-grid-item-view";
 
 /**
  * ItemView registry — mirror of BE `SCORERS` (scorers/registry.ts).
@@ -41,6 +42,9 @@ export const ITEM_RENDERERS = {
   SCALE_TALLY: RightWrongItemView,
   // A choice tally is a question with N options — also the right/wrong shape.
   CHOICE_TALLY: RightWrongItemView,
+  // A digit grid draws one lajur at a time with a box between each pair of
+  // digits; no other family has a row of answers inside one item.
+  TIMED_GRID: TimedGridItemView,
 } as const satisfies Record<ScorerType, React.ElementType>;
 
 export type RendererScorerType = keyof typeof ITEM_RENDERERS;
@@ -50,8 +54,11 @@ function isValidScorerType(value: unknown): value is ScorerType {
 }
 
 function sniffScorerType(items: Array<{ content: Record<string, unknown> }>): ScorerType {
-  const first = items[0]?.content as { words?: unknown; statements?: unknown } | undefined;
+  const first = items[0]?.content as
+    | { words?: unknown; statements?: unknown; digits?: unknown }
+    | undefined;
   if (Array.isArray(first?.words)) return "FORCED_CHOICE_DISC";
+  if (Array.isArray(first?.digits)) return "TIMED_GRID";
   if (Array.isArray(first?.statements)) return "FORCED_CHOICE_PAIR";
   return "RIGHT_WRONG_NORM";
 }

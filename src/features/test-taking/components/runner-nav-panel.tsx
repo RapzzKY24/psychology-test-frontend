@@ -16,6 +16,8 @@ interface RunnerNavPanelProps {
   allAnswered: boolean;
   completing: boolean;
   remainingSeconds?: number | null;
+  /** A timed grid locks the map and the back button; see `RunnerMobileBar`. */
+  locked?: boolean;
   onSelect: (index: number) => void;
   onPrev: () => void;
   onNext: () => void;
@@ -34,6 +36,7 @@ export function RunnerNavPanel({
   allAnswered,
   completing,
   remainingSeconds,
+  locked = false,
   onSelect,
   onPrev,
   onNext,
@@ -56,17 +59,19 @@ export function RunnerNavPanel({
           <span className="text-sm font-normal text-muted-foreground">dari {total}</span>
         </p>
       </div>
-      <QuestionNavigator
-        total={total}
-        answered={answered}
-        activeIndex={activeIndex}
-        onSelect={onSelect}
-        orientation="vertical"
-      />
+      {locked ? null : (
+        <QuestionNavigator
+          total={total}
+          answered={answered}
+          activeIndex={activeIndex}
+          onSelect={onSelect}
+          orientation="vertical"
+        />
+      )}
       <Separator />
       <NavButtons
         stacked
-        atStart={atStart}
+        atStart={atStart || locked}
         isLast={isLast}
         currentAnswered={currentAnswered}
         allAnswered={allAnswered}

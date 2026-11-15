@@ -5,6 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReviewAnswerSection } from "@/features/psikolog/review/components/review-answer-section";
 import { ReviewDetailActions } from "@/features/psikolog/review/components/review-detail-actions";
 import { ReviewScoreCards } from "@/features/psikolog/review/components/review-score-cards";
+import {
+  WorkCurveChart,
+  isTimedGridScores,
+} from "@/features/psikolog/review/components/work-curve-chart";
 import { fetchReviewDetailServer } from "@/features/psikolog/review/api.server";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
@@ -52,6 +56,17 @@ export default async function ReviewDetailPage({
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
             {detail.interpretation.body}
+          </CardContent>
+        </Card>
+      )}
+
+      {isTimedGridScores(result.scores) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Kurva kerja</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WorkCurveChart scores={result.scores} />
           </CardContent>
         </Card>
       )}

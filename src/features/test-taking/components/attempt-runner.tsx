@@ -11,6 +11,7 @@ import { RightWrongItemView } from "./right-wrong-item-view";
 import { RunnerHeader } from "./runner-header";
 import { RunnerMobileBar } from "./runner-mobile-bar";
 import { RunnerNavPanel } from "./runner-nav-panel";
+import { TimedGridItemView } from "./timed-grid-item-view";
 import { useAttemptRunner } from "../hooks/use-attempt-runner";
 import { resolveScorerType } from "../registry";
 import type { AttemptRead } from "@/lib/api/types";
@@ -49,7 +50,7 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
 
   return (
     <main className="flex w-full flex-1 flex-col gap-6 px-4 pt-4 pb-10 sm:px-6 lg:flex-row lg:items-start lg:gap-8 lg:py-10">
-      <RunnerMobileBar {...navProps} />
+      <RunnerMobileBar {...navProps} locked={runner.usesTimedGridView} />
 
       <div className="flex w-full min-w-0 flex-col gap-6 lg:order-1 lg:w-auto lg:flex-1">
         <RunnerHeader
@@ -61,7 +62,22 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
           remainingSeconds={runner.remainingSeconds}
         />
 
-        {runner.usesMarkView ? (
+        {runner.usesTimedGridView ? (
+          <TimedGridItemView
+            column={
+              typeof runner.content.column === "number" ? runner.content.column : 1
+            }
+            digits={
+              Array.isArray(runner.content.digits)
+                ? (runner.content.digits as number[])
+                : []
+            }
+            answers={runner.timedGridAnswers}
+            disabled={runner.timeUp}
+            onChange={runner.answerTimedGrid}
+            onComplete={runner.finishTimedGridColumn}
+          />
+        ) : runner.usesMarkView ? (
           <MarkGroupItemView
             order={runner.safeIndex + 1}
             question={(runner.content.question as string | null) ?? null}
@@ -143,6 +159,7 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
         running={!runner.completed}
         allAnswered={runner.allAnswered}
         remainingSeconds={runner.remainingSeconds}
+        locked={runner.usesTimedGridView}
       />
     </main>
   );

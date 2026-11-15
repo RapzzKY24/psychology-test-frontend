@@ -20,6 +20,7 @@ describe("scorer options", () => {
       "RANK_GROUP",
       "LIKERT",
       "OPTION_SCALE",
+      "TIMED_GRID",
     ]);
   });
 

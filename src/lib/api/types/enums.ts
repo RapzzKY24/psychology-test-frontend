@@ -31,6 +31,7 @@ export const SCORER_TYPES = [
   "RIGHT_WRONG_NORM",
   "SCALE_TALLY",
   "STYLE_GRID",
+  "TIMED_GRID",
 ] as const;
 export type ScorerType = (typeof SCORER_TYPES)[number];
 

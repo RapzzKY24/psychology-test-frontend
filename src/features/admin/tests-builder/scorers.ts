@@ -84,6 +84,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
     description:
       "Tiap pernyataan punya tiga pilihan jawaban (a/b/c). Tiap pilihan menambah skor satu faktor, lalu skor faktor dibaca sebagai sten dari tabel norma sesuai jenis kelamin dan jenjang pendidikan.",
   },
+  {
+    value: "TIMED_GRID",
+    label: "Kisi angka berwaktu (Pauli/Kraepelin)",
+    description:
+      "Tiap soal adalah satu lajur berisi deretan angka; peserta menulis angka terakhir dari penjumlahan dua angka bersebelahan, secepat mungkin sampai waktu habis. Jawaban benar per lajur membentuk kurva kerja, dan kurva itu dibaca sebagai faktor kecepatan, ketelitian, ketahanan dan keajegan.",
+  },
 ] as const;
 
 export const DEFAULT_SCORER_BY_CATEGORY: Record<TestCategory, ScorerType> = {

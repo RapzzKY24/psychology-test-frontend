@@ -11,6 +11,12 @@ interface RunnerMobileBarProps {
   isLast: boolean;
   currentAnswered: boolean;
   completing: boolean;
+  /**
+   * A timed grid may not be walked back through: a lajur already left keeps
+   * its gaps, and reopening it would turn a real "terlewati" into a filled
+   * cell. Locks the map and the back button.
+   */
+  locked?: boolean;
   onSelect: (index: number) => void;
   onPrev: () => void;
   onNext: () => void;
@@ -29,6 +35,7 @@ export function RunnerMobileBar({
   isLast,
   currentAnswered,
   completing,
+  locked = false,
   onSelect,
   onPrev,
   onNext,
@@ -37,15 +44,23 @@ export function RunnerMobileBar({
   return (
     <div className="sticky top-0 z-40 -mx-4 border-b bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
       <div className="flex flex-col gap-2">
-        <QuestionNavigator
-          total={total}
-          answered={answered}
-          activeIndex={activeIndex}
-          onSelect={onSelect}
-          orientation="horizontal"
-        />
+        {locked ? null : (
+          <QuestionNavigator
+            total={total}
+            answered={answered}
+            activeIndex={activeIndex}
+            onSelect={onSelect}
+            orientation="horizontal"
+          />
+        )}
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="flex-1" onClick={onPrev} disabled={atStart}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={onPrev}
+            disabled={atStart || locked}
+          >
             Sebelumnya
           </Button>
           <p className="shrink-0 px-1 text-xs font-medium text-muted-foreground tabular-nums">

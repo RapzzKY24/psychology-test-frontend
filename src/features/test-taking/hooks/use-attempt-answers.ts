@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { isApiError } from "@/lib/api/client";
@@ -37,7 +37,14 @@ export function useAttemptAnswers(
    * upsert overwrite the first pick.
    */
   const saveQueue = useRef<Promise<void>>(Promise.resolve());
-  const pendingText = useRef<{ itemId: string; value: unknown; timer: number } | null>(null);
+  /**
+   * Items whose latest value has not been sent yet. A map, not a single slot:
+   * a digit grid debounces one lajur while the participant may already have
+   * moved on to the next, and a single slot would drop the earlier lajur.
+   */
+  const pending = useRef(
+    new Map<string, { value: unknown; timer: number }>(),
+  );
 
   const enqueue = useCallback(
     (itemId: string, value: unknown) => {
@@ -59,27 +66,51 @@ export function useAttemptAnswers(
     [enqueue],
   );
 
-  /** Short answers update the UI at once but only reach the server when idle. */
-  const answerText = useCallback(
-    (itemId: string, text: string) => {
-      setAnswers((prev) => ({ ...prev, [itemId]: { text } }));
-      if (pendingText.current) window.clearTimeout(pendingText.current.timer);
+  /**
+   * The UI takes the value at once; the server only hears about it when the
+   * participant pauses. Used for short answers and for a digit grid, where a
+   * lajur of 27 gaps would otherwise be 27 PUTs.
+   */
+  const answerDebounced = useCallback(
+    (itemId: string, value: unknown, delayMs = TEXT_SAVE_DEBOUNCE_MS) => {
+      setAnswers((prev) => ({ ...prev, [itemId]: value }));
+      const queued = pending.current.get(itemId);
+      if (queued) window.clearTimeout(queued.timer);
       const timer = window.setTimeout(() => {
-        pendingText.current = null;
-        enqueue(itemId, { text });
-      }, TEXT_SAVE_DEBOUNCE_MS);
-      pendingText.current = { itemId, value: { text }, timer };
+        pending.current.delete(itemId);
+        enqueue(itemId, value);
+      }, delayMs);
+      pending.current.set(itemId, { value, timer });
     },
     [enqueue],
   );
 
+  /** Short answers update the UI at once but only reach the server when idle. */
+  const answerText = useCallback(
+    (itemId: string, text: string) => {
+      answerDebounced(itemId, { text });
+    },
+    [answerDebounced],
+  );
+
   const flushPendingText = useCallback(() => {
-    const pending = pendingText.current;
-    if (!pending) return;
-    window.clearTimeout(pending.timer);
-    pendingText.current = null;
-    enqueue(pending.itemId, pending.value);
+    for (const [itemId, queued] of pending.current) {
+      window.clearTimeout(queued.timer);
+      enqueue(itemId, queued.value);
+    }
+    pending.current.clear();
   }, [enqueue]);
+
+  // A lajur left half-typed when the tab closes would lose its last digits.
+  useEffect(() => {
+    const flush = () => flushPendingText();
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", flush);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", flush);
+    };
+  }, [flushPendingText]);
 
   const items = attempt.items;
   const answeredCount = useMemo(
@@ -128,6 +159,8 @@ export function useAttemptAnswers(
     answers,
     answer,
     answerText,
+    answerDebounced,
+    flushPendingText,
     answeredCount,
     firstUnansweredId,
     completed,

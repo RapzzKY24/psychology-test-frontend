@@ -274,6 +274,9 @@ export function getPatternCodes(
   if (scorerType === "OPTION_SCALE") return optionScalePatternCodes(itemContents ?? []);
   if (scorerType === "SCALE_TALLY") return scaleTallyPatternCodes(itemContents ?? []);
   if (scorerType === "CHOICE_TALLY") return choiceTallyPatternCodes(itemContents ?? []);
+  // A work curve is a score profile, not a typology: publish must not demand an
+  // interpretation for a code that never occurs.
+  if (scorerType === "TIMED_GRID") return [];
   return PATTERN_CODES;
 }
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ClipboardCheck } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { ScoreSummary } from "@/components/shared/score-summary";
 import { fetchMeResultDetailServer } from "@/features/participant/api";
@@ -34,15 +35,32 @@ export default async function HasilDetailPage({ params }: PageProps<"/hasil/[att
           <CardTitle className="text-lg">Ringkasan skor</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ScoreSummary scores={detail.scores} />
-          <p className="text-xs text-muted-foreground">
-            Kode pola:{" "}
-            <span className="font-mono font-medium text-foreground">{detail.patternCode}</span>
-          </p>
+          {detail.scorerType === "TIMED_GRID" ? (
+            <div className="flex items-start gap-3 rounded-xl border bg-primary/5 p-4">
+              <ClipboardCheck className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+              <div className="space-y-1">
+                <p className="text-sm font-medium">Hasil sudah selesai</p>
+                <p className="text-sm text-muted-foreground">
+                  Tes ini dinilai dari kurva kerja Anda, jadi ringkasannya disampaikan
+                  langsung oleh psikolog pada sesi konsultasi.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <ScoreSummary scores={detail.scores} />
+              <p className="text-xs text-muted-foreground">
+                Kode pola:{" "}
+                <span className="font-mono font-medium text-foreground">
+                  {detail.patternCode}
+                </span>
+              </p>
+            </>
+          )}
         </CardContent>
       </Card>
 
-      {detail.interpretation ? (
+      {detail.scorerType === "TIMED_GRID" ? null : detail.interpretation ? (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">{detail.interpretation.title}</CardTitle>

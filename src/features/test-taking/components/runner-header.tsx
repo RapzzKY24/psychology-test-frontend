@@ -90,6 +90,14 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       Anda. Tidak ada jawaban benar atau salah; jawaban tersimpan otomatis.
     </>
   ),
+  TIMED_GRID: (
+    <>
+      Kerjakan secepat dan seteliti mungkin. Untuk tiap pasangan angka, tulis{" "}
+      <span className="font-medium text-foreground">angka terakhir</span> dari
+      penjumlahannya. Lajur berpindah sendiri begitu semua kotak terisi dan tidak bisa
+      dibuka lagi — jangan berhenti di tengah lajur.
+    </>
+  ),
 };
 
 interface RunnerHeaderProps {

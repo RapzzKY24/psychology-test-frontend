@@ -572,3 +572,52 @@ export function slugify(name: string): string {
 export function normalizePairNormContent(content: unknown): PairNormItemContentInput {
   return normalizeStyleGridContent(content);
 }
+
+/**
+ * A lajur of a digit grid. The answer key is never stored: the backend derives
+ * it from `digits`, so the admin only has to get the digits right.
+ */
+export const TimedGridItemContentSchema = z.object({
+  column: z.number().int().min(1).max(200),
+  digits: z.array(z.number().int().min(0).max(9)).min(2).max(60),
+});
+
+export type TimedGridItemContentInput = z.infer<typeof TimedGridItemContentSchema>;
+
+/**
+ * The paste format: one lajur per line, digits read off the line and every
+ * other character ignored — a column copied out of the source PDF arrives with
+ * spaces, tabs and stray punctuation.
+ */
+export function parseTimedGridLines(text: string): {
+  items: TimedGridItemContentInput[];
+  errors: string[];
+} {
+  const items: TimedGridItemContentInput[] = [];
+  const errors: string[] = [];
+  text.split(/\r?\n/).forEach((line, index) => {
+    if (!line.trim()) return;
+    const digits = line.replace(/\D/g, "").split("").map(Number);
+    if (digits.length < 2) {
+      errors.push(`Baris ${index + 1}: butuh minimal dua angka.`);
+      return;
+    }
+    if (digits.length > 60) {
+      errors.push(`Baris ${index + 1}: maksimal 60 angka.`);
+      return;
+    }
+    items.push({ column: items.length + 1, digits });
+  });
+  return { items, errors };
+}
+
+/** The inverse of `parseTimedGridLines`, so the tab reopens on its own paste. */
+export function timedGridLines(items: { content: unknown }[]): string {
+  return items
+    .map((item) => {
+      const digits = (item.content as { digits?: unknown } | undefined)?.digits;
+      return Array.isArray(digits) ? digits.join("") : "";
+    })
+    .filter((line) => line.length > 0)
+    .join("\n");
+}

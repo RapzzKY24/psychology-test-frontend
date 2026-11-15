@@ -72,6 +72,22 @@ export function isAnsweredMarks(value: unknown): boolean {
   return marks.liked.length + marks.disliked.length > 0;
 }
 
+/**
+ * A timed grid stores one digit per gap, `null` for a gap left empty. The array
+ * is position-keyed, so it is never trimmed: index 4 is the fifth gap whether
+ * or not the earlier ones are filled.
+ */
+export function toTimedGridAnswers(value: unknown): (number | null)[] {
+  const v = value as { answers?: unknown } | undefined;
+  if (!Array.isArray(v?.answers)) return [];
+  return v.answers.map((answer) => (typeof answer === "number" ? answer : null));
+}
+
+/** A lajur counts as answered once any gap holds a digit. */
+export function isAnsweredTimedGrid(value: unknown): boolean {
+  return toTimedGridAnswers(value).some((answer) => answer !== null);
+}
+
 /** A group counts as answered only when every option holds a rank. */
 export function isAnsweredRanks(value: unknown): boolean {
   const ranks = toRanks(value);
@@ -103,5 +119,6 @@ export function isAnsweredValue(scorerType: ScorerType, value: unknown): boolean
   if (scorerType === "OPTION_SCALE") return toOptionChoice(value) !== null;
   if (scorerType === "RANK_GROUP") return isAnsweredRanks(value);
   if (scorerType === "MARK_GROUP") return isAnsweredMarks(value);
+  if (scorerType === "TIMED_GRID") return isAnsweredTimedGrid(value);
   return isAnsweredRightWrong(value);
 }

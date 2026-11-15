@@ -115,6 +115,8 @@ export interface TestResultRow {
 /** `GET /api/v1/public/attempts/:id/result` (released view; 403 result_not_released pre-approval). */
 export interface TestResultView {
   patternCode: string;
+  /** The family that scored it — `/hasil` shows a neutral card for TIMED_GRID. */
+  scorerType?: ScorerType;
   scores: Record<string, number>;
   interpretation: Interpretation | null;
   completedAt: string;

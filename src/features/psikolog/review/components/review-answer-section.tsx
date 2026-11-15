@@ -14,6 +14,8 @@ import { OptionScaleDetailTable } from "./option-scale-detail-table";
 import { PairDetailTable, type PairItem, type PairResponseRow } from "./pair-detail-table";
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
 import { ScaleTallyDetailTable } from "./scale-tally-detail-table";
+import { TimedGridDetailTable } from "./timed-grid-detail-table";
+import type { TimedGridScores } from "./work-curve-chart";
 
 /** The table takes the item/response slices it renders, not the whole review. */
 interface RightWrongItem {
@@ -47,8 +49,15 @@ export function ReviewAnswerSection({ detail, scores }: ReviewAnswerSectionProps
         mapping?: unknown;
         scale?: unknown;
         text?: unknown;
+        digits?: unknown;
       }
     | undefined;
+
+  // A digit grid is the only family whose item is a row of numbers; every
+  // other branch below would print it as an unanswered question.
+  if (detail.items.length > 0 && Array.isArray(firstContent?.digits)) {
+    return <TimedGridDetailTable scores={scores as unknown as TimedGridScores} />;
+  }
 
   // A three-option item also carries `text`, so it has to be recognised before
   // the Likert branch — otherwise every rating column prints "—".

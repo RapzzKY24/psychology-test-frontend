@@ -11,6 +11,7 @@ import { PairItemsTab } from "./pair-items-tab";
 import { RankGroupItemsTab } from "./rank-group-items-tab";
 import { RightWrongItemsTab } from "./right-wrong-items-tab";
 import { ScaleTallyItemsTab } from "./scale-tally-items-tab";
+import { TimedGridItemsTab } from "./timed-grid-items-tab";
 import { InterpretationsTab } from "./interpretations-tab";
 import { useBuilderForm } from "../hooks/use-builder-form";
 import { scorerOption } from "../scorers";
@@ -47,8 +48,8 @@ function ItemsTabFor({
       return <LikertItemsTab builder={builder} locked={builder.locked} />;
     case "OPTION_SCALE":
       return <OptionScaleItemsTab builder={builder} locked={builder.locked} />;
-    case "OPTION_SCALE":
-      return <OptionScaleItemsTab builder={builder} locked={builder.locked} />;
+    case "TIMED_GRID":
+      return <TimedGridItemsTab builder={builder} locked={builder.locked} />;
     case "CHOICE_TALLY":
       return <ChoiceTallyItemsTab builder={builder} locked={builder.locked} />;
     case "MARK_GROUP":
