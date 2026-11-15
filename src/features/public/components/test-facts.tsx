@@ -18,7 +18,7 @@ function Fact({ icon: Icon, label, value }: { icon: typeof Clock; label: string;
 /** Three-cell summary strip — the facts people scan for before reading on. */
 export function TestFacts({ test }: { test: PublicTest }) {
   return (
-    <div className="bg-border grid grid-cols-2 gap-px overflow-hidden rounded-2xl border sm:grid-cols-3">
+    <div className="bg-border grid grid-cols-1 gap-px overflow-hidden rounded-2xl border sm:grid-cols-3">
       <Fact icon={Clock} label="Durasi" value={`${test.estimatedDurationMin} menit`} />
       <Fact icon={Layers} label="Kategori" value={TEST_CATEGORY_LABELS[test.category]} />
       <Fact icon={FileText} label="Hasil" value="Laporan PDF + QR" />

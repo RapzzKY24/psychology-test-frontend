@@ -6,6 +6,7 @@ import { TestBuyBar, TestBuyPanel } from "./test-buy-panel";
 import { TestDetailHeader } from "./test-detail-header";
 import { TestFaq } from "./test-faq";
 import { TestFacts } from "./test-facts";
+import { TestReportContents } from "./test-report-contents";
 import { TestSteps } from "./test-steps";
 
 /** Layout of the public test detail page — sections only, no data fetching. */
@@ -26,6 +27,7 @@ export function TestDetailView({ test, role }: { test: PublicTest; role: UserRol
             <TestDetailHeader test={test} />
             <TestFacts test={test} />
             <AgeGateCard role={role} className="lg:hidden" />
+            <TestReportContents />
             <TestSteps />
             <TestFaq />
           </div>
