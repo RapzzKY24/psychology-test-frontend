@@ -23,6 +23,12 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  /* Test categories — the only place colour leaves the neutral scale. */
+  --color-category-personality: var(--category-personality);
+  --color-category-cognitive: var(--category-cognitive);
+  --color-category-work-style: var(--category-work-style);
+  --color-category-interest: var(--category-interest);
+  --color-category-projective: var(--category-projective);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -72,6 +78,15 @@
   --chart-3: oklch(0.78 0.155 85);
   --chart-4: oklch(0.42 0.17 264);
   --chart-5: oklch(0.55 0.05 264);
+  /*
+   * Category accents. Low chroma on purpose: they separate five kinds of test
+   * without turning the catalog into a rainbow next to the neutral UI.
+   */
+  --category-personality: oklch(0.55 0.16 285);
+  --category-cognitive: oklch(0.55 0.1 200);
+  --category-work-style: oklch(0.6 0.12 60);
+  --category-interest: oklch(0.55 0.11 150);
+  --category-projective: oklch(0.55 0.13 340);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0.008 264);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -107,6 +122,11 @@
   --chart-3: oklch(0.82 0.16 85);
   --chart-4: oklch(0.45 0.15 264);
   --chart-5: oklch(0.6 0.04 264);
+  --category-personality: oklch(0.75 0.13 285);
+  --category-cognitive: oklch(0.75 0.09 200);
+  --category-work-style: oklch(0.8 0.11 75);
+  --category-interest: oklch(0.75 0.1 150);
+  --category-projective: oklch(0.75 0.11 340);
   --sidebar: oklch(0.19 0.025 264);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.55 0.21 264);
