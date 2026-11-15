@@ -5,6 +5,7 @@ import type {
   PublicTest,
   PublicArticleListItem,
   PublicArticle,
+  PublicPsychologist,
   InvoiceVerification,
   ReportVerification,
   CertificateVerification,
@@ -35,6 +36,17 @@ export const fetchPublicTestsServer = cache(
 
 export const fetchPublicTestServer = cache((slug: string): Promise<ApiSuccess<PublicTest>> =>
   apiFetchServer<PublicTest>(`/tests/${slug}`, { revalidate: PUBLIC_REVALIDATE }),
+);
+
+/**
+ * The psychologists who sign reports. Site-level, not per test: the catalog has
+ * no author field, so this is the same list on every detail page.
+ */
+export const fetchPublicPsychologistsServer = cache(
+  (): Promise<ApiSuccess<PublicPsychologist[]>> =>
+    apiFetchServer<PublicPsychologist[]>("/psychologists", {
+      revalidate: PUBLIC_REVALIDATE,
+    }),
 );
 
 export const fetchPublicArticlesServer = cache(

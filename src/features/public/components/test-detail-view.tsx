@@ -1,16 +1,25 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import type { PublicTest, UserRole } from "@/lib/api/types";
+import type { PublicPsychologist, PublicTest, UserRole } from "@/lib/api/types";
 import { AgeGateCard, AgeGateProvider } from "./age-gate";
 import { TestBuyBar, TestBuyPanel } from "./test-buy-panel";
 import { TestDetailHeader } from "./test-detail-header";
 import { TestFaq } from "./test-faq";
 import { TestFacts } from "./test-facts";
+import { TestPsychologistCard } from "./test-psychologist-card";
 import { TestReportContents } from "./test-report-contents";
 import { TestSteps } from "./test-steps";
 
 /** Layout of the public test detail page — sections only, no data fetching. */
-export function TestDetailView({ test, role }: { test: PublicTest; role: UserRole | null }) {
+export function TestDetailView({
+  test,
+  role,
+  psychologists,
+}: {
+  test: PublicTest;
+  role: UserRole | null;
+  psychologists: PublicPsychologist[];
+}) {
   return (
     <AgeGateProvider band={test.ageBand}>
       <main className="mx-auto w-full max-w-6xl px-4 py-8 pb-28 sm:px-6 sm:py-10 md:pb-14">
@@ -29,6 +38,7 @@ export function TestDetailView({ test, role }: { test: PublicTest; role: UserRol
             <AgeGateCard role={role} className="lg:hidden" />
             <TestReportContents />
             <TestSteps />
+            <TestPsychologistCard psychologists={psychologists} />
             <TestFaq />
           </div>
 
