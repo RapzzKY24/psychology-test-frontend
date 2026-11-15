@@ -10,7 +10,7 @@ import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import { cn } from "@/lib/utils";
 import type { ManualMark } from "@/lib/api/types";
 import { MANUAL_MARK_LABELS } from "@/lib/manual-marks";
-import { uploadItemImage } from "../api";
+import { useUploadDrawing } from "../hooks/use-upload-drawing";
 import { paintStimulus } from "../lib/manual-marks";
 
 interface ManualItemViewProps {
@@ -53,7 +53,7 @@ export function ManualItemView({
   const loadedRef = useRef<string | null>(null);
   const [empty, setEmpty] = useState(true);
   const [dirty, setDirty] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const { upload, saving } = useUploadDrawing();
 
   /** Repaint the lower layer with the printed mark only. */
   const paintMark = useCallback(() => {
@@ -182,23 +182,20 @@ export function ManualItemView({
       return;
     }
 
-    setSaving(true);
     try {
       const file = new File([blob], "drawing.png", { type: "image/png" });
-      const { data } = await uploadItemImage(
+      const savedUrl = await upload(
         attemptId,
         itemId,
         file,
         participantToken ?? undefined,
       );
-      loadedRef.current = data.imageUrl;
+      loadedRef.current = savedUrl;
       setDirty(false);
-      onSaved(data.imageUrl);
+      onSaved(savedUrl);
       toast.success("Gambar tersimpan.");
     } catch (error) {
       toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
-    } finally {
-      setSaving(false);
     }
   };
 

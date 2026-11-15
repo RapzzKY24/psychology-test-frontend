@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { formatDayShort } from "@/lib/format/format-day-short";
-import type { ReviewStatsPoint } from "../api";
+import type { ReviewStatsPoint } from "../types";
 
 const CHART_CONFIG = {
   count: { label: "Hasil masuk", color: "var(--chart-1)" },

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { computeBatchAmount } from "@/features/instansi/sessions/compute-batch-amount";
-import type { InstansiTestOption } from "@/features/instansi/sessions/api";
+import type { InstansiTestOption } from "@/features/instansi/sessions/types";
 
 function test(price: number, id = "t1"): InstansiTestOption {
   return {

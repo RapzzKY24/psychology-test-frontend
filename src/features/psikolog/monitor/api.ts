@@ -2,20 +2,9 @@ import { apiFetchServer, apiRawServer } from "@/lib/api/server";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { PsychologistProfileResponse } from "@/lib/api/types";
 import type { ReviewListItem } from "@/lib/api/types";
+import type { ReviewStats } from "./types";
 
 /** Server-only fetchers for the psychologist overview (RSC pages). */
-
-export interface ReviewStatsPoint {
-  /** `YYYY-MM-DD` in Asia/Jakarta. */
-  date: string;
-  count: number;
-}
-
-export interface ReviewStats {
-  incoming: ReviewStatsPoint[];
-  mine: { approved7d: number; returned7d: number };
-  queueNow: number;
-}
 
 export function fetchReviewQueueCount(): Promise<number> {
   return apiFetchServer<ReviewListItem[]>("/psychologist/reviews?status=PENDING_REVIEW&limit=1").then(

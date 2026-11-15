@@ -1,18 +1,13 @@
 import { apiFetch } from "@/lib/api/client";
-import type { PublicTest, SessionSummary } from "@/lib/api/types";
+import type { SessionSummary } from "@/lib/api/types";
 import type { InstansiInvoice, InstansiSessionDetail, ResetSeatResult } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
+import type { InstansiTestOption } from "./types";
 
 export interface InstansiSessionFilters {
   page?: number;
   limit?: number;
 }
-
-/**
- * `GET /instansi/tests` returns the full public DTO (price included) for every
- * published test.
- */
-export type InstansiTestOption = PublicTest;
 
 export interface CreateInstansiSessionInput {
   testIds: string[];

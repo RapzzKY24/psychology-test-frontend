@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { SingleTestCheckout } from "@/features/instansi/sessions/components/single-test-checkout";
-import type { InstansiTestOption } from "@/features/instansi/sessions/api";
+import type { InstansiTestOption } from "@/features/instansi/sessions/types";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),

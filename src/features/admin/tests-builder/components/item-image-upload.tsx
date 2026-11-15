@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { ImageIcon, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { uploadItemImage } from "../api";
-
-const MAX_BYTES = 2 * 1024 * 1024;
-const ALLOWED = ["image/png", "image/jpeg"];
+import { useItemImageUpload } from "../hooks/use-item-image-upload";
 
 interface ItemImageUploadProps {
   testId: string;
@@ -19,17 +16,11 @@ interface ItemImageUploadProps {
 }
 
 export function ItemImageUpload({ testId, value, serverError, onChange }: ItemImageUploadProps) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const { inputRef, preview, error, pending, pick, clear } = useItemImageUpload({
+    testId,
+    onChange,
+  });
   const [loadError, setLoadError] = useState(false);
-
-  useEffect(() => {
-    return () => {
-      if (preview) URL.revokeObjectURL(preview);
-    };
-  }, [preview]);
 
   const displayUrl = preview ?? value ?? null;
   const shownError = error ?? serverError ?? null;
@@ -42,43 +33,6 @@ export function ItemImageUpload({ testId, value, serverError, onChange }: ItemIm
     setPrevDisplayUrl(displayUrl);
     setLoadError(false);
   }
-
-  const pick = async (file: File | undefined) => {
-    setError(null);
-    setLoadError(false);
-    if (!file) return;
-    if (!ALLOWED.includes(file.type)) {
-      setError("Format file tidak didukung (PNG/JPG).");
-      return;
-    }
-    if (file.size > MAX_BYTES) {
-      setError("Ukuran file terlalu besar (maks 2MB).");
-      return;
-    }
-    const objectUrl = URL.createObjectURL(file);
-    setPreview(objectUrl);
-    setPending(true);
-    try {
-      const { data } = await uploadItemImage(testId, file);
-      onChange(data.imageUrl);
-      setPreview(null);
-      URL.revokeObjectURL(objectUrl);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal mengunggah gambar.");
-      setPreview(null);
-      URL.revokeObjectURL(objectUrl);
-    } finally {
-      setPending(false);
-    }
-  };
-
-  const clear = () => {
-    setError(null);
-    setPreview(null);
-    setLoadError(false);
-    onChange(null);
-    if (inputRef.current) inputRef.current.value = "";
-  };
 
   return (
     <Field data-invalid={Boolean(error)}>
@@ -103,7 +57,10 @@ export function ItemImageUpload({ testId, value, serverError, onChange }: ItemIm
               variant="outline"
               size="icon"
               className="absolute right-2 top-2 size-7 bg-white shadow"
-              onClick={clear}
+              onClick={() => {
+                clear();
+                setLoadError(false);
+              }}
               aria-label="Hapus gambar"
             >
               <X className="size-4" />
@@ -128,6 +85,7 @@ export function ItemImageUpload({ testId, value, serverError, onChange }: ItemIm
             onChange={(e) => {
               const file = e.target.files?.[0];
               e.target.value = "";
+              setLoadError(false);
               void pick(file);
             }}
             className="hidden"

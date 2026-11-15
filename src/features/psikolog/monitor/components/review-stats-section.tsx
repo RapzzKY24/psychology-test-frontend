@@ -1,7 +1,7 @@
 import { CheckCircle2, Undo2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReviewIncomingChart } from "./review-incoming-chart";
-import type { ReviewStats } from "../api";
+import type { ReviewStats } from "../types";
 
 export function ReviewStatsSection({ stats }: { stats: ReviewStats }) {
   const cards = [

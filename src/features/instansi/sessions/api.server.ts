@@ -2,7 +2,8 @@ import { apiFetchServer } from "@/lib/api/server";
 import type { SessionSummary } from "@/lib/api/types";
 import type { InstansiSessionDetail } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
-import type { InstansiSessionFilters, InstansiTestOption } from "./api";
+import type { InstansiSessionFilters } from "./api";
+import type { InstansiTestOption } from "./types";
 
 /** Server-only fetchers for the instansi sessions feature (RSC pages). */
 

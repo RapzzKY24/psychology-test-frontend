@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { formatIdr } from "@/lib/format/format-idr";
-import type { InstansiTestOption } from "../api";
+import type { InstansiTestOption } from "../types";
 import { MAX_SLOT_LIMIT } from "../constants";
 import { useInstansiTests } from "../hooks/use-instansi-tests";
 import { useSingleTestCheckout } from "../hooks/use-single-test-checkout";

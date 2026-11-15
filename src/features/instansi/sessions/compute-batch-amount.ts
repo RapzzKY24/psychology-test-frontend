@@ -1,4 +1,4 @@
-import type { InstansiTestOption } from "./api";
+import type { InstansiTestOption } from "./types";
 
 /**
  * Prepaid batch total: Σ(test price) × slotLimit.

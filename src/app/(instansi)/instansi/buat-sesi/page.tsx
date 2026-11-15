@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
-import type { InstansiTestOption } from "@/features/instansi/sessions/api";
+import type { InstansiTestOption } from "@/features/instansi/sessions/types";
 import { fetchPublishedTestsServer } from "@/features/instansi/sessions/api.server";
 import { SingleTestCheckout } from "@/features/instansi/sessions/components/single-test-checkout";
 

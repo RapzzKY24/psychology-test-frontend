@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { qk } from "@/lib/api/query-keys";
 import { fetchPublishedTests } from "../api";
-import type { InstansiTestOption } from "../api";
+import type { InstansiTestOption } from "../types";
 import { INSTANSI_TESTS_STALE_MS } from "../constants";
 
 /**

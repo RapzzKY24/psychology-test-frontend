@@ -1,13 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { isApiError } from "@/lib/api/client";
-import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
-import { uploadArticleImage } from "../api";
+import { useUploadArticleImage } from "../hooks/use-upload-article-image";
 
 interface ArticleBlockImageEditorProps {
   url: string;
@@ -20,20 +16,9 @@ export function ArticleBlockImageEditor({
   caption,
   onChange,
 }: ArticleBlockImageEditorProps) {
-  const [uploading, setUploading] = useState(false);
-
-  const pick = async (file: File | undefined) => {
-    if (!file) return;
-    setUploading(true);
-    try {
-      const mediaUrl = await uploadArticleImage(file);
-      onChange(mediaUrl, caption);
-    } catch (error) {
-      toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
-    } finally {
-      setUploading(false);
-    }
-  };
+  const { upload, uploading } = useUploadArticleImage({
+    onUploaded: (mediaUrl) => onChange(mediaUrl, caption),
+  });
 
   return (
     <div className="space-y-2">
@@ -51,7 +36,7 @@ export function ArticleBlockImageEditor({
           aria-label="Unggah gambar"
           className="max-w-xs"
           onChange={(e) => {
-            void pick(e.target.files?.[0]);
+            void upload(e.target.files?.[0]);
             e.target.value = "";
           }}
         />

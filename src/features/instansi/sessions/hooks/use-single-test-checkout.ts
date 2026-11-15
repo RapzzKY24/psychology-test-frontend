@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { isApiError } from "@/lib/api/client";
 import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import { createInstansiSession } from "../api";
-import type { InstansiTestOption } from "../api";
+import type { InstansiTestOption } from "../types";
 import { computeBatchAmount } from "../compute-batch-amount";
 import { CreateBatchSchema, type CreateBatchInput } from "../schemas";
 
