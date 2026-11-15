@@ -3,8 +3,10 @@ import {
   CreateTestSchema,
   DiscItemContentSchema,
   LikertItemContentSchema,
+  MarkGroupItemContentSchema,
   RankGroupItemContentSchema,
   normalizeLikertContent,
+  normalizeMarkGroupContent,
   normalizeRankGroupContent,
   slugify,
 } from "@/features/admin/tests-builder/schemas";
@@ -196,5 +198,68 @@ describe("RankGroupItemContentSchema", () => {
       femaleOptions: ["Pekerjaan pertanian", ""],
       mapping: ["OUT", "COMP"],
     });
+  });
+});
+
+describe("MarkGroupItemContentSchema", () => {
+  const ready = {
+    question: "Kelompok 1",
+    options: ["Berkebun", "Membongkar mesin"],
+    mapping: [["OUT"], ["ME", "COMP"]],
+  };
+
+  it("accepts a list where every activity carries its fields", () => {
+    expect(MarkGroupItemContentSchema.parse(ready)).toEqual({
+      question: "Kelompok 1",
+      options: ["Berkebun", "Membongkar mesin"],
+      mapping: [["OUT"], ["ME", "COMP"]],
+    });
+  });
+
+  it("allows an activity that scores no field but feeds the validity scale", () => {
+    expect(
+      MarkGroupItemContentSchema.safeParse({
+        ...ready,
+        mapping: [[], ["OUT"]],
+        verification: [0],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects a mapping that does not cover every activity", () => {
+    const parsed = MarkGroupItemContentSchema.safeParse({ ...ready, mapping: [["OUT"]] });
+    expect(parsed.success).toBe(false);
+    expect(parsed.error?.issues.some((i) => i.message.includes("daftar bidang"))).toBe(true);
+  });
+
+  it("rejects a validity flag on a row that does not exist", () => {
+    expect(
+      MarkGroupItemContentSchema.safeParse({ ...ready, verification: [5] }).success,
+    ).toBe(false);
+  });
+
+  it("pads the mapping to the option count when a draft is normalized", () => {
+    expect(
+      normalizeMarkGroupContent({
+        question: "Kelompok 1",
+        options: ["Berkebun", "Menanam padi"],
+        mapping: [["out"]],
+      }),
+    ).toEqual({
+      question: "Kelompok 1",
+      options: ["Berkebun", "Menanam padi"],
+      mapping: [["OUT"], []],
+    });
+  });
+
+  it("drops a validity flag whose row was removed", () => {
+    expect(
+      normalizeMarkGroupContent({
+        question: "Kelompok 1",
+        options: ["Berkebun", "Menanam padi"],
+        mapping: [["OUT"], []],
+        verification: [0, 4],
+      }).verification,
+    ).toEqual([0]);
   });
 });

@@ -7,6 +7,12 @@ export interface DiscResponse {
   least: number;
 }
 
+/** One marked list: `liked` and `disliked` hold option indexes and never overlap. */
+export interface MarkGroupResponse {
+  liked: number[];
+  disliked: number[];
+}
+
 /** Right/wrong answer: `chosen` for choice items (1 index = radio), `text` for short items. */
 export interface RightWrongResponse {
   chosen?: number[];
@@ -36,7 +42,7 @@ export type Gender = "MALE" | "FEMALE";
  */
 export interface PutResponseInput {
   itemId: string;
-  value: DiscResponse | LikertResponse | RankGroupResponse | RightWrongResponse;
+  value: DiscResponse | LikertResponse | MarkGroupResponse | RankGroupResponse | RightWrongResponse;
 }
 
 /** `GET /api/v1/public/attempts/:id` (AttemptReadDto, verified). Items arrive sanitized: content only — never `mapping`/`correctIndex`. */

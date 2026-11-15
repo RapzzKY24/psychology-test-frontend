@@ -152,6 +152,61 @@ describe("ScoreSummary", () => {
     expect(screen.getByText("48%")).toBeTruthy();
   });
 
+  it("shows a marked list's top interests and its validity scale", () => {
+    render(
+      <ScoreSummary
+        scores={{
+          type: "OUT_PER_ART",
+          dominant: "OUT",
+          answered: 12,
+          total: 12,
+          gender: "FEMALE",
+          scales: {
+            OUT: { score: 14, min: -122, max: 122, percent: 88, band: "Tinggi" },
+            PER: { score: 6, min: -125, max: 125, percent: 55, band: "Cukup" },
+            ART: { score: 2, min: -78, max: 78, percent: 40, band: "Cukup" },
+          },
+          verification: {
+            raw: 41,
+            max: 63,
+            band: "Valid",
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Minat utama")).toBeTruthy();
+    expect(screen.getAllByText("OUT").length).toBeGreaterThan(0);
+    expect(screen.getByText("OUT · PER · ART")).toBeTruthy();
+    expect(screen.getByText("Kelompok terjawab")).toBeTruthy();
+    expect(screen.getByText("12/12")).toBeTruthy();
+    expect(screen.getByText("Skala validitas 41/63")).toBeTruthy();
+    expect(screen.getByText("Valid")).toBeTruthy();
+    expect(screen.getByText("88%")).toBeTruthy();
+  });
+
+  it("flags a protocol the validity scale rejects", () => {
+    render(
+      <ScoreSummary
+        scores={{
+          dominant: "OUT",
+          type: "OUT_ME_ART",
+          scales: { OUT: { score: 2, min: -2, max: 2, percent: 90, band: "Tinggi" } },
+          verification: {
+            raw: 4,
+            max: 63,
+            band: "Kurang valid dikarenakan testee kurang bersungguh-sungguh.",
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Skala validitas 4/63")).toBeTruthy();
+    expect(
+      screen.getByText("Kurang valid dikarenakan testee kurang bersungguh-sungguh."),
+    ).toBeTruthy();
+  });
+
   it("draws the DISC profile from graph, not from the M/P counters", () => {
     render(
       <ScoreSummary scores={{ M: { D: 6 }, P: { D: 2 }, graph: { D: 12, I: 8, S: 5, C: 3 } }} />,

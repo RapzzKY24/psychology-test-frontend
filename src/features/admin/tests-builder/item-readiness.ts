@@ -101,6 +101,30 @@ export function isRankGroupItemReady(content: RankGroupItemDraft | undefined): b
   );
 }
 
+export interface MarkGroupItemDraft {
+  question?: string;
+  options?: string[];
+  mapping?: string[][];
+  verification?: number[];
+}
+
+/**
+ * A marked list needs a label, at least two activities and a field list for
+ * each of them. An activity may load on no field at all (Kuder's
+ * verification-only rows), so an empty list is fine — a missing one is not.
+ */
+export function isMarkGroupItemReady(content: MarkGroupItemDraft | undefined): boolean {
+  if (!content) return false;
+  if (!content.question?.trim()) return false;
+  const options = content.options ?? [];
+  const mapping = content.mapping ?? [];
+  if (options.length < 2 || options.length !== mapping.length) return false;
+  if (!options.every((option) => option.trim().length > 0)) return false;
+  return mapping.every((fields) =>
+    fields.every((field) => /^[A-Za-z][A-Za-z.]{0,5}$/.test(field.trim())),
+  );
+}
+
 export function isRightWrongItemReady(content: RightWrongItemDraft | undefined): boolean {
   if (!content) return false;
   const hasPrompt = Boolean(content.question?.trim() || content.imageUrl);

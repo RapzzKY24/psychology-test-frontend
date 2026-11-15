@@ -201,6 +201,42 @@ export const RankGroupItemContentSchema = z
 
 export type RankGroupItemContentInput = z.infer<typeof RankGroupItemContentSchema>;
 
+/**
+ * One list of activities the participant marks `+` (likes) or `-` (does not).
+ * `mapping` lines up with `options` and lists every field an activity scores —
+ * Kuder loads one activity on two or three fields, and a few on none at all.
+ * `verification` names the positions the validity scale counts. Both are keys
+ * and never reach the participant.
+ */
+export const MarkGroupItemContentSchema = z
+  .object({
+    question: z.string().trim().min(1, "Nama kelompok wajib diisi.").max(2000),
+    options: z
+      .array(z.string().trim().min(1, "Aktivitas wajib diisi.").max(200))
+      .min(2, "Minimal 2 aktivitas.")
+      .max(42, "Maksimal 42 aktivitas."),
+    mapping: z.array(z.array(RankFieldCodeSchema).max(6)).min(2).max(42),
+    verification: z.array(z.number().int().min(0)).max(42).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.mapping.length !== data.options.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Tiap aktivitas harus punya daftar bidang (boleh kosong).",
+        path: ["mapping"],
+      });
+    }
+    if (data.verification?.some((index) => index >= data.options.length)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Penanda validitas harus menunjuk baris yang ada.",
+        path: ["verification"],
+      });
+    }
+  });
+
+export type MarkGroupItemContentInput = z.infer<typeof MarkGroupItemContentSchema>;
+
 const itemBase = {
   question: z.string().trim().max(2000).optional(),
   imageUrl: z.string().trim().max(2048).optional().nullable(),
@@ -348,6 +384,29 @@ export function normalizeRankGroupContent(content: unknown): RankGroupItemConten
         }
       : {}),
     mapping: options.map((_, index) => (mapping[index] ?? "").toUpperCase()),
+  };
+}
+
+/** A marked list keeps `options`, `mapping` and `verification` in step. */
+export function normalizeMarkGroupContent(content: unknown): MarkGroupItemContentInput {
+  const raw = (content ?? {}) as {
+    question?: string;
+    options?: string[];
+    mapping?: string[][];
+    verification?: number[];
+  };
+  const options = raw.options?.length ? raw.options : ["", ""];
+  const mapping = raw.mapping ?? [];
+  // A verification flag on a row that no longer exists would fail the schema on
+  // save, so only live indexes survive an edit.
+  const verification = (raw.verification ?? []).filter(
+    (index) => Number.isInteger(index) && index >= 0 && index < options.length,
+  );
+  return {
+    question: raw.question ?? "",
+    options,
+    mapping: options.map((_, index) => (mapping[index] ?? []).map((code) => code.toUpperCase())),
+    ...(verification.length ? { verification } : {}),
   };
 }
 

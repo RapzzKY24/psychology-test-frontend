@@ -1,6 +1,7 @@
 import type { ScorerType } from "@/lib/api/types";
 import { DiscItemView } from "./components/disc-item-view";
 import { LikertItemView } from "./components/likert-item-view";
+import { MarkGroupItemView } from "./components/mark-group-item-view";
 import { PairItemView } from "./components/pair-item-view";
 import { RankGroupItemView } from "./components/rank-group-item-view";
 import { RightWrongItemView } from "./components/right-wrong-item-view";
@@ -15,6 +16,9 @@ export const ITEM_RENDERERS = {
   FORCED_CHOICE_PAIR: PairItemView,
   // A Likert item is one statement plus a rating scale — its own view.
   LIKERT: LikertItemView,
+  // A marked list draws one row per activity with a + and a - column — the
+  // shape of the answer sheet, not of any other family.
+  MARK_GROUP: MarkGroupItemView,
   // A pair tally asks the same question ("pick one of two statements"); only
   // the scoring differs — every statement feeds a named scale.
   PAIR_TALLY: PairItemView,

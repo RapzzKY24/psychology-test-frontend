@@ -43,6 +43,29 @@ export function toRanks(value: unknown): number[] {
   return v.ranks.map((rank) => (typeof rank === "number" ? rank : 0));
 }
 
+export interface MarkState {
+  liked: number[];
+  disliked: number[];
+}
+
+/**
+ * A marked list stores the indexes it likes and the indexes it does not. Both
+ * lists are read even when empty, so the view can render a row that has not
+ * been touched yet without falling back to a draft.
+ */
+export function toMarks(value: unknown): MarkState {
+  const v = value as { liked?: unknown; disliked?: unknown } | undefined;
+  const indexes = (list: unknown) =>
+    Array.isArray(list) ? list.filter((index): index is number => typeof index === "number") : [];
+  return { liked: indexes(v?.liked), disliked: indexes(v?.disliked) };
+}
+
+/** One mark is enough: the participant may dislike nothing on a list. */
+export function isAnsweredMarks(value: unknown): boolean {
+  const marks = toMarks(value);
+  return marks.liked.length + marks.disliked.length > 0;
+}
+
 /** A group counts as answered only when every option holds a rank. */
 export function isAnsweredRanks(value: unknown): boolean {
   const ranks = toRanks(value);
@@ -67,5 +90,6 @@ export function isAnsweredValue(scorerType: ScorerType, value: unknown): boolean
   }
   if (scorerType === "LIKERT") return toRating(value) !== null;
   if (scorerType === "RANK_GROUP") return isAnsweredRanks(value);
+  if (scorerType === "MARK_GROUP") return isAnsweredMarks(value);
   return isAnsweredRightWrong(value);
 }

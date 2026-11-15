@@ -3,6 +3,7 @@
 import { AttemptCompleteScreen } from "./attempt-complete-screen";
 import { DiscItemView } from "./disc-item-view";
 import { LikertItemView } from "./likert-item-view";
+import { MarkGroupItemView } from "./mark-group-item-view";
 import { PairItemView } from "./pair-item-view";
 import { RankGroupItemView } from "./rank-group-item-view";
 import { RightWrongItemView } from "./right-wrong-item-view";
@@ -59,7 +60,16 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
           remainingSeconds={runner.remainingSeconds}
         />
 
-        {runner.usesRankView ? (
+        {runner.usesMarkView ? (
+          <MarkGroupItemView
+            order={runner.safeIndex + 1}
+            question={(runner.content.question as string | null) ?? null}
+            options={(runner.content.options as string[]) ?? []}
+            marks={runner.marks}
+            disabled={runner.timeUp}
+            onChange={runner.mark}
+          />
+        ) : runner.usesRankView ? (
           <RankGroupItemView
             order={runner.safeIndex + 1}
             question={(runner.content.question as string | null) ?? null}

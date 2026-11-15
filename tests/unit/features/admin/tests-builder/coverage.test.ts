@@ -7,6 +7,7 @@ import {
   likertPatternCodes,
   likertSections,
   missingPatternCodes,
+  markGroupPatternCodes,
   pairTallyPatternCodes,
   rankGroupPatternCodes,
   scaleTallyPatternCodes,
@@ -231,5 +232,29 @@ describe("rankGroupPatternCodes", () => {
 
   it("feeds getPatternCodes for the family", () => {
     expect(missingPatternCodes([], "RANK_GROUP", 2, groups)).toEqual(["OUT", "ME", "S.S"]);
+  });
+});
+
+describe("markGroupPatternCodes", () => {
+  const lists = [
+    { question: "Kelompok 1", options: ["a", "b"], mapping: [["out"], ["ME", "comp"]] },
+    { question: "Kelompok 2", options: ["c", "d"], mapping: [[], ["s.s"]] },
+  ];
+
+  it("collects every field an activity loads on, in first-appearance order", () => {
+    expect(markGroupPatternCodes(lists)).toEqual(["OUT", "ME", "COMP", "S.S"]);
+  });
+
+  it("ignores rows that are not lists", () => {
+    expect(markGroupPatternCodes([{ question: "x" }, null, { mapping: "nope" }])).toEqual([]);
+  });
+
+  it("feeds getPatternCodes for the family", () => {
+    expect(missingPatternCodes([], "MARK_GROUP", 2, lists)).toEqual([
+      "OUT",
+      "ME",
+      "COMP",
+      "S.S",
+    ]);
   });
 });

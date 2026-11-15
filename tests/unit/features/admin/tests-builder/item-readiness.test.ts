@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   isChoiceTallyItemReady,
+  isMarkGroupItemReady,
   isPairItemReady,
   isRankGroupItemReady,
   isRightWrongItemReady,
@@ -213,5 +214,33 @@ describe("isRankGroupItemReady", () => {
 
   it("is not ready when a field code is missing", () => {
     expect(isRankGroupItemReady({ ...ready, mapping: ["OUT", ""] })).toBe(false);
+  });
+});
+
+describe("isMarkGroupItemReady", () => {
+  const ready = {
+    question: "Kelompok 1",
+    options: ["Berkebun", "Membongkar mesin"],
+    mapping: [["OUT"], ["ME"]],
+  };
+
+  it("is ready with a label, two activities and their fields", () => {
+    expect(isMarkGroupItemReady(ready)).toBe(true);
+  });
+
+  it("is ready when an activity scores no field at all", () => {
+    expect(isMarkGroupItemReady({ ...ready, mapping: [[], ["ME"]] })).toBe(true);
+  });
+
+  it("is not ready while an activity has no text", () => {
+    expect(isMarkGroupItemReady({ ...ready, options: ["Berkebun", " "] })).toBe(false);
+  });
+
+  it("is not ready without a group label", () => {
+    expect(isMarkGroupItemReady({ ...ready, question: "  " })).toBe(false);
+  });
+
+  it("is not ready when the mapping has fewer rows than activities", () => {
+    expect(isMarkGroupItemReady({ ...ready, mapping: [["OUT"]] })).toBe(false);
   });
 });

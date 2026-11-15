@@ -5,9 +5,11 @@ import {
   Fingerprint,
   ListChecks,
   Percent,
+  ShieldCheck,
   TrendingUp,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Stat {
   key: string;
@@ -102,6 +104,85 @@ function rankStats(scores: Record<string, unknown>): Stat[] | null {
     });
   }
   return stats;
+}
+
+/**
+ * MARK_GROUP (KUDER) prints the same "dominant + top three" headline as a
+ * ranking instrument, but each item is a whole list, so the counter is groups.
+ */
+function markStats(scores: Record<string, unknown>): Stat[] | null {
+  const dominant = scores.dominant;
+  if (typeof dominant !== "string" || !dominant.trim()) return null;
+  if (!isRecord(scores.scales)) return null;
+
+  const stats: Stat[] = [
+    { key: "dominant", label: "Minat utama", value: dominant.trim(), icon: Compass },
+  ];
+  const type = scores.type;
+  if (typeof type === "string" && type.trim()) {
+    stats.push({
+      key: "type",
+      label: "Tiga minat terkuat",
+      value: type.trim().split("_").join(" · "),
+      icon: Fingerprint,
+    });
+  }
+  const { answered, total } = scores;
+  if (typeof answered === "number" && typeof total === "number") {
+    stats.push({
+      key: "answered",
+      label: "Kelompok terjawab",
+      value: `${answered}/${total}`,
+      icon: ListChecks,
+    });
+  }
+  return stats;
+}
+
+interface Validity {
+  raw: number;
+  max: number;
+  band: string | null;
+  valid: boolean;
+}
+
+/**
+ * KUDER bands the count of marks on its flagged activities. The workbook calls
+ * the protocol unusable when too few of them carry a mark, so the result page
+ * says so instead of letting the reader take the percentiles at face value.
+ */
+function validityOf(scores: Record<string, unknown>): Validity | null {
+  const value = scores.verification;
+  if (!isRecord(value)) return null;
+  if (typeof value.raw !== "number" || typeof value.max !== "number") return null;
+  const band = typeof value.band === "string" && value.band.trim() ? value.band.trim() : null;
+  return { raw: value.raw, max: value.max, band, valid: band === "Valid" };
+}
+
+function ValidityNote({ validity }: { validity: Validity }) {
+  return (
+    <div
+      className={cn(
+        "flex items-start gap-3 rounded-lg border p-3 text-sm",
+        validity.valid ? "bg-primary/5" : "border-destructive/30 bg-destructive/5",
+      )}
+    >
+      <span
+        className={cn(
+          "flex size-8 shrink-0 items-center justify-center rounded-md",
+          validity.valid ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive",
+        )}
+      >
+        <ShieldCheck className="size-4" aria-hidden />
+      </span>
+      <div className="min-w-0">
+        <p className="font-medium tabular-nums">
+          Skala validitas {validity.raw}/{validity.max}
+        </p>
+        {validity.band && <p className="text-muted-foreground">{validity.band}</p>}
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -327,17 +408,20 @@ export function ScoreSummary({ scores }: { scores: Record<string, unknown> }) {
   const stats =
     rightWrongStats(scores) ??
     likertStats(scores) ??
+    markStats(scores) ??
     rankStats(scores) ??
     tallyStats(scores) ??
     typeStats(scores);
   const scales = scaleBars(scores);
   const table = sectionTable(scores);
+  const validity = validityOf(scores);
 
-  if (stats || scales || table) {
+  if (stats || scales || table || validity) {
     return (
       <div className="space-y-4">
         {stats && <StatCards stats={stats} />}
         {scales && <ScaleBars bars={scales} />}
+        {validity && <ValidityNote validity={validity} />}
         {table && <SectionTable table={table} />}
       </div>
     );

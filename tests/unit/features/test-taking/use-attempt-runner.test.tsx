@@ -164,6 +164,27 @@ function rankAttempt(responses: AttemptRead["responses"] = []): AttemptRead {
   };
 }
 
+function markAttempt(responses: AttemptRead["responses"] = []): AttemptRead {
+  const attempt = rightWrongAttempt();
+  return {
+    ...attempt,
+    scorerType: "MARK_GROUP",
+    responses,
+    items: [
+      {
+        id: "item-1",
+        order: 1,
+        content: { question: "Kelompok 1", options: ["Berkebun", "Membongkar mesin", "Melukis"] },
+      },
+      {
+        id: "item-2",
+        order: 2,
+        content: { question: "Kelompok 2", options: ["Menanam padi", "Menyanyi", "Mengetik"] },
+      },
+    ],
+  };
+}
+
 function timedAttempt(remainingSeconds: number): AttemptRead {
   return {
     ...rightWrongAttempt(),
@@ -369,6 +390,38 @@ describe("useAttemptRunner", () => {
     );
 
     expect(result.current.ranks).toEqual([2, 1, 3]);
+    expect(result.current.answered).toEqual([true, false]);
+  });
+
+  it("counts a marked list as answered once one activity is marked", async () => {
+    const { result } = renderRunner(markAttempt());
+
+    expect(result.current.usesMarkView).toBe(true);
+    expect(result.current.usesRankView).toBe(false);
+    expect(result.current.discValue).toBeUndefined();
+    expect(result.current.answered[0]).toBe(false);
+
+    await act(async () => result.current.mark({ liked: [1], disliked: [] }));
+    await waitFor(() =>
+      expect(putResponse).toHaveBeenCalledWith(
+        "attempt-1",
+        "item-1",
+        { liked: [1], disliked: [] },
+        undefined,
+      ),
+    );
+    expect(result.current.answered[0]).toBe(true);
+    // A list holds many judgements, so the runner never advances on its own.
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 500)));
+    expect(result.current.safeIndex).toBe(0);
+  });
+
+  it("prefills the marks already stored for a list", () => {
+    const { result } = renderRunner(
+      markAttempt([{ itemId: "item-1", value: { liked: [0], disliked: [2] } }]),
+    );
+
+    expect(result.current.marks).toEqual({ liked: [0], disliked: [2] });
     expect(result.current.answered).toEqual([true, false]);
   });
 

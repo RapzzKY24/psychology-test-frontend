@@ -49,6 +49,12 @@ export const SCORER_OPTIONS: readonly ScorerOption[] = [
       "Tiap soal punya beberapa opsi dan setiap opsi menambah skor satu skala — tidak ada jawaban benar atau salah. Skala yang paling dominan menjadi hasil.",
   },
   {
+    value: "MARK_GROUP",
+    label: "Tanda suka / tidak suka per aktivitas (KUDER)",
+    description:
+      "Tiap soal berisi satu daftar aktivitas; peserta menandai + bila menyukainya dan − bila tidak. Tiap tanda menambah atau mengurangi skor bidang minat yang dimuat aktivitas itu, lalu skor dibaca sebagai persentil dari norma sesuai jenis kelamin.",
+  },
+  {
     value: "RANK_GROUP",
     label: "Peringkat dalam kelompok (RMIB)",
     description:

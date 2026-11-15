@@ -14,6 +14,7 @@ describe("scorer options", () => {
       "FORCED_CHOICE_DISC",
       "SCALE_TALLY",
       "CHOICE_TALLY",
+      "MARK_GROUP",
       "RANK_GROUP",
       "LIKERT",
     ]);

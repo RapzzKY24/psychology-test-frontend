@@ -51,6 +51,14 @@ const INSTRUCTIONS: Record<ScorerType, React.ReactNode> = {
       jawaban tersimpan otomatis.
     </>
   ),
+  MARK_GROUP: (
+    <>
+      Tandai tiap aktivitas dengan{" "}
+      <span className="font-medium text-foreground">+</span> bila Anda menyukainya dan{" "}
+      <span className="font-medium text-foreground">−</span> bila tidak. Tidak ada jawaban benar
+      atau salah; jawaban tersimpan otomatis.
+    </>
+  ),
   RANK_GROUP: (
     <>
       Urutkan tiap daftar pekerjaan dari yang{" "}
