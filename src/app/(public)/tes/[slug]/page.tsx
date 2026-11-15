@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { isApiError } from "@/lib/api/client";
-import { fetchPublicTestServer } from "@/features/public/api";
+import { fetchPublicPsychologistsServer, fetchPublicTestServer } from "@/features/public/api";
 import { TestDetailView } from "@/features/public/components/test-detail-view";
 import { getServerSession } from "@/lib/api/server";
 
@@ -31,7 +31,14 @@ export default async function TestDetailPage({ params }: PageProps<"/tes/[slug]"
     throw error;
   }
 
-  const userRole = (await getServerSession())?.user?.role ?? null;
+  // The credential block is an enhancement: if the endpoint is down the page
+  // still sells the test, it just omits who signs it.
+  const [userRole, psychologists] = await Promise.all([
+    getServerSession().then((session) => session?.user?.role ?? null),
+    fetchPublicPsychologistsServer()
+      .then((response) => response.data)
+      .catch(() => []),
+  ]);
 
-  return <TestDetailView test={test} role={userRole} />;
+  return <TestDetailView test={test} role={userRole} psychologists={psychologists} />;
 }
