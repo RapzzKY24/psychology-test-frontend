@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ArticleCover } from "@/features/public/components/article-cover";
 import type { PublicArticleListItem } from "@/lib/api/types";
 import { formatIdDate } from "@/lib/format/format-date";
 
@@ -11,21 +12,14 @@ export function ArticleFeaturedCard({ article }: { article: PublicArticleListIte
       href={`/artikel/${article.slug}`}
       className="group grid overflow-hidden rounded-2xl border bg-background shadow-sm transition-shadow hover:shadow-md md:grid-cols-2"
     >
-      <div className="aspect-[16/9] w-full overflow-hidden bg-muted">
-        {article.coverUrl ? (
-          // Local upload URL — next/image processing is unnecessary here.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={article.coverUrl}
-            alt=""
-            className="size-full object-cover transition-transform group-hover:scale-105"
-          />
-        ) : (
-          <div className="size-full bg-gradient-to-br from-primary/15 to-secondary" />
-        )}
-      </div>
+      <ArticleCover
+        article={article}
+        size="lg"
+        className="aspect-[16/9] w-full overflow-hidden border-b md:aspect-auto md:min-h-56 md:border-r md:border-b-0"
+      />
       <div className="space-y-3 p-6">
-        {article.category ? (
+        {/* Without a cover the band already prints the category. */}
+        {article.coverUrl && article.category ? (
           <Badge className="w-fit bg-primary/10 text-primary">{article.category}</Badge>
         ) : null}
         <h2 className="text-xl font-semibold leading-snug group-hover:text-primary">
