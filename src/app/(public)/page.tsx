@@ -7,6 +7,7 @@ import { LandingArticlesBand } from "@/features/public/components/landing-articl
 import { LandingB2bBand } from "@/features/public/components/landing-b2b-band";
 import { LandingHero } from "@/features/public/components/landing-hero";
 import { LandingProofBand } from "@/features/public/components/landing-proof-band";
+import { LandingStepsBand } from "@/features/public/components/landing-steps-band";
 import { LandingTestsBand } from "@/features/public/components/landing-tests-band";
 
 /** Bands alternate white / gray so the page reads as separate chapters. */
@@ -23,6 +24,7 @@ export default async function LandingPage() {
   return (
     <main className="w-full">
       <LandingHero />
+      <LandingStepsBand />
       <LandingProofBand stats={stats} />
       <LandingTestsBand tests={tests?.data ?? []} total={tests?.meta?.total ?? 0} />
       <LandingArticlesBand articles={articles?.data ?? []} />
