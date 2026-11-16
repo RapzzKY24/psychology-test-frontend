@@ -19,8 +19,8 @@ import {
   INVOICE_STATUS_LABEL,
   bankLabel,
 } from "../constants";
-import { CopyValueButton } from "./copy-value-button";
-import { InvoiceCountdown } from "./invoice-countdown";
+import { CopyValueButton } from "@/components/shared/copy-value-button";
+import { ExpiryCountdown } from "@/components/shared/expiry-countdown";
 
 /**
  * Client island for the checkout page: polls the invoice until it is PAID,
@@ -143,7 +143,7 @@ export function InvoiceIsland({ initial }: { initial: InstansiInvoice }) {
             {invoice.expiresAt && (
               <p className="flex items-center gap-1 text-sm text-muted-foreground">
                 <Clock className="size-4" aria-hidden />
-                Bayar sebelum: <InvoiceCountdown expiresAt={invoice.expiresAt} />
+                Bayar sebelum: <ExpiryCountdown expiresAt={invoice.expiresAt} />
               </p>
             )}
           </div>

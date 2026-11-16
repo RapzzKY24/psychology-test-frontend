@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { PersonalCheckoutButton } from "@/features/checkout/components/personal-checkout-button";
 import type { UserRole } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 import { useAgeGate } from "./age-gate";
 
 interface TestBuyCtaProps {
   testId: string;
+  testName: string;
   /** null = signed-out visitor. */
   role: UserRole | null;
   className?: string;
@@ -16,11 +18,11 @@ interface TestBuyCtaProps {
 /**
  * Single buy action for the public catalog and the test detail page: the
  * destination depends on who is looking (institution checkout vs personal
- * dashboard vs sign-in). When the test has an age band, the button stays shut
+ * checkout vs sign-in). When the test has an age band, the button stays shut
  * until the gate card confirms the participant fits it — institutions buy for
  * a roster, so they pass through.
  */
-export function TestBuyCta({ testId, role, className }: TestBuyCtaProps) {
+export function TestBuyCta({ testId, testName, role, className }: TestBuyCtaProps) {
   const { band, status } = useAgeGate();
   const blocked = Boolean(band) && role !== "INSTANSI" && status !== "inside";
 
@@ -42,9 +44,11 @@ export function TestBuyCta({ testId, role, className }: TestBuyCtaProps) {
 
   if (role) {
     return (
-      <Button asChild className={cn("rounded-full", className)}>
-        <Link href="/dashboard">Mulai Tes</Link>
-      </Button>
+      <PersonalCheckoutButton
+        testId={testId}
+        testName={testName}
+        className={className}
+      />
     );
   }
 

@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { InvoiceCountdown } from "@/features/instansi/invoices/components/invoice-countdown";
+import { ExpiryCountdown } from "@/components/shared/expiry-countdown";
 import { INVOICE_STATUS_LABEL } from "@/features/instansi/invoices/constants";
 import type { InstansiSessionDetail } from "@/lib/api/types";
 import { formatIdr } from "@/lib/format/format-idr";
@@ -67,7 +67,7 @@ export function InvoiceDialogButton({
           {!isPaid && invoice.expiresAt && (
             <p className="text-muted-foreground flex items-center gap-1 text-sm">
               <Clock className="size-4" aria-hidden />
-              Bayar sebelum: <InvoiceCountdown expiresAt={invoice.expiresAt} />
+              Bayar sebelum: <ExpiryCountdown expiresAt={invoice.expiresAt} />
             </p>
           )}
 

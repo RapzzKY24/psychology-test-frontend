@@ -34,7 +34,7 @@ export function TestBuyPanel({ test, role }: BuyProps) {
 
         <AgeGateCard role={role} />
 
-        <TestBuyCta testId={test.id} role={role} className="w-full" />
+        <TestBuyCta testId={test.id} testName={test.name} role={role} className="w-full" />
 
         <ul className="space-y-2.5 border-t pt-4">
           {INCLUDES.map((item) => (
@@ -63,7 +63,7 @@ export function TestBuyBar({ test, role }: BuyProps) {
           <p className="text-muted-foreground text-xs">Harga</p>
           <p className="text-lg font-semibold">{formatIdr(test.price)}</p>
         </div>
-        <TestBuyCta testId={test.id} role={role} className="flex-shrink-0" />
+        <TestBuyCta testId={test.id} testName={test.name} role={role} className="flex-shrink-0" />
       </div>
     </div>
   );

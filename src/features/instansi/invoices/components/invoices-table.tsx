@@ -18,7 +18,7 @@ import type { InvoiceStatus } from "@/lib/api/types";
 import { formatIdr } from "@/lib/format/format-idr";
 import { cn } from "@/lib/utils";
 import { INVOICE_STATUS_LABEL, isInvoiceExpired } from "../constants";
-import { InvoiceCountdown } from "./invoice-countdown";
+import { ExpiryCountdown } from "@/components/shared/expiry-countdown";
 
 interface InvoicesTableProps {
   rows: InstansiInvoiceListItem[];
@@ -58,7 +58,7 @@ function InvoiceRow({ row }: { row: InstansiInvoiceListItem }) {
         {isUnpaid && row.expiresAt ? (
           <span className={cn("flex items-center gap-1", expired && "text-muted-foreground")}>
             <Clock className="size-3.5" aria-hidden />
-            <InvoiceCountdown expiresAt={row.expiresAt} />
+            <ExpiryCountdown expiresAt={row.expiresAt} />
           </span>
         ) : (
           <span className="text-muted-foreground">—</span>

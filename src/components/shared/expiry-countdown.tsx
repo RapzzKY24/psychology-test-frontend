@@ -13,8 +13,8 @@ function remaining(target: number): string {
   return hours > 0 ? `${hours} jam ${mmss}` : mmss;
 }
 
-/** Live countdown to the invoice expiry. */
-export function InvoiceCountdown({ expiresAt }: { expiresAt: string }) {
+/** Live countdown to a payment window's end (invoice or order). */
+export function ExpiryCountdown({ expiresAt }: { expiresAt: string }) {
   const target = new Date(expiresAt).getTime();
   const [label, setLabel] = useState(() => remaining(target));
 

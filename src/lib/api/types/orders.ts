@@ -29,9 +29,15 @@ export interface OrderDetail {
   basePrice: number;
   uniqueCode: number;
   expiresAt: string;
-  /** Seconds left in the payment window, computed server-side on read. */
-  secondsRemaining: number;
+  /** Seconds left in the payment window; null once the order is settled. */
+  secondsRemaining: number | null;
   userClaimedAt: string | null;
+  /** Null on rows created before the provider was recorded. */
+  paymentProvider: PaymentProvider | null;
+  /** Merchant QRIS image; only for a payable manual-QRIS order. */
+  qrisImageUrl: string | null;
+  vaNumber: string | null;
+  vaBankCode: string | null;
   /** Hosted payment page (Snap or Doku Checkout); null for manual providers. */
   paymentUrl: string | null;
   /** Snap token for the embedded popup; null for VA and manual providers. */
@@ -42,4 +48,21 @@ export interface OrderDetail {
 export interface ClaimOrderResult {
   id: string;
   userClaimedAt: string | null;
+}
+
+/** `GET /api/v1/me/orders` — one row of the participant's purchase history. */
+export interface MeOrderItem {
+  id: string;
+  testName: string;
+  /** Lets an expired row link back to the test page for a new purchase. */
+  testSlug: string;
+  amount: number;
+  status: OrderStatus;
+  createdAt: string;
+  expiresAt: string;
+  paidAt: string | null;
+  /** True only while the payment window is still open. */
+  canPay: boolean;
+  /** Hosted checkout link; present only while `canPay`. */
+  paymentUrl: string | null;
 }
