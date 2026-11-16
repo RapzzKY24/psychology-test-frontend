@@ -2,6 +2,7 @@ import { apiFetchServer } from "@/lib/api/server";
 import type { MeAttemptItem, TestResultView } from "@/lib/api/types";
 import type { MeResultItem } from "@/lib/api/types/attempts";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
+import type { ParticipantStage } from "@/features/participant/stages";
 
 /**
  * Participant dashboard endpoints (session-authenticated, cookie-based).
@@ -11,8 +12,12 @@ import type { ApiSuccess } from "@/lib/api/types/pagination";
  * its data as props from the page, not refetch it.
  */
 
-export function fetchMeAttemptsServer(page = 1): Promise<ApiSuccess<MeAttemptItem[]>> {
-  return apiFetchServer<MeAttemptItem[]>(`/me/attempts?page=${page}`);
+export function fetchMeAttemptsServer(
+  params: { page?: number; stage?: ParticipantStage } = {},
+): Promise<ApiSuccess<MeAttemptItem[]>> {
+  const query = new URLSearchParams({ page: String(params.page ?? 1) });
+  if (params.stage) query.set("stage", params.stage);
+  return apiFetchServer<MeAttemptItem[]>(`/me/attempts?${query.toString()}`);
 }
 
 export function fetchMeResultsServer(page = 1): Promise<ApiSuccess<MeResultItem[]>> {
@@ -20,8 +25,6 @@ export function fetchMeResultsServer(page = 1): Promise<ApiSuccess<MeResultItem[
 }
 
 /** Own released result web view — same shape as the feature 05 public result. */
-export function fetchMeResultDetailServer(
-  attemptId: string,
-): Promise<ApiSuccess<TestResultView>> {
+export function fetchMeResultDetailServer(attemptId: string): Promise<ApiSuccess<TestResultView>> {
   return apiFetchServer<TestResultView>(`/me/results/${attemptId}`);
 }

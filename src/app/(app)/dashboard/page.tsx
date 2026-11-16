@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Dashboard" };
 
 export default async function DashboardPage() {
   const [attemptsPage, resultsPage] = await Promise.all([
-    fetchMeAttemptsServer(1),
+    fetchMeAttemptsServer(),
     fetchMeResultsServer(1),
   ]);
 

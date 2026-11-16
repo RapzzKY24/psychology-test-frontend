@@ -197,6 +197,7 @@ export interface MeAttemptItem {
   sessionId: string;
   sessionTitle: string;
   resultStatus: ResultStatus | null;
+  reviewNote: string | null;
 }
 
 /** Scorer registry key — the attempt runner picks a renderer by this (renderer registry). */
