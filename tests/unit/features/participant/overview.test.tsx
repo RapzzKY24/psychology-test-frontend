@@ -102,8 +102,8 @@ describe("ActivityList", () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByText("Pesanan DISC Form A menunggu pembayaran")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Bayar" })).toBeTruthy();
+    expect(screen.getByText("Pembayaran DISC Form A belum selesai")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Lanjutkan" })).toBeTruthy();
   });
 
   it("says so when nothing has happened yet", () => {
@@ -173,7 +173,7 @@ describe("QuickActions", () => {
     expect(screen.getByRole("link", { name: /Lanjutkan tes/ }).getAttribute("href")).toBe(
       "/tes/kerjakan/a1",
     );
-    expect(screen.getByRole("link", { name: /Bayar pesanan/ }).getAttribute("href")).toBe(
+    expect(screen.getByRole("link", { name: /Selesaikan pembayaran/ }).getAttribute("href")).toBe(
       "/dashboard/pembelian?status=PENDING",
     );
     expect(screen.getByRole("link", { name: /Lihat hasil/ }).getAttribute("href")).toBe(
@@ -200,7 +200,7 @@ describe("QuickActions", () => {
     );
 
     expect(screen.queryByRole("link", { name: /Lanjutkan tes/ })).toBeNull();
-    expect(screen.queryByRole("link", { name: /Bayar pesanan/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /Selesaikan pembayaran/ })).toBeNull();
     expect(screen.queryByRole("link", { name: /Lihat hasil/ })).toBeNull();
     expect(screen.getByRole("link", { name: /Sertifikat/ })).toBeTruthy();
   });

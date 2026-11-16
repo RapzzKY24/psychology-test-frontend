@@ -44,7 +44,7 @@ describe("AgeGateCard", () => {
       target: { value: isoYearsAgo(14) },
     });
     expect(screen.getByText(/sesuai dengan norma tes ini/)).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Beli Tes" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Mulai Tes" })).toBeTruthy();
   });
 
   it("blocks a participant below the band and says why", () => {
@@ -72,7 +72,7 @@ describe("AgeGateCard", () => {
   it("renders nothing when the test has no age band", () => {
     renderGate(null);
     expect(screen.queryByLabelText(/Tanggal lahir peserta/)).toBeNull();
-    expect(screen.getByRole("link", { name: "Beli Tes" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Mulai Tes" })).toBeTruthy();
   });
 
   it("gives institutions the note without a gate", () => {
@@ -84,6 +84,6 @@ describe("AgeGateCard", () => {
     );
     expect(screen.getByText(/Pastikan seluruh peserta/)).toBeTruthy();
     expect(screen.queryByLabelText(/Tanggal lahir peserta/)).toBeNull();
-    expect(screen.getByRole("link", { name: /Beli & Bayar/ })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /Pesan Sesi/ })).toBeTruthy();
   });
 });

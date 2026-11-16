@@ -18,18 +18,18 @@ function renderCta(role: "PARTICIPANT" | "INSTANSI" | null) {
 describe("TestBuyCta", () => {
   it("sends a signed-out visitor to sign in", () => {
     renderCta(null);
-    const link = screen.getByRole("link", { name: "Beli Tes" });
+    const link = screen.getByRole("link", { name: "Mulai Tes" });
     expect(link.getAttribute("href")).toBe("/masuk");
   });
 
   it("sends an institution to the batch checkout with the test preselected", () => {
     renderCta("INSTANSI");
-    const link = screen.getByRole("link", { name: /Beli & Bayar/ });
+    const link = screen.getByRole("link", { name: /Pesan Sesi/ });
     expect(link.getAttribute("href")).toBe("/instansi/buat-sesi?testId=t1");
   });
 
   it("offers a personal checkout to a participant", () => {
     renderCta("PARTICIPANT");
-    expect(screen.getByRole("button", { name: "Beli Tes" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Mulai Tes" })).toBeTruthy();
   });
 });

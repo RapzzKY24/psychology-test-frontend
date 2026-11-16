@@ -17,7 +17,7 @@ interface PersonalCheckoutButtonProps {
 }
 
 /**
- * "Beli Tes" for a signed-in participant: opens an order, then hands the id to
+ * "Mulai Tes" for a signed-in participant: opens an order, then hands the id to
  * the payment dialog. The order is created on click, never on page load, so a
  * visitor who only reads the page leaves no rows behind.
  */
@@ -42,7 +42,7 @@ export function PersonalCheckoutButton({
         disabled={create.isPending}
         onClick={() => create.mutate()}
       >
-        {create.isPending ? "Menyiapkan…" : "Beli Tes"}
+        {create.isPending ? "Menyiapkan…" : "Mulai Tes"}
       </Button>
       <PaymentDialog
         orderId={orderId}

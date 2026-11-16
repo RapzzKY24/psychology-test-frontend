@@ -14,8 +14,8 @@ export function LandingB2bBand() {
                 Tes untuk tim & perusahaan
               </h2>
               <p className="max-w-2xl text-sm text-primary-foreground/90 sm:text-base">
-                Beli slot terlebih dahulu, lalu isi nama peserta kapan saja. Cocok untuk rekrutmen
-                maupun pemetaan karyawan.
+                Tentukan kuota peserta terlebih dahulu, lalu isi namanya kapan saja. Cocok untuk
+                rekrutmen maupun pemetaan karyawan.
               </p>
             </div>
             <Button asChild variant="secondary" className="h-12 shrink-0 rounded-full px-6 text-base">

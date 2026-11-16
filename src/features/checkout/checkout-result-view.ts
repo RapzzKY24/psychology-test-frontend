@@ -23,7 +23,7 @@ export const CHECKOUT_VIEW_COPY: Record<CheckoutView, { title: string; body: str
   },
   failed: {
     title: "Pembayaran tidak berhasil",
-    body: "Transaksi dibatalkan atau sudah kedaluwarsa. Silakan buat pesanan baru.",
+    body: "Pembayaran tidak selesai atau sudah kedaluwarsa. Silakan mulai lagi.",
   },
 };
 
@@ -53,6 +53,6 @@ export function primaryCheckoutAction(
   if (view === "waiting" && checkout.kind === "invoice") {
     return { kind: "link", href: `/instansi/tagihan/${checkout.id}`, label: "Lihat tagihan" };
   }
-  if (view === "failed") return { kind: "link", href: "/tes", label: "Beli lagi" };
+  if (view === "failed") return { kind: "link", href: "/tes", label: "Mulai lagi" };
   return { kind: "link", href: "/dashboard", label: "Ke dashboard" };
 }

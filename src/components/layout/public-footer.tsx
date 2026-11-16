@@ -5,7 +5,7 @@ const COLUMNS = [
   {
     title: "Layanan",
     links: [
-      { href: "/tes", label: "Katalog Tes" },
+      { href: "/tes", label: "Tes Psikologi" },
       { href: "/artikel", label: "Artikel" },
       { href: "/untuk-perusahaan", label: "Untuk Perusahaan" },
     ],
@@ -40,7 +40,7 @@ export function PublicFooter() {
             className="h-9 w-auto"
           />
           <p className="max-w-xs text-sm text-muted-foreground">
-            Platform tes psikologi: katalog tes, pengerjaan online, dan hasil yang terverifikasi.
+            Platform tes psikologi: pengerjaan online dan hasil yang terverifikasi.
           </p>
         </div>
 

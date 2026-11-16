@@ -11,8 +11,8 @@ import { TestPagination } from "@/features/public/components/test-pagination";
 import { getServerSession } from "@/lib/api/server";
 
 export const metadata: Metadata = {
-  title: "Katalog Tes",
-  description: "Jelajahi tes psikologi yang tersedia dan pilih yang sesuai kebutuhan Anda.",
+  title: "Tes Psikologi",
+  description: "Pilih tes psikologi yang sesuai kebutuhan Anda.",
 };
 
 const PAGE_SIZE = 12;
@@ -42,7 +42,7 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
     <main className="mx-auto w-full max-w-6xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-3">
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Katalog Tes</h1>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Tes Psikologi</h1>
           <p className="text-muted-foreground max-w-2xl">
             Pilih tes yang ingin Anda kerjakan. Setiap tes dikerjakan online dan hasilnya
             diverifikasi oleh psikolog.
@@ -79,7 +79,7 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
           <div className="space-y-1">
             <p className="font-medium">Belum ada tes pada kategori ini</p>
             <p className="text-muted-foreground text-sm">
-              Coba pilih kategori lain, atau lihat seluruh katalog.
+              Coba pilih kategori lain, atau lihat semua tes.
             </p>
           </div>
           <Button asChild variant="outline" className="rounded-full">

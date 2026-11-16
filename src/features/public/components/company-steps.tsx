@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 const STEPS = [
   { title: "Daftar instansi", body: "Isi data instansi dan akun akuntabilitas (PIC HR)." },
-  { title: "Pilih paket & beli slot", body: "Pilih paket sesuai jumlah peserta & durasi." },
+  { title: "Tentukan kuota peserta", body: "Tentukan jumlah peserta dan durasi asesmen." },
   { title: "Daftarkan peserta", body: "Masukkan data peserta; admin bisa mengirim undangan." },
   { title: "Terima hasil", body: "Bagi hasil per orang atau kelompok, verifikasi psikolog." },
 ];

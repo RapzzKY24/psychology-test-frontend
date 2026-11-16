@@ -38,7 +38,7 @@ export function QuickActions({ overview }: { overview: MeOverview }) {
   if (counts.pendingOrders > 0) {
     shortcuts.push({
       href: "/dashboard/pembelian?status=PENDING",
-      label: "Bayar pesanan",
+      label: "Selesaikan pembayaran",
       icon: CreditCard,
     });
   }

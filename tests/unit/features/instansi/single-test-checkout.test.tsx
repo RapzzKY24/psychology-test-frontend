@@ -72,7 +72,7 @@ describe("SingleTestCheckout", () => {
 
     fireEvent.change(screen.getByLabelText("Jumlah slot"), { target: { value: "20" } });
 
-    expect(screen.getByRole("alert").textContent).toContain("Harga tes ini belum diset");
+    expect(screen.getByRole("alert").textContent).toContain("Biaya tes ini belum ditetapkan");
     expect(screen.getByRole("button", { name: /Buat Sesi/ }).hasAttribute("disabled")).toBe(true);
   });
 

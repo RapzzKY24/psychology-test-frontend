@@ -47,7 +47,7 @@ describe("ParticipantSidebar", () => {
   it("marks the menu that matches the current page", () => {
     render(<ParticipantSidebar name="Budi" email="budi@example.com" />);
 
-    expect(screen.getByRole("link", { name: /Pembelian/ }).getAttribute("aria-current")).toBe(
+    expect(screen.getByRole("link", { name: /Pembayaran/ }).getAttribute("aria-current")).toBe(
       "page",
     );
     expect(screen.getByRole("link", { name: /Riwayat/ }).getAttribute("aria-current")).toBeNull();

@@ -4,7 +4,7 @@ import {
   Award,
   History,
   LayoutDashboard,
-  ShoppingBag,
+  ReceiptText,
   UserRound,
 } from "lucide-react";
 import {
@@ -22,7 +22,7 @@ const CONFIG: ConsoleConfig = {
       items: [
         { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard },
         { href: "/dashboard/riwayat", label: "Riwayat", icon: History },
-        { href: "/dashboard/pembelian", label: "Pembelian", icon: ShoppingBag },
+        { href: "/dashboard/pembelian", label: "Pembayaran", icon: ReceiptText },
         { href: "/dashboard/sertifikat", label: "Sertifikat", icon: Award },
         { href: "/dashboard/profil", label: "Profil", icon: UserRound },
       ],

@@ -23,7 +23,7 @@ export default async function DaftarPage({ searchParams }: PageProps<"/daftar">)
   return (
     <AuthCard
       title="Daftar"
-      description="Buat akun untuk membeli dan mengerjakan tes psikologi."
+      description="Buat akun untuk mengerjakan tes dan melihat hasil Anda."
       footerText="Sudah punya akun?"
       footerHref="/masuk"
       footerLinkLabel="Masuk"

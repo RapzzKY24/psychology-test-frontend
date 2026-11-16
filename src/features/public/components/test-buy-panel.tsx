@@ -23,12 +23,12 @@ export function TestBuyPanel({ test, role }: BuyProps) {
     <Card className="sticky top-24 rounded-2xl">
       <CardContent className="space-y-5">
         <div>
-          <p className="text-muted-foreground text-sm">Harga</p>
+          <p className="text-muted-foreground text-sm">Biaya asesmen</p>
           <p className="font-heading text-3xl font-semibold tracking-tight">
             {formatIdr(test.price)}
           </p>
           <p className="text-muted-foreground mt-1 text-xs">
-            Sekali bayar, termasuk laporan hasil.
+            Biaya sudah termasuk laporan hasil.
           </p>
         </div>
 
@@ -60,7 +60,7 @@ export function TestBuyBar({ test, role }: BuyProps) {
     <div className="bg-background/95 fixed inset-x-0 bottom-0 z-30 border-t p-4 backdrop-blur md:hidden">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
         <div>
-          <p className="text-muted-foreground text-xs">Harga</p>
+          <p className="text-muted-foreground text-xs">Biaya</p>
           <p className="text-lg font-semibold">{formatIdr(test.price)}</p>
         </div>
         <TestBuyCta testId={test.id} testName={test.name} role={role} className="flex-shrink-0" />

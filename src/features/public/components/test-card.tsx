@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { TEST_CATEGORY_LABELS, type PublicTest, type TestCategory } from "@/lib/api/types";
-import { formatIdr } from "@/lib/format/format-idr";
 
 /**
  * One accent per category, from the `--category-*` tokens. The class strings
@@ -85,15 +84,10 @@ export function TestCard({ test, buySlot }: { test: PublicTest; buySlot?: ReactN
 
       <CardContent className="flex flex-1 flex-col gap-4">
         <p className="text-muted-foreground line-clamp-2 text-sm">{test.description}</p>
-        <div className="mt-auto flex items-end justify-between gap-3">
-          <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
-            <Clock className="size-4" aria-hidden />
-            {test.estimatedDurationMin} menit
-          </span>
-          <span className="text-foreground text-lg font-semibold tabular-nums">
-            {formatIdr(test.price)}
-          </span>
-        </div>
+        <span className="text-muted-foreground mt-auto flex items-center gap-1.5 text-sm">
+          <Clock className="size-4" aria-hidden />
+          {test.estimatedDurationMin} menit
+        </span>
       </CardContent>
 
       <CardFooter className="gap-2 border-t pt-4">

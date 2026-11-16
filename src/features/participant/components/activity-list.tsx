@@ -26,7 +26,7 @@ function describe(item: ActivityItem): ActivityView {
     case "ORDER_PENDING":
       return {
         icon: Clock,
-        text: `Pesanan ${item.testName} menunggu pembayaran`,
+        text: `Pembayaran ${item.testName} belum selesai`,
         hint: formatIdr(item.amount),
         pay: { orderId: item.orderId, testName: item.testName },
       };
@@ -87,7 +87,11 @@ export function ActivityList({ items }: { items: ActivityItem[] }) {
               </p>
             </div>
             {view.pay ? (
-              <PayOrderButton orderId={view.pay.orderId} testName={view.pay.testName} />
+              <PayOrderButton
+                orderId={view.pay.orderId}
+                testName={view.pay.testName}
+                label="Lanjutkan"
+              />
             ) : (
               view.action && (
                 <Link

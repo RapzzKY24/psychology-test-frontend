@@ -12,16 +12,18 @@ const ACTION_LINK = "text-sm font-medium text-primary hover:underline";
 export function PayOrderButton({
   orderId,
   testName,
+  label = "Bayar",
 }: {
   orderId: string;
   testName: string;
+  label?: string;
 }) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <button type="button" className={ACTION_LINK} onClick={() => setOpen(true)}>
-        Bayar
+        {label}
       </button>
       <PaymentDialog
         orderId={open ? orderId : null}

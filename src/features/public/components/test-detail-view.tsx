@@ -28,7 +28,7 @@ export function TestDetailView({
           className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
         >
           <ArrowLeft className="size-4" aria-hidden />
-          Katalog Tes
+          Semua Tes
         </Link>
 
         <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">

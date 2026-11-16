@@ -7,7 +7,7 @@ const STEPS: { step: string; icon: LucideIcon; title: string; description: strin
     icon: Search,
     title: "Pilih Tes yang Sesuai",
     description:
-      "Jelajahi katalog dan pilih tes yang sesuai kebutuhanmu — kepribadian, kognitif, gaya kerja, dan lainnya.",
+      "Pilih tes yang sesuai kebutuhanmu — kepribadian, kognitif, gaya kerja, dan lainnya.",
   },
   {
     step: "02",

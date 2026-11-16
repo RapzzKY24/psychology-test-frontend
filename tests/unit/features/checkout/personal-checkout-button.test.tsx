@@ -71,7 +71,7 @@ describe("PersonalCheckoutButton", () => {
     fetchOrderDetail.mockResolvedValue({ data: detail });
 
     renderButton();
-    fireEvent.click(screen.getByRole("button", { name: "Beli Tes" }));
+    fireEvent.click(screen.getByRole("button", { name: "Mulai Tes" }));
 
     await waitFor(() => expect(createOrder).toHaveBeenCalledWith("t1"));
     expect(await screen.findByText("Pembayaran IST")).toBeTruthy();

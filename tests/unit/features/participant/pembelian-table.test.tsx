@@ -55,7 +55,7 @@ describe("PembelianTable", () => {
     renderTable([row({})]);
 
     expect(screen.getAllByRole("button", { name: "Bayar" }).length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Menunggu bayar").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Belum dibayar").length).toBeGreaterThan(0);
   });
 
   it("sends a paid order with an approved result to the result page", () => {
@@ -96,7 +96,7 @@ describe("PembelianTable", () => {
   it("lets an expired order be bought again from the test page", () => {
     renderTable([row({ status: "EXPIRED", canPay: false, paymentUrl: null })]);
 
-    expect(hrefsOf("Beli lagi")).toEqual(["/tes/ist"]);
+    expect(hrefsOf("Mulai lagi")).toEqual(["/tes/ist"]);
   });
 
   it("keeps the status filter in the pagination links", () => {
@@ -108,6 +108,6 @@ describe("PembelianTable", () => {
   it("explains an empty purchase history", () => {
     renderTable([]);
 
-    expect(screen.getByText("Belum ada pembelian")).toBeTruthy();
+    expect(screen.getByText("Belum ada pembayaran")).toBeTruthy();
   });
 });

@@ -2,10 +2,10 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { OrderStatus } from "@/lib/api/types";
 
-/** Tab copy for the purchase filter; the row badge uses the same words. */
+/** Tab copy for the payment filter; the row badge uses the same words. */
 export const PEMBELIAN_STATUS_LABEL: Record<OrderStatus, string> = {
-  PENDING: "Menunggu bayar",
-  PAID: "Dibayar",
+  PENDING: "Belum dibayar",
+  PAID: "Lunas",
   EXPIRED: "Kedaluwarsa",
   CANCELLED: "Dibatalkan",
 };
@@ -23,7 +23,7 @@ export function PembelianFilters({ status }: { status?: OrderStatus }) {
   return (
     <div
       role="group"
-      aria-label="Filter status pembelian"
+      aria-label="Filter status pembayaran"
       className="flex w-fit max-w-full flex-wrap gap-1 rounded-lg border p-1"
     >
       {ITEMS.map((item) => {

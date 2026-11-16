@@ -1,5 +1,5 @@
 const STEPS = [
-  { title: "Beli tes", body: "Pilih tes ini dan selesaikan pembayaran dengan aman." },
+  { title: "Mulai tes", body: "Pilih tes ini dan selesaikan pembayarannya dengan aman." },
   { title: "Kerjakan online", body: "Akses tes dari dasbor dan jawab sesuai waktu yang tersedia." },
   {
     title: "Terima hasil",

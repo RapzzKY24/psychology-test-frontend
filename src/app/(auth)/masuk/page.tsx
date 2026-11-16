@@ -21,7 +21,7 @@ export default async function MasukPage({ searchParams }: PageProps<"/masuk">) {
   return (
     <AuthCard
       title="Masuk"
-      description="Masuk untuk membeli dan mengerjakan tes psikologi."
+      description="Masuk untuk mengerjakan tes dan melihat hasil Anda."
       footerText="Belum punya akun?"
       footerHref="/daftar"
       footerLinkLabel="Daftar"

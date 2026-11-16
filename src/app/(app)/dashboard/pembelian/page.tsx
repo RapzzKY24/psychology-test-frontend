@@ -5,7 +5,7 @@ import { PembelianFilters } from "@/features/participant/components/pembelian-fi
 import { PembelianTable } from "@/features/participant/components/pembelian-table";
 import type { OrderStatus } from "@/lib/api/types";
 
-export const metadata: Metadata = { title: "Pembelian" };
+export const metadata: Metadata = { title: "Pembayaran" };
 
 const STATUSES: readonly OrderStatus[] = ["PENDING", "PAID", "EXPIRED", "CANCELLED"];
 
@@ -23,8 +23,8 @@ export default async function PembelianPage({ searchParams }: PageProps<"/dashbo
   return (
     <main className="flex-1 space-y-6 p-6">
       <PageHeader
-        title="Pembelian"
-        description="Riwayat pembelian tes dan status pembayarannya."
+        title="Pembayaran"
+        description="Riwayat pembayaran tes dan statusnya."
       />
       <PembelianFilters status={status} />
       <PembelianTable rows={data} meta={tableMeta} status={status} />

@@ -105,7 +105,7 @@ describe("PaymentDialog", () => {
   it("explains an expired window instead of offering a payment", async () => {
     renderDialog({ ...base, status: "EXPIRED" });
 
-    expect(await screen.findByText(/Batas waktu pembayaran sudah lewat/)).toBeTruthy();
+    expect(await screen.findByText(/Waktu pembayaran sudah lewat/)).toBeTruthy();
     expect(screen.queryByRole("link", { name: /Lanjut ke Pembayaran/ })).toBeNull();
   });
 });

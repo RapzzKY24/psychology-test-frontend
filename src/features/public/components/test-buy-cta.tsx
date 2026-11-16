@@ -16,7 +16,7 @@ interface TestBuyCtaProps {
 }
 
 /**
- * Single buy action for the public catalog and the test detail page: the
+ * Single start action for the public catalog and the test detail page: the
  * destination depends on who is looking (institution checkout vs personal
  * checkout vs sign-in). When the test has an age band, the button stays shut
  * until the gate card confirms the participant fits it — institutions buy for
@@ -37,7 +37,7 @@ export function TestBuyCta({ testId, testName, role, className }: TestBuyCtaProp
   if (role === "INSTANSI") {
     return (
       <Button asChild className={cn("rounded-full", className)}>
-        <Link href={`/instansi/buat-sesi?testId=${testId}`}>Beli &amp; Bayar</Link>
+        <Link href={`/instansi/buat-sesi?testId=${testId}`}>Pesan Sesi</Link>
       </Button>
     );
   }
@@ -54,7 +54,7 @@ export function TestBuyCta({ testId, testName, role, className }: TestBuyCtaProp
 
   return (
     <Button asChild className={cn("rounded-full", className)}>
-      <Link href="/masuk">Beli Tes</Link>
+      <Link href="/masuk">Mulai Tes</Link>
     </Button>
   );
 }

@@ -17,7 +17,7 @@ export function LandingProofBand({ stats }: { stats: PublicStats | null }) {
   ];
 
   return (
-    <section aria-label="Ringkasan katalog" className="bg-background border-t">
+    <section aria-label="Ringkasan layanan" className="bg-background border-t">
       <div className="mx-auto grid w-full max-w-4xl grid-cols-3 divide-x px-4 py-10 sm:px-6 sm:py-12">
         {items.map(({ icon: Icon, value, label }) => (
           <div key={label} className="flex flex-col items-center gap-2 px-4 text-center">

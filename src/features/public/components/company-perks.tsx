@@ -14,8 +14,8 @@ const PERKS = [
   },
   {
     icon: Building2,
-    title: "Slot prabayar",
-    body: "Beli kuota slot instansi, lalu daftarkan peserta kapan saja.",
+    title: "Kuota peserta",
+    body: "Sediakan kuota peserta instansi, lalu daftarkan kapan saja.",
   },
 ];
 

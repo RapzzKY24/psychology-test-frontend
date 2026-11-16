@@ -49,7 +49,7 @@ export function CheckoutStateCard({ state, isRetrying, onRetry }: CheckoutStateC
           </Button>
         ) : (
           <Button asChild variant="outline">
-            <Link href="/tes">Kembali ke katalog</Link>
+            <Link href="/tes">Kembali ke daftar tes</Link>
           </Button>
         )}
       </CardContent>

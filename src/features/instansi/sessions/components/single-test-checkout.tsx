@@ -109,7 +109,7 @@ function SingleTestCheckoutForm({ test }: { test: InstansiTestOption }) {
           </div>
           {isPriceMissing && (
             <p role="alert" className="text-destructive text-sm">
-              Harga tes ini belum diset — hubungi admin sebelum membeli slot.
+              Biaya tes ini belum ditetapkan — hubungi admin sebelum memesan sesi.
             </p>
           )}
           <Button type="submit" className="w-full" disabled={!canSubmit}>

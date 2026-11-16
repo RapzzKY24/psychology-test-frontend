@@ -38,7 +38,7 @@ function RowAction({ row }: { row: MeOrderItem }) {
   if (row.status === "EXPIRED") {
     return (
       <Link href={`/tes/${row.testSlug}`} className={ACTION_LINK}>
-        Beli lagi
+        Mulai lagi
       </Link>
     );
   }
@@ -69,8 +69,8 @@ export function PembelianTable({ rows, meta, status }: PembelianTableProps) {
   if (rows.length === 0) {
     return (
       <TableEmpty
-        title="Belum ada pembelian"
-        description="Tes yang Anda beli muncul di sini beserta status pembayarannya."
+        title="Belum ada pembayaran"
+        description="Pembayaran tes yang Anda ikuti akan muncul di sini."
         filtered={Boolean(status)}
       />
     );

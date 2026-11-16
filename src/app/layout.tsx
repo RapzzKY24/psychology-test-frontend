@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | Psikotes",
   },
   description:
-    "Platform tes psikologi: katalog tes, pengerjaan online, verifikasi psikolog, dan laporan resmi.",
+    "Platform tes psikologi: pengerjaan online, verifikasi psikolog, dan laporan resmi.",
   // The icon set lives in /public/logo-website (generated package): .ico for
   // legacy tabs, PNGs for the sized slots, and the manifest for installs.
   icons: {

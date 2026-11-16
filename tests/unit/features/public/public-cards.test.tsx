@@ -30,12 +30,12 @@ const article: PublicArticleListItem = {
 };
 
 describe("TestCard", () => {
-  it("shows the name, category, duration, price and detail link", () => {
+  it("shows the name, category, duration and detail link", () => {
     render(<TestCard test={test} />);
     expect(screen.getByText("Tes DISC")).toBeTruthy();
     expect(screen.getByText("Gaya Kerja")).toBeTruthy();
     expect(screen.getByText("15 menit")).toBeTruthy();
-    expect(screen.getByText(/Rp\s?150\.000/)).toBeTruthy();
+    expect(screen.queryByText(/Rp\s?150\.000/)).toBeNull();
     expect(screen.getByRole("link", { name: /Detail/ }).getAttribute("href")).toBe("/tes/disc");
   });
 

@@ -45,7 +45,7 @@ export function InstansiSessionsTable({ rows, meta, listKey }: InstansiSessionsT
     return (
       <TableEmpty
         title="Belum ada sesi"
-        description="Sesi yang dibeli dari katalog akan muncul di sini."
+        description="Sesi yang dibuat dari daftar tes akan muncul di sini."
       />
     );
   }

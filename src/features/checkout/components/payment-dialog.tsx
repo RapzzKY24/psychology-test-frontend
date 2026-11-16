@@ -92,8 +92,8 @@ function OrderBody({ order, onClose }: { order: OrderDetail; onClose: () => void
     <div className="space-y-4">
       <p className="text-muted-foreground text-sm">
         {order.status === "EXPIRED"
-          ? "Batas waktu pembayaran sudah lewat. Buat pesanan baru untuk mencoba lagi."
-          : "Pesanan ini sudah dibatalkan."}
+          ? "Waktu pembayaran sudah lewat. Silakan mulai lagi untuk mencoba ulang."
+          : "Pembayaran ini sudah dibatalkan."}
       </p>
       <Button variant="outline" className="w-full" onClick={onClose}>
         Tutup
@@ -131,7 +131,7 @@ function PayableBody({ order }: { order: OrderDetail }) {
       <div className="rounded-lg border bg-muted/30 p-4">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-muted-foreground text-xs uppercase">Total</p>
+            <p className="text-muted-foreground text-xs uppercase">Total biaya</p>
             {order.uniqueCode > 0 && (
               <p className="text-muted-foreground text-xs">
                 {formatIdr(order.basePrice)} + kode unik {order.uniqueCode}
@@ -144,7 +144,7 @@ function PayableBody({ order }: { order: OrderDetail }) {
         </div>
         <p className="text-muted-foreground mt-3 flex items-center gap-1 text-sm">
           <Clock className="size-4" aria-hidden />
-          Bayar dalam <ExpiryCountdown expiresAt={order.expiresAt} />
+          Selesaikan dalam <ExpiryCountdown expiresAt={order.expiresAt} />
         </p>
       </div>
 
