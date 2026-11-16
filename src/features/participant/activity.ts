@@ -1,11 +1,19 @@
 import type { MeOverview } from "@/lib/api/types";
 
 /**
- * One line in "Aktivitas terakhir". The four kinds come from four different
- * tables, so they are merged here rather than in the API.
+ * One line in "Aktivitas terakhir". The kinds come from different tables, so
+ * they are merged here rather than in the API. An unpaid order is not an
+ * event, but it belongs on the same list: it is the participant's next task.
  */
 export type ActivityItem =
   | { kind: "ORDER_PAID"; at: string; testName: string; amount: number }
+  | {
+      kind: "ORDER_PENDING";
+      at: string;
+      testName: string;
+      amount: number;
+      orderId: string;
+    }
   | { kind: "ATTEMPT_COMPLETED"; at: string; testName: string; attemptId: string }
   | { kind: "RESULT_APPROVED"; at: string; testName: string; attemptId: string }
   | { kind: "CERTIFICATE_ISSUED"; at: string; testName: string; number: string };
@@ -21,6 +29,13 @@ export function buildActivity(overview: MeOverview, limit = 5): ActivityItem[] {
       at: order.paidAt,
       testName: order.testName,
       amount: order.amount,
+    })),
+    ...overview.latestUnpaidOrders.map((order): ActivityItem => ({
+      kind: "ORDER_PENDING",
+      at: order.createdAt,
+      testName: order.testName,
+      amount: order.amount,
+      orderId: order.orderId,
     })),
     ...overview.latestCompletedAttempts.map((attempt): ActivityItem => ({
       kind: "ATTEMPT_COMPLETED",

@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Award, CheckCircle2, FileCheck2, Wallet } from "lucide-react";
+import { Award, CheckCircle2, Clock, FileCheck2, Wallet } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { PayOrderButton } from "@/features/checkout/components/pay-order-button";
 import { formatIdDate } from "@/lib/format/format-date";
 import { formatIdr } from "@/lib/format/format-idr";
 import type { ActivityItem } from "../activity";
@@ -10,6 +11,8 @@ interface ActivityView {
   text: string;
   hint?: string;
   action?: { href: string; label: string };
+  /** An unpaid order opens the payment dialog instead of a page. */
+  pay?: { orderId: string; testName: string };
 }
 
 function describe(item: ActivityItem): ActivityView {
@@ -19,6 +22,13 @@ function describe(item: ActivityItem): ActivityView {
         icon: Wallet,
         text: `Pembayaran ${item.testName} diterima`,
         hint: formatIdr(item.amount),
+      };
+    case "ORDER_PENDING":
+      return {
+        icon: Clock,
+        text: `Pesanan ${item.testName} menunggu pembayaran`,
+        hint: formatIdr(item.amount),
+        pay: { orderId: item.orderId, testName: item.testName },
       };
     case "ATTEMPT_COMPLETED":
       return { icon: CheckCircle2, text: `Tes ${item.testName} selesai` };
@@ -42,9 +52,11 @@ function keyOf(item: ActivityItem, index: number): string {
   const id =
     item.kind === "ORDER_PAID"
       ? item.testName
-      : item.kind === "CERTIFICATE_ISSUED"
-        ? item.number
-        : item.attemptId;
+      : item.kind === "ORDER_PENDING"
+        ? item.orderId
+        : item.kind === "CERTIFICATE_ISSUED"
+          ? item.number
+          : item.attemptId;
   return `${item.kind}-${id}-${index}`;
 }
 
@@ -74,13 +86,17 @@ export function ActivityList({ items }: { items: ActivityItem[] }) {
                 {view.hint ? ` · ${view.hint}` : ""}
               </p>
             </div>
-            {view.action && (
-              <Link
-                href={view.action.href}
-                className="shrink-0 text-sm font-medium text-primary hover:underline"
-              >
-                {view.action.label}
-              </Link>
+            {view.pay ? (
+              <PayOrderButton orderId={view.pay.orderId} testName={view.pay.testName} />
+            ) : (
+              view.action && (
+                <Link
+                  href={view.action.href}
+                  className="shrink-0 text-sm font-medium text-primary hover:underline"
+                >
+                  {view.action.label}
+                </Link>
+              )
             )}
           </li>
         );

@@ -7,6 +7,8 @@ export interface MeOverviewCounts {
   awaitingReview: number;
   resultsReady: number;
   certificatesReady: number;
+  /** Unpaid orders that have not expired yet. */
+  pendingOrders: number;
 }
 
 export interface ActiveAttemptSummary {
@@ -36,6 +38,14 @@ export interface LatestOrderSummary {
   paidAt: string;
 }
 
+export interface UnpaidOrderSummary {
+  orderId: string;
+  testName: string;
+  amount: number;
+  createdAt: string;
+  expiresAt: string;
+}
+
 export interface CompletedAttemptSummary {
   attemptId: string;
   testName: string;
@@ -48,5 +58,6 @@ export interface MeOverview {
   latestResults: LatestResultSummary[];
   latestCertificates: LatestCertificateSummary[];
   latestOrders: LatestOrderSummary[];
+  latestUnpaidOrders: UnpaidOrderSummary[];
   latestCompletedAttempts: CompletedAttemptSummary[];
 }

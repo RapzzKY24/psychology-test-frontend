@@ -7,6 +7,7 @@ import { buildActivity } from "@/features/participant/activity";
 import { ActivityList } from "@/features/participant/components/activity-list";
 import { ContinueTesting } from "@/features/participant/components/continue-testing";
 import { OverviewStats } from "@/features/participant/components/overview-stats";
+import { QuickActions } from "@/features/participant/components/quick-actions";
 
 export const metadata: Metadata = { title: "Ringkasan" };
 
@@ -21,6 +22,8 @@ export default async function DashboardPage() {
         title="Ringkasan"
         description="Status tes Anda: yang sedang dikerjakan, yang menunggu psikolog, dan yang sudah terbit."
       />
+
+      {!nothingYet && <QuickActions overview={overview} />}
 
       <OverviewStats counts={overview.counts} />
 
@@ -47,7 +50,7 @@ export default async function DashboardPage() {
             <div>
               <h2 className="text-base font-semibold">Aktivitas terakhir</h2>
               <p className="text-sm text-muted-foreground">
-                Pembayaran, tes selesai, hasil disetujui, dan sertifikat terbit.
+                Pesanan, pembayaran, tes selesai, hasil disetujui, dan sertifikat terbit.
               </p>
             </div>
             <ActivityList items={activity} />

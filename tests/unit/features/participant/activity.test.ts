@@ -4,11 +4,18 @@ import type { MeOverview } from "@/lib/api/types";
 
 function overview(overrides: Partial<MeOverview> = {}): MeOverview {
   return {
-    counts: { inProgress: 0, awaitingReview: 0, resultsReady: 0, certificatesReady: 0 },
+    counts: {
+      inProgress: 0,
+      awaitingReview: 0,
+      resultsReady: 0,
+      certificatesReady: 0,
+      pendingOrders: 0,
+    },
     activeAttempts: [],
     latestResults: [],
     latestCertificates: [],
     latestOrders: [],
+    latestUnpaidOrders: [],
     latestCompletedAttempts: [],
     ...overrides,
   };
@@ -73,8 +80,33 @@ describe("buildActivity", () => {
     expect(items[0]?.kind).toBe("CERTIFICATE_ISSUED");
   });
 
-  it("drops a result that has no approval date", () => {
+  it("lists an unpaid order as the next thing to do", () => {
     const items = buildActivity(
+      overview({
+        latestUnpaidOrders: [
+          {
+            orderId: "o9",
+            testName: "DISC Form A",
+            amount: 75000,
+            createdAt: "2026-11-16T10:00:00Z",
+            expiresAt: "2026-11-16T11:00:00Z",
+          },
+        ],
+      }),
+    );
+
+    expect(items).toEqual([
+      {
+        kind: "ORDER_PENDING",
+        at: "2026-11-16T10:00:00Z",
+        testName: "DISC Form A",
+        amount: 75000,
+        orderId: "o9",
+      },
+    ]);
+  });
+
+  it("drops a result that has no approval date", () => {    const items = buildActivity(
       overview({
         latestResults: [{ attemptId: "a1", testName: "DISC", patternCode: "D", approvedAt: null }],
       }),
