@@ -2,8 +2,10 @@ import { apiFetchServer } from "@/lib/api/server";
 import type {
   MeAttemptItem,
   MeCertificateItem,
+  MeOrderItem,
   MeOverview,
   MeProfile,
+  OrderStatus,
   TestResultView,
 } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
@@ -43,4 +45,13 @@ export function fetchMeProfileServer(): Promise<ApiSuccess<MeProfile>> {
 /** Counts, previews, and the raw events behind the activity list. */
 export function fetchMeOverviewServer(): Promise<ApiSuccess<MeOverview>> {
   return apiFetchServer<MeOverview>("/me/overview");
+}
+
+/** Own purchases, newest first; `status` narrows the tab. */
+export function fetchMeOrdersServer(
+  params: { page?: number; status?: OrderStatus } = {},
+): Promise<ApiSuccess<MeOrderItem[]>> {
+  const query = new URLSearchParams({ page: String(params.page ?? 1) });
+  if (params.status) query.set("status", params.status);
+  return apiFetchServer<MeOrderItem[]>(`/me/orders?${query.toString()}`);
 }
