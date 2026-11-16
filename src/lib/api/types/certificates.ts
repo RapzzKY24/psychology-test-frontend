@@ -102,3 +102,15 @@ export interface CertificatePayload {
   purpose?: string | null;
   validUntil?: string | null;
 }
+
+/** Row of `GET /api/v1/me/certificates` — the buyer's own issued rows. */
+export interface MeCertificateItem {
+  id: string;
+  number: string;
+  testName: string;
+  issuedAt: string;
+  validUntil: string | null;
+  /** DRAFT and SUPERSEDED never reach this endpoint. */
+  status: "ACTIVE" | "REVOKED";
+  verifyCode: string | null;
+}
