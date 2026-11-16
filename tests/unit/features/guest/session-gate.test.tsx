@@ -52,7 +52,7 @@ describe("SessionGate", () => {
       </SessionGate>,
     );
 
-    fireEvent.click(screen.getByText(/Bukan saya/));
+    fireEvent.click(screen.getByText(/Pilih ulang kursi/));
 
     await waitFor(() => expect(screen.getByText("pilih nama")).toBeTruthy());
   });
