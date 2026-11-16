@@ -1,6 +1,7 @@
 "use client";
 
 import { AttemptCompleteScreen } from "./attempt-complete-screen";
+import { AttemptSaveAlert } from "./attempt-save-alert";
 import { DiscItemView } from "./disc-item-view";
 import { LikertItemView } from "./likert-item-view";
 import { ManualItemView } from "./manual-item-view";
@@ -50,7 +51,17 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
   };
 
   return (
-    <main className="flex w-full flex-1 flex-col gap-6 px-4 pt-4 pb-10 sm:px-6 lg:flex-row lg:items-start lg:gap-8 lg:py-10">
+    <main className="flex w-full flex-1 flex-col gap-6 px-4 pt-4 pb-10 sm:px-6 lg:flex-row lg:flex-wrap lg:items-start lg:gap-8 lg:py-10">
+      {runner.savingFailed ? (
+        <div className="w-full">
+          <AttemptSaveAlert
+            attemptId={attempt.id}
+            expired={runner.timeUp}
+            canRetry={runner.canRetryFailed}
+            onRetry={() => void runner.retryFailed()}
+          />
+        </div>
+      ) : null}
       <RunnerMobileBar {...navProps} locked={runner.usesTimedGridView} />
 
       <div className="flex w-full min-w-0 flex-col gap-6 lg:order-1 lg:w-auto lg:flex-1">

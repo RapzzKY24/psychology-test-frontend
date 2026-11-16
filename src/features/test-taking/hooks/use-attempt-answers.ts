@@ -13,6 +13,27 @@ export type AnswerValue = Record<string, unknown>;
 
 /** Typing a short answer would fire one PUT per keystroke without this. */
 const TEXT_SAVE_DEBOUNCE_MS = 500;
+const FAILED_SAVE_PREFIX = "pt:failed-save:attempt:";
+
+function loadFailedItems(attemptId: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(`${FAILED_SAVE_PREFIX}${attemptId}`);
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function persistFailedItems(attemptId: string, items: Set<string>): void {
+  try {
+    const key = `${FAILED_SAVE_PREFIX}${attemptId}`;
+    if (items.size > 0) localStorage.setItem(key, JSON.stringify([...items]));
+    else localStorage.removeItem(key);
+  } catch {
+    // Storage may be disabled; the in-memory failure gate still applies.
+  }
+}
 
 /**
  * Generic answer state for the runner: one upsert PUT per answered item
@@ -30,6 +51,9 @@ export function useAttemptAnswers(
     Object.fromEntries(attempt.responses.map((r) => [r.itemId, r.value])),
   );
   const [completed, setCompleted] = useState(false);
+  const [savingFailed, setSavingFailed] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
   /**
    * Answers are queued one request at a time. DISC writes most and least as two
@@ -37,6 +61,21 @@ export function useAttemptAnswers(
    * upsert overwrite the first pick.
    */
   const saveQueue = useRef<Promise<void>>(Promise.resolve());
+  const latestValues = useRef(new Map<string, unknown>());
+  const failedItems = useRef(new Set<string>());
+  // Persist the IDs of writes still in flight too. A reload can interrupt a
+  // request before it has a chance to reject, so failure-only tracking loses it.
+  const unsyncedItems = useRef(new Set<string>());
+  const persistOutstanding = useCallback(() => {
+    persistFailedItems(
+      attempt.id,
+      new Set([...failedItems.current, ...unsyncedItems.current]),
+    );
+  }, [attempt.id]);
+  useEffect(() => {
+    failedItems.current = loadFailedItems(attempt.id);
+    setSavingFailed(failedItems.current.size > 0);
+  }, [attempt.id]);
   /**
    * Items whose latest value has not been sent yet. A map, not a single slot:
    * a digit grid debounces one lajur while the participant may already have
@@ -48,14 +87,30 @@ export function useAttemptAnswers(
 
   const enqueue = useCallback(
     (itemId: string, value: unknown) => {
+      latestValues.current.set(itemId, value);
+      unsyncedItems.current.add(itemId);
+      persistOutstanding();
       saveQueue.current = saveQueue.current
         .then(() => putResponse(attempt.id, itemId, value, participantToken ?? undefined))
-        .then(() => undefined)
+        .then(() => {
+          if (latestValues.current.get(itemId) === value) {
+            failedItems.current.delete(itemId);
+            unsyncedItems.current.delete(itemId);
+            persistOutstanding();
+            setSavingFailed(failedItems.current.size > 0);
+          }
+        })
         .catch((error: unknown) => {
+          if (latestValues.current.get(itemId) === value) {
+            failedItems.current.add(itemId);
+            unsyncedItems.current.delete(itemId);
+            persistOutstanding();
+            setSavingFailed(true);
+          }
           toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
         });
     },
-    [attempt.id, participantToken],
+    [attempt.id, participantToken, persistOutstanding],
   );
 
   const answer = useCallback(
@@ -74,6 +129,8 @@ export function useAttemptAnswers(
   const answerDebounced = useCallback(
     (itemId: string, value: unknown, delayMs = TEXT_SAVE_DEBOUNCE_MS) => {
       setAnswers((prev) => ({ ...prev, [itemId]: value }));
+      unsyncedItems.current.add(itemId);
+      persistOutstanding();
       const queued = pending.current.get(itemId);
       if (queued) window.clearTimeout(queued.timer);
       const timer = window.setTimeout(() => {
@@ -82,7 +139,7 @@ export function useAttemptAnswers(
       }, delayMs);
       pending.current.set(itemId, { value, timer });
     },
-    [enqueue],
+    [enqueue, persistOutstanding],
   );
 
   /** Short answers update the UI at once but only reach the server when idle. */
@@ -129,6 +186,7 @@ export function useAttemptAnswers(
     },
     meta: { silentError: true },
     onSuccess: () => {
+      persistFailedItems(attempt.id, new Set());
       setCompleted(true);
       onCompleted(attempt.id);
     },
@@ -142,18 +200,38 @@ export function useAttemptAnswers(
    * wrong for a raw-score test, and the countdown calls this at zero.
    */
   const submit = useCallback(async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
     flushPendingText();
-    await saveQueue.current;
-    complete.mutate();
+    try {
+      await saveQueue.current;
+      if (failedItems.current.size > 0) return;
+      await complete.mutateAsync();
+    } catch {
+      // The mutation's onError displays the API error.
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
   }, [complete, flushPendingText]);
 
   const tryComplete = useCallback((): string | null => {
-    flushPendingText();
     const missing = firstUnansweredId;
     if (missing) return missing;
-    complete.mutate();
+    void submit();
     return null;
-  }, [complete, firstUnansweredId, flushPendingText]);
+  }, [firstUnansweredId, submit]);
+
+  const retryFailed = useCallback(async () => {
+    if (submittingRef.current) return;
+    for (const itemId of [...failedItems.current]) {
+      if (latestValues.current.has(itemId)) {
+        enqueue(itemId, latestValues.current.get(itemId));
+      }
+    }
+    await saveQueue.current;
+  }, [enqueue]);
 
   return {
     answers,
@@ -164,7 +242,11 @@ export function useAttemptAnswers(
     answeredCount,
     firstUnansweredId,
     completed,
-    completing: complete.isPending,
+    completing: submitting || complete.isPending,
+    savingFailed,
+    failedItemIds: [...failedItems.current],
+    canRetryFailed: savingFailed && [...failedItems.current].every((id) => latestValues.current.has(id)),
+    retryFailed,
     submit,
     tryComplete,
   };

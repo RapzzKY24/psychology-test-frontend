@@ -36,7 +36,7 @@ export function ResumeSessionView({
         </Button>
         <Button variant="ghost" className="w-full" onClick={onDismiss}>
           <UserRound className="size-4" aria-hidden />
-          Bukan saya — pilih nama lain
+          Pilih ulang kursi atau tes
         </Button>
       </CardContent>
     </Card>

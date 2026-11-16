@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { ResultFilters } from "@/features/admin/results-monitor/components/result-filters";
 import { ResultsTable } from "@/features/admin/results-monitor/components/results-table";
+import { ResetExpiredAttempt } from "@/features/admin/results-monitor/components/reset-expired-attempt";
 import { fetchResultsServer } from "@/features/admin/results-monitor/api.server";
 import { qk } from "@/lib/api/query-keys";
 
@@ -26,6 +27,7 @@ export default async function HasilPage({ searchParams }: PageProps<"/admin/hasi
         description="Status hasil peserta — approval dilakukan psikolog, kirim ulang untuk hasil yang dikembalikan."
       />
       <ResultFilters status={status} />
+      <ResetExpiredAttempt />
       <ResultsTable rows={data} meta={tableMeta} listKey={listKey} status={status} />
     </main>
   );

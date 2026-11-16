@@ -93,13 +93,18 @@ export function AttemptRunnerIsland({ attemptId }: { attemptId: string }) {
     }
 
     const unauthorized = isApiError(query.error) && query.error.isUnauthorized;
+    const replaced = isApiError(query.error) && query.error.code === "attempt_not_in_progress";
     return (
       <main className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-24 text-center">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>{unauthorized ? "Sesi tes tidak valid" : "Terjadi kesalahan"}</CardTitle>
+            <CardTitle>
+              {replaced ? "Pengerjaan lama ditutup" : unauthorized ? "Sesi tes tidak valid" : "Terjadi kesalahan"}
+            </CardTitle>
             <CardDescription>
-              {unauthorized
+              {replaced
+                ? "Buka kembali dashboard atau tautan undangan untuk masuk ke pengerjaan yang baru."
+                : unauthorized
                 ? "Token pengerjaan tidak ditemukan atau sudah tidak berlaku. Buka kembali tautan undangan untuk bergabung."
                 : "Coba muat ulang halaman, atau kembali lagi nanti."}
             </CardDescription>

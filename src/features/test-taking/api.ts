@@ -3,9 +3,13 @@ import { parseErrorResponse, unwrapEnvelope } from "@/lib/api/error";
 import type { AttemptRead, AttemptComplete, Education, Gender } from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 
+function attemptPath(attemptId: string, token?: string): string {
+  return `${token ? "/public" : "/me"}/attempts/${attemptId}`;
+}
+
 /**
- * Attempt endpoints — public routes guarded by cookie (participant) OR
- * `x-participant-token` (guest). The api client attaches the guest token.
+ * Signed-in attempts use the account session. Guest attempts use the
+ * x-participant-token header and the public routes.
  */
 
 export function fetchAttempt(
@@ -22,7 +26,7 @@ export function fetchAttempt(
   if (gender) params.set("gender", gender);
   if (education) params.set("education", education);
   const query = params.size > 0 ? `?${params.toString()}` : "";
-  return apiFetch<AttemptRead>(`/public/attempts/${attemptId}${query}`, { participantToken });
+  return apiFetch<AttemptRead>(`${attemptPath(attemptId, participantToken)}${query}`, { participantToken });
 }
 
 export function putResponse(
@@ -31,7 +35,7 @@ export function putResponse(
   value: unknown,
   participantToken?: string | undefined,
 ): Promise<ApiSuccess<unknown>> {
-  return apiFetch<unknown>(`/public/attempts/${attemptId}/responses`, {
+  return apiFetch<unknown>(`${attemptPath(attemptId, participantToken)}/responses`, {
     method: "PUT",
     body: { itemId, value },
     participantToken: participantToken ?? undefined,
@@ -42,7 +46,7 @@ export function completeAttempt(
   attemptId: string,
   participantToken?: string | undefined,
 ): Promise<ApiSuccess<AttemptComplete>> {
-  return apiFetch<AttemptComplete>(`/public/attempts/${attemptId}/complete`, {
+  return apiFetch<AttemptComplete>(`${attemptPath(attemptId, participantToken)}/complete`, {
     method: "POST",
     participantToken: participantToken ?? undefined,
   });
@@ -65,7 +69,7 @@ export async function uploadItemImage(
   const headers: Record<string, string> = {};
   if (participantToken) headers["x-participant-token"] = participantToken;
 
-  const response = await fetch(`/api/v1/public/attempts/${attemptId}/items/${itemId}/image`, {
+  const response = await fetch(`/api/v1${attemptPath(attemptId, participantToken)}/items/${itemId}/image`, {
     method: "POST",
     headers,
     credentials: "include",

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { AttemptCompleteScreen } from "./attempt-complete-screen";
+import { AttemptSaveAlert } from "./attempt-save-alert";
 import { ElapsedTimer } from "./elapsed-timer";
 import { MultiSubtestItemView } from "./multi-subtest-item-view";
 import { useAttemptAnswers } from "../hooks/use-attempt-answers";
@@ -62,6 +63,9 @@ export function MultiSubtestRunner({
     if (itemFrom === 0) return [];
     return attempt.items.filter((item) => item.order >= itemFrom && item.order <= itemTo);
   }, [attempt.items, itemFrom, itemTo]);
+  const failedWindowClosed = answers.failedItemIds.some(
+    (id) => !subtestItems.some((item) => item.id === id),
+  );
 
   const safeIndex = Math.min(index, Math.max(subtestItems.length - 1, 0));
   const item = subtestItems[safeIndex];
@@ -122,7 +126,11 @@ export function MultiSubtestRunner({
   if (!active) {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-1 items-center justify-center px-6 py-24 text-center">
-        <p className="text-sm text-muted-foreground">Menyiapkan hasil…</p>
+        {answers.savingFailed ? (
+          <AttemptSaveAlert attemptId={attempt.id} expired canRetry={false} onRetry={() => {}} />
+        ) : (
+          <p className="text-sm text-muted-foreground">Menyiapkan hasil…</p>
+        )}
       </main>
     );
   }
@@ -132,6 +140,14 @@ export function MultiSubtestRunner({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-5 px-4 pt-4 pb-10 sm:px-6 lg:py-8">
+      {answers.savingFailed ? (
+        <AttemptSaveAlert
+          attemptId={attempt.id}
+          expired={clock.finished || failedWindowClosed}
+          canRetry={answers.canRetryFailed && !failedWindowClosed}
+          onRetry={() => void answers.retryFailed()}
+        />
+      ) : null}
       <div className="space-y-2">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
