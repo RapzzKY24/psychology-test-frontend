@@ -14,3 +14,4 @@ export * from "./reports";
 export * from "./certificates";
 export * from "./verify";
 export * from "./checkout";
+export * from "./profile";
