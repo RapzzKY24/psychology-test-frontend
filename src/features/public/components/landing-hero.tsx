@@ -19,8 +19,8 @@ export function LandingHero() {
   const waLink = buildWhatsAppLink(whatsappNumber, WA_CONSULT_MESSAGE);
 
   return (
-    <section className="bg-background flex min-h-[calc(100svh-4rem)] items-center">
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-10 sm:px-6 md:grid-cols-2 md:gap-12">
+    <section className="bg-background">
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 md:gap-16 md:py-20">
         <div>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
             <BadgeCheck className="size-4" aria-hidden />
