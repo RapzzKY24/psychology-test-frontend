@@ -51,6 +51,7 @@ const detail: OrderDetail = {
   vaBankCode: null,
   paymentUrl: created.paymentUrl,
   paymentToken: null,
+  attempt: null,
 };
 
 function renderButton() {

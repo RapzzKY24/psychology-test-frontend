@@ -15,6 +15,7 @@ import type { MeOrderItem, OrderStatus } from "@/lib/api/types";
 import type { PaginationMeta } from "@/lib/api/types/pagination";
 import { formatIdDate } from "@/lib/format/format-date";
 import { formatIdr } from "@/lib/format/format-idr";
+import { orderAttemptTarget } from "@/lib/order-attempt";
 import { OrderStatusBadge } from "./order-status-badge";
 
 const ACTION_LINK = "text-sm font-medium text-primary hover:underline";
@@ -24,9 +25,13 @@ function RowAction({ row }: { row: MeOrderItem }) {
     return <PayOrderButton orderId={row.id} testName={row.testName} />;
   }
   if (row.status === "PAID") {
+    const target = orderAttemptTarget(row.attempt);
+    if (!target) {
+      return <span className="text-muted-foreground text-sm">—</span>;
+    }
     return (
-      <Link href="/dashboard/riwayat" className={ACTION_LINK}>
-        Lihat hasil
+      <Link href={target.href} className={ACTION_LINK}>
+        {target.kind === "work" ? "Kerjakan" : "Lihat hasil"}
       </Link>
     );
   }

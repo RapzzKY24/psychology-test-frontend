@@ -33,6 +33,7 @@ const base: OrderDetail = {
   vaBankCode: null,
   paymentUrl: null,
   paymentToken: null,
+  attempt: null,
 };
 
 function renderDialog(order: OrderDetail = base) {
@@ -71,12 +72,34 @@ describe("PaymentDialog", () => {
     expect(img.getAttribute("src")).toBe("/uploads/qris/merchant.png");
   });
 
-  it("confirms a settled order and points to the dashboard", async () => {
-    renderDialog({ ...base, status: "PAID" });
+  it("confirms a settled order and points to the dashboard when nothing is linked", async () => {
+    renderDialog({ ...base, status: "PAID", attempt: null });
 
     expect(await screen.findByText(/Pembayaran diterima/)).toBeTruthy();
     const link = screen.getByRole("link", { name: "Buka Dashboard" });
     expect(link.getAttribute("href")).toBe("/dashboard");
+  });
+
+  it("sends a paid order straight to the work", async () => {
+    renderDialog({
+      ...base,
+      status: "PAID",
+      attempt: { id: "a1", status: "IN_PROGRESS", resultStatus: null },
+    });
+
+    const link = await screen.findByRole("link", { name: "Kerjakan Sekarang" });
+    expect(link.getAttribute("href")).toBe("/tes/kerjakan/a1");
+  });
+
+  it("sends a paid order with an approved result to the result page", async () => {
+    renderDialog({
+      ...base,
+      status: "PAID",
+      attempt: { id: "a1", status: "COMPLETED", resultStatus: "APPROVED" },
+    });
+
+    const link = await screen.findByRole("link", { name: "Lihat Hasil" });
+    expect(link.getAttribute("href")).toBe("/hasil/a1");
   });
 
   it("explains an expired window instead of offering a payment", async () => {

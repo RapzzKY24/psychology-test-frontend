@@ -1,4 +1,4 @@
-import type { OrderStatus, PaymentProvider } from "./enums";
+import type { AttemptStatus, OrderStatus, PaymentProvider, ResultStatus } from "./enums";
 
 /** `POST /api/v1/orders` response — amount = basePrice + uniqueCode (3 digits). */
 export interface CreateOrderResult {
@@ -19,6 +19,13 @@ export interface CreateOrderResult {
   paymentUrl: string | null;
   /** Snap token for the embedded popup; null for VA and manual providers. */
   paymentToken: string | null;
+}
+
+/** The attempt an order paid for; the UI decides "Kerjakan" vs "Lihat hasil". */
+export interface OrderAttempt {
+  id: string;
+  status: AttemptStatus;
+  resultStatus: ResultStatus | null;
 }
 
 /** `GET /api/v1/orders/:id` — server-computed expiry; client clock is untrusted. */
@@ -42,6 +49,8 @@ export interface OrderDetail {
   paymentUrl: string | null;
   /** Snap token for the embedded popup; null for VA and manual providers. */
   paymentToken: string | null;
+  /** The attempt this order paid for; null until it settles. */
+  attempt: OrderAttempt | null;
 }
 
 /** `POST /api/v1/orders/:id/claim` — idempotent. */
@@ -65,4 +74,6 @@ export interface MeOrderItem {
   canPay: boolean;
   /** Hosted checkout link; present only while `canPay`. */
   paymentUrl: string | null;
+  /** Null on orders settled before settlement recorded the session. */
+  attempt: OrderAttempt | null;
 }

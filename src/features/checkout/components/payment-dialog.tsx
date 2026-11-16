@@ -26,6 +26,7 @@ import { GENERIC_ERROR_MESSAGE } from "@/lib/api/error";
 import { qk } from "@/lib/api/query-keys";
 import type { OrderDetail } from "@/lib/api/types";
 import { formatIdr } from "@/lib/format/format-idr";
+import { orderAttemptTarget } from "@/lib/order-attempt";
 import { reconcileCheckoutStatus } from "../api";
 import { useOrderDetail } from "../hooks/use-order-detail";
 
@@ -84,7 +85,7 @@ export function PaymentDialog({ orderId, testName, onClose }: PaymentDialogProps
 }
 
 function OrderBody({ order, onClose }: { order: OrderDetail; onClose: () => void }) {
-  if (order.status === "PAID") return <PaidBody onClose={onClose} />;
+  if (order.status === "PAID") return <PaidBody order={order} onClose={onClose} />;
   if (order.status === "PENDING") return <PayableBody order={order} />;
 
   return (
@@ -101,17 +102,24 @@ function OrderBody({ order, onClose }: { order: OrderDetail; onClose: () => void
   );
 }
 
-function PaidBody({ onClose }: { onClose: () => void }) {
+function PaidBody({ order, onClose }: { order: OrderDetail; onClose: () => void }) {
+  const target = orderAttemptTarget(order.attempt);
+  const label = target
+    ? target.kind === "work"
+      ? "Kerjakan Sekarang"
+      : "Lihat Hasil"
+    : "Buka Dashboard";
+
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-emerald-700">
         <CheckCircle2 className="mt-0.5 size-5 shrink-0" aria-hidden />
         <p className="text-sm">
-          Pembayaran diterima. Tes sudah terbuka di dashboard Anda.
+          Pembayaran diterima. Tes sudah bisa Anda kerjakan.
         </p>
       </div>
       <Button asChild className="w-full" onClick={onClose}>
-        <Link href="/dashboard">Buka Dashboard</Link>
+        <Link href={target?.href ?? "/dashboard"}>{label}</Link>
       </Button>
     </div>
   );

@@ -25,6 +25,7 @@ function row(overrides: Partial<MeOrderItem>): MeOrderItem {
     paidAt: null,
     canPay: true,
     paymentUrl: "https://pay.doku.test/abc",
+    attempt: null,
     ...overrides,
   };
 }
@@ -57,10 +58,39 @@ describe("PembelianTable", () => {
     expect(screen.getAllByText("Menunggu bayar").length).toBeGreaterThan(0);
   });
 
-  it("sends a paid order to the result history", () => {
+  it("sends a paid order with an approved result to the result page", () => {
+    renderTable([
+      row({
+        status: "PAID",
+        canPay: false,
+        paymentUrl: null,
+        paidAt: "2026-11-16T09:00:00.000Z",
+        attempt: { id: "a1", status: "COMPLETED", resultStatus: "APPROVED" },
+      }),
+    ]);
+
+    expect(hrefsOf("Lihat hasil")).toEqual(["/hasil/a1"]);
+  });
+
+  it("sends a paid order whose work is still open to the test", () => {
+    renderTable([
+      row({
+        status: "PAID",
+        canPay: false,
+        paymentUrl: null,
+        paidAt: "2026-11-16T09:00:00.000Z",
+        attempt: { id: "a1", status: "IN_PROGRESS", resultStatus: null },
+      }),
+    ]);
+
+    expect(hrefsOf("Kerjakan")).toEqual(["/tes/kerjakan/a1"]);
+  });
+
+  it("shows no action for a paid order with nothing linked", () => {
     renderTable([row({ status: "PAID", canPay: false, paymentUrl: null, paidAt: "2026-11-16T09:00:00.000Z" })]);
 
-    expect(hrefsOf("Lihat hasil")).toEqual(["/dashboard/riwayat"]);
+    expect(screen.queryByRole("link", { name: "Lihat hasil" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Kerjakan" })).toBeNull();
   });
 
   it("lets an expired order be bought again from the test page", () => {
