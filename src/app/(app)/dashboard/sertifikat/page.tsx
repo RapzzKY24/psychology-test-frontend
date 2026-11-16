@@ -15,7 +15,7 @@ export default async function SertifikatPage({ searchParams }: PageProps<"/dashb
   const tableMeta = meta ?? { page, limit: 10, total: data.length, totalPages: 1 };
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 p-6">
+    <main className="flex-1 space-y-6 p-6">
       <PageHeader
         title="Sertifikat"
         description="Sertifikat yang diterbitkan psikolog setelah hasil disetujui."

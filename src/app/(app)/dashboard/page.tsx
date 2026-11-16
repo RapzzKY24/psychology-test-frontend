@@ -16,7 +16,7 @@ export default async function DashboardPage() {
   const nothingYet = Object.values(overview.counts).every((count) => count === 0);
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 space-y-8 p-6">
+    <main className="flex-1 space-y-6 p-6">
       <PageHeader
         title="Ringkasan"
         description="Status tes Anda: yang sedang dikerjakan, yang menunggu psikolog, dan yang sudah terbit."

@@ -19,7 +19,7 @@ export default async function RiwayatPage({ searchParams }: PageProps<"/dashboar
   const tableMeta = meta ?? { page, limit: 10, total: data.length, totalPages: 1 };
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 p-6">
+    <main className="flex-1 space-y-6 p-6">
       <PageHeader
         title="Riwayat"
         description="Semua tes yang pernah Anda kerjakan, lengkap dengan statusnya."

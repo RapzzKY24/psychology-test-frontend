@@ -21,7 +21,7 @@ export default async function PembelianPage({ searchParams }: PageProps<"/dashbo
   const tableMeta = meta ?? { page, limit: 10, total: data.length, totalPages: 1 };
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 p-6">
+    <main className="flex-1 space-y-6 p-6">
       <PageHeader
         title="Pembelian"
         description="Riwayat pembelian tes dan status pembayarannya."

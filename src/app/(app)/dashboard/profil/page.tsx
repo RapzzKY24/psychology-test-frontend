@@ -10,7 +10,7 @@ export default async function ProfilPage() {
   const { data: profile } = await fetchMeProfileServer();
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 p-6">
+    <main className="flex-1 space-y-6 p-6">
       <PageHeader
         title="Profil"
         description="Data akun yang dipakai untuk laporan dan sertifikat."
