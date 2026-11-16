@@ -1,6 +1,11 @@
 import { apiFetchServer } from "@/lib/api/server";
-import type { MeAttemptItem, MeCertificateItem, MeProfile, TestResultView } from "@/lib/api/types";
-import type { MeResultItem } from "@/lib/api/types/attempts";
+import type {
+  MeAttemptItem,
+  MeCertificateItem,
+  MeOverview,
+  MeProfile,
+  TestResultView,
+} from "@/lib/api/types";
 import type { ApiSuccess } from "@/lib/api/types/pagination";
 import type { ParticipantStage } from "@/features/participant/stages";
 
@@ -20,10 +25,6 @@ export function fetchMeAttemptsServer(
   return apiFetchServer<MeAttemptItem[]>(`/me/attempts?${query.toString()}`);
 }
 
-export function fetchMeResultsServer(page = 1): Promise<ApiSuccess<MeResultItem[]>> {
-  return apiFetchServer<MeResultItem[]>(`/me/results?page=${page}`);
-}
-
 /** Own released result web view — same shape as the feature 05 public result. */
 export function fetchMeResultDetailServer(attemptId: string): Promise<ApiSuccess<TestResultView>> {
   return apiFetchServer<TestResultView>(`/me/results/${attemptId}`);
@@ -37,4 +38,9 @@ export function fetchMeCertificatesServer(page = 1): Promise<ApiSuccess<MeCertif
 /** Own account row plus the declarations recorded on the latest attempt. */
 export function fetchMeProfileServer(): Promise<ApiSuccess<MeProfile>> {
   return apiFetchServer<MeProfile>("/me/profile");
+}
+
+/** Counts, previews, and the raw events behind the activity list. */
+export function fetchMeOverviewServer(): Promise<ApiSuccess<MeOverview>> {
+  return apiFetchServer<MeOverview>("/me/overview");
 }

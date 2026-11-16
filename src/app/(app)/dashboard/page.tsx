@@ -1,57 +1,59 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageHeader } from "@/components/layout/page-header";
-import { fetchMeAttemptsServer, fetchMeResultsServer } from "@/features/participant/api";
-import { AttemptCard } from "@/features/participant/components/attempt-card";
-import { ResultCard } from "@/features/participant/components/result-card";
+import { Button } from "@/components/ui/button";
+import { fetchMeOverviewServer } from "@/features/participant/api";
+import { buildActivity } from "@/features/participant/activity";
+import { ActivityList } from "@/features/participant/components/activity-list";
+import { ContinueTesting } from "@/features/participant/components/continue-testing";
+import { OverviewStats } from "@/features/participant/components/overview-stats";
 
-export const metadata: Metadata = { title: "Dashboard" };
+export const metadata: Metadata = { title: "Ringkasan" };
 
 export default async function DashboardPage() {
-  const [attemptsPage, resultsPage] = await Promise.all([
-    fetchMeAttemptsServer(),
-    fetchMeResultsServer(1),
-  ]);
-
-  const activeAttempts = attemptsPage.data.filter(
-    (attempt) => attempt.status !== "ABANDONED" && attempt.resultStatus !== "APPROVED",
-  );
+  const { data: overview } = await fetchMeOverviewServer();
+  const activity = buildActivity(overview);
+  const nothingYet = Object.values(overview.counts).every((count) => count === 0);
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 space-y-8 p-6">
       <PageHeader
-        title="Dashboard"
-        description="Riwayat tes dan hasil yang sudah dirilis psikolog."
+        title="Ringkasan"
+        description="Status tes Anda: yang sedang dikerjakan, yang menunggu psikolog, dan yang sudah terbit."
       />
 
-      <section className="space-y-3">
-        <h2 className="text-base font-semibold">Sedang berjalan</h2>
-        {activeAttempts.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
-            Tidak ada tes yang sedang berjalan. Ikuti sesi dari institusi atau beli tes di katalog.
-          </p>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {activeAttempts.map((attempt) => (
-              <AttemptCard key={attempt.id} attempt={attempt} />
-            ))}
-          </div>
-        )}
-      </section>
+      <OverviewStats counts={overview.counts} />
 
-      <section className="space-y-3">
-        <h2 className="text-base font-semibold">Hasil tersedia</h2>
-        {resultsPage.data.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
-            Belum ada hasil yang dirilis. Hasil tampil di sini setelah psikolog menyetujui.
+      {nothingYet ? (
+        <section className="rounded-lg border border-dashed p-10 text-center">
+          <p className="text-sm font-medium">Belum ada tes</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Pilih tes di katalog untuk memulai. Hasil dan sertifikat akan muncul di sini.
           </p>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {resultsPage.data.map((result) => (
-              <ResultCard key={result.attemptId} result={result} />
-            ))}
-          </div>
-        )}
-      </section>
+          <Button asChild className="mt-4">
+            <Link href="/tes">Lihat katalog</Link>
+          </Button>
+        </section>
+      ) : (
+        <>
+          {overview.activeAttempts.length > 0 && (
+            <ContinueTesting
+              attempts={overview.activeAttempts}
+              total={overview.counts.inProgress}
+            />
+          )}
+
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-base font-semibold">Aktivitas terakhir</h2>
+              <p className="text-sm text-muted-foreground">
+                Pembayaran, tes selesai, hasil disetujui, dan sertifikat terbit.
+              </p>
+            </div>
+            <ActivityList items={activity} />
+          </section>
+        </>
+      )}
     </main>
   );
 }
