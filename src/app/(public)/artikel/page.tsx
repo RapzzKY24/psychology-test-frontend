@@ -9,7 +9,7 @@ import { ArticleSearchForm } from "@/features/public/components/article-search-f
 
 export const metadata: Metadata = {
   title: "Artikel",
-  description: "Kebijaksanaan, tips, dan edukasi psikologi dari tim kami.",
+  description: "Panduan, tips, dan edukasi psikologi dari tim kami.",
 };
 
 const PAGE_SIZE = 12;
@@ -20,9 +20,7 @@ function firstValue(value: string | string[] | undefined): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
-export default async function ArtikelPage({
-  searchParams,
-}: PageProps<"/artikel">) {
+export default async function ArtikelPage({ searchParams }: PageProps<"/artikel">) {
   const sp = await searchParams;
   const search = firstValue(sp.search);
   const category = firstValue(sp.category);
@@ -49,17 +47,20 @@ export default async function ArtikelPage({
         </p>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Artikel Psikologi</h1>
         <p className="max-w-2xl text-muted-foreground">
-          Tips, kebijaksanaan, dan edukasi untuk kesehatan mental — ditulis bersama psikolog kami.
+          Panduan, tips, dan edukasi psikologi — ditulis bersama psikolog kami.
         </p>
       </header>
 
-      <ArticleSearchForm category={category} />
-
-      <ArticleCategoryFilters
-        categories={categories.map((c) => ({ value: c, label: c }))}
-        category={category}
-        search={search}
-      />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex-1">
+          <ArticleSearchForm category={category} search={search} />
+        </div>
+        <ArticleCategoryFilters
+          categories={categories.map((c) => ({ value: c, label: c }))}
+          category={category}
+          search={search}
+        />
+      </div>
 
       {featured ? <ArticleFeaturedCard article={featured} /> : null}
 

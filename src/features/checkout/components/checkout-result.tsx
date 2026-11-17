@@ -16,6 +16,7 @@ import {
 } from "../checkout-result-view";
 import { CheckoutStatusIcon } from "./checkout-status-icon";
 import { CheckoutSummary } from "./checkout-summary";
+import { CheckoutNextSteps } from "./checkout-next-steps";
 
 interface CheckoutResultProps {
   initial: CheckoutStatusResult;
@@ -52,49 +53,52 @@ export function CheckoutResult({ initial, hint }: CheckoutResultProps) {
   const showDashboardLink = action.kind === "reconcile" || action.href !== dashboardHref;
 
   return (
-    <Card className="mx-auto max-w-md">
-      <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
-        {/* The asset is a 3.4:1 wordmark, so it keeps its ratio: a square box
+    <div className="space-y-2">
+      <Card className="mx-auto max-w-md">
+        <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
+          {/* The asset is a 3.4:1 wordmark, so it keeps its ratio: a square box
             with object-cover would crop the mark and upscale it into a blur. */}
-        <Image
-          src="/logo/logopsikologi.jpeg"
-          alt="Psikotes"
-          width={173}
-          height={50}
-          priority
-          className="h-10 w-auto"
-        />
+          <Image
+            src="/logo/logopsikologi.jpeg"
+            alt="Psikotes"
+            width={173}
+            height={50}
+            priority
+            className="h-10 w-auto"
+          />
 
-        <CheckoutStatusIcon view={view} />
+          <CheckoutStatusIcon view={view} />
 
-        <div className="space-y-1">
-          <h1 className="text-xl font-semibold">{copy.title}</h1>
-          <p className="text-muted-foreground text-sm">{copy.body}</p>
-        </div>
+          <div className="space-y-1">
+            <h1 className="text-xl font-semibold">{copy.title}</h1>
+            <p className="text-muted-foreground text-sm">{copy.body}</p>
+          </div>
 
-        <CheckoutSummary testNames={checkout.testNames} amount={checkout.amount} />
+          <CheckoutSummary testNames={checkout.testNames} amount={checkout.amount} />
 
-        {action.kind === "reconcile" ? (
-          <Button className="w-full" onClick={() => reconcileNow()} disabled={isPending}>
-            {isPending ? (
-              <Loader2 className="size-4 animate-spin" aria-hidden />
-            ) : (
-              <RefreshCw className="size-4" aria-hidden />
-            )}
-            {isPending ? "Mengecek status…" : action.label}
-          </Button>
-        ) : (
-          <Button asChild className="w-full">
-            <Link href={action.href}>{action.label}</Link>
-          </Button>
-        )}
+          {action.kind === "reconcile" ? (
+            <Button className="w-full" onClick={() => reconcileNow()} disabled={isPending}>
+              {isPending ? (
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+              ) : (
+                <RefreshCw className="size-4" aria-hidden />
+              )}
+              {isPending ? "Mengecek status…" : action.label}
+            </Button>
+          ) : (
+            <Button asChild className="w-full">
+              <Link href={action.href}>{action.label}</Link>
+            </Button>
+          )}
 
-        {showDashboardLink && (
-          <Button asChild variant="ghost" className="w-full">
-            <Link href={dashboardHref}>Ke dashboard</Link>
-          </Button>
-        )}
-      </CardContent>
-    </Card>
+          {showDashboardLink && (
+            <Button asChild variant="ghost" className="w-full">
+              <Link href={dashboardHref}>Ke dashboard</Link>
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+      <CheckoutNextSteps kind={checkout.kind} view={view} />
+    </div>
   );
 }

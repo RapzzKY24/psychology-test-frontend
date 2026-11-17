@@ -1,58 +1,58 @@
-import { FileCheck, Monitor, Search } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Building2, UserRound } from "lucide-react";
+import { PUBLIC_COPY } from "../copy";
+import { SectionHeading } from "./section-heading";
 
-const STEPS: { step: string; icon: LucideIcon; title: string; description: string }[] = [
-  {
-    step: "01",
-    icon: Search,
-    title: "Pilih Tes yang Sesuai",
-    description:
-      "Pilih tes yang sesuai kebutuhanmu — kepribadian, kognitif, gaya kerja, dan lainnya.",
-  },
-  {
-    step: "02",
-    icon: Monitor,
-    title: "Kerjakan Secara Online",
-    description:
-      "Ikuti tes langsung di platform kami kapan saja dan di mana saja. Tidak perlu instalasi.",
-  },
-  {
-    step: "03",
-    icon: FileCheck,
-    title: "Terima Hasil Resmi",
-    description:
-      "Hasil diverifikasi psikolog berlisensi dan tersedia sebagai laporan resmi yang dapat dipercaya.",
-  },
-];
+const TRACK_ICONS = [UserRound, Building2] as const;
 
-/** How-it-works band. Cards on gray, white background per card creates depth. */
+/** Two parallel flows: a personal buyer and an institution. */
 export function LandingStepsBand() {
+  const copy = PUBLIC_COPY.landing.steps;
+  const tracks = [copy.personal, copy.instansi];
+
   return (
-    <section className="bg-muted/40 border-y">
+    <section id="cara-kerja" className="bg-muted/40 scroll-mt-24 border-y">
       <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-16">
-        <div className="mb-10">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Cara kerjanya</h2>
-          <p className="text-muted-foreground mt-1.5 max-w-lg text-sm sm:text-base">
-            Dari pilih tes hingga terima hasil — semua selesai di satu platform.
-          </p>
+        <SectionHeading eyebrow={copy.eyebrow} title={copy.title} description={copy.description} />
+
+        <div className="mt-8 grid gap-5 lg:grid-cols-2">
+          {tracks.map((track, trackIndex) => {
+            const Icon = TRACK_ICONS[trackIndex] ?? UserRound;
+            return (
+              <div key={track.title} className="bg-background rounded-2xl border p-6 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-lg">
+                    <Icon className="size-4" aria-hidden />
+                  </span>
+                  <h3 className="font-semibold">{track.title}</h3>
+                </div>
+                <ol className="mt-5 space-y-4">
+                  {track.steps.map((step, index) => (
+                    <li key={step.title} className="flex gap-3">
+                      <span className="bg-primary/10 text-primary flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums">
+                        {index + 1}
+                      </span>
+                      <div>
+                        <p className="text-sm font-medium">{step.title}</p>
+                        <p className="text-muted-foreground mt-0.5 text-sm leading-relaxed">
+                          {step.body}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            );
+          })}
         </div>
 
-        <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {STEPS.map(({ step, icon: Icon, title, description }) => (
-            <li key={step} className="rounded-2xl border bg-background p-6 shadow-sm">
-              <div className="mb-5 flex items-start justify-between gap-2">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                  <Icon className="size-5 text-primary" strokeWidth={1.5} aria-hidden />
-                </div>
-                <span className="font-mono text-5xl font-bold leading-none text-muted-foreground/15 select-none">
-                  {step}
-                </span>
-              </div>
-              <h3 className="font-semibold leading-snug">{title}</h3>
-              <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{description}</p>
-            </li>
-          ))}
-        </ol>
+        <Link
+          href="/bantuan"
+          className="text-primary mt-6 inline-flex items-center gap-1 text-sm font-medium hover:underline"
+        >
+          {copy.helpLink}
+          <ArrowRight className="size-4" aria-hidden />
+        </Link>
       </div>
     </section>
   );

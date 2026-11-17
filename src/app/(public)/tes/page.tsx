@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SearchX } from "lucide-react";
+import { Check, SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TEST_CATEGORIES, type TestCategory } from "@/lib/api/types";
 import { fetchPublicTestsServer } from "@/features/public/api";
+import { PUBLIC_COPY } from "@/features/public/copy";
 import { TestBuyCta } from "@/features/public/components/test-buy-cta";
 import { TestCard } from "@/features/public/components/test-card";
 import { TestCategoryFilters } from "@/features/public/components/test-category-filters";
@@ -42,11 +43,10 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
     <main className="mx-auto w-full max-w-6xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-3">
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Tes Psikologi</h1>
-          <p className="text-muted-foreground max-w-2xl">
-            Pilih tes yang ingin Anda kerjakan. Setiap tes dikerjakan online dan hasilnya
-            diverifikasi oleh psikolog.
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            {PUBLIC_COPY.catalog.title}
+          </h1>
+          <p className="text-muted-foreground max-w-2xl">{PUBLIC_COPY.catalog.description}</p>
         </div>
         {meta ? (
           <p className="text-muted-foreground pb-1 text-sm">
@@ -55,6 +55,24 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
           </p>
         ) : null}
       </header>
+
+      <section className="bg-muted/30 grid gap-4 rounded-2xl border p-5 sm:grid-cols-[1fr_auto] sm:items-center">
+        <div>
+          <h2 className="text-sm font-semibold">{PUBLIC_COPY.catalog.introTitle}</h2>
+          <p className="text-muted-foreground mt-1 text-sm">{PUBLIC_COPY.catalog.introBody}</p>
+          <ul className="mt-3 grid gap-1.5 sm:grid-cols-3">
+            {PUBLIC_COPY.catalog.introPoints.map((point) => (
+              <li key={point} className="text-muted-foreground flex items-start gap-1.5 text-xs">
+                <Check className="text-primary mt-0.5 size-3.5 shrink-0" aria-hidden />
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <Button asChild variant="outline" className="rounded-full">
+          <Link href="/bantuan#alur-personal">{PUBLIC_COPY.catalog.helpLink}</Link>
+        </Button>
+      </section>
 
       <TestCategoryFilters category={category} />
 

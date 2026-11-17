@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { PUBLIC_COPY } from "@/features/public/copy";
 import { findInvoiceVerificationServer } from "@/features/public/api";
 import { InvoiceVerificationCard } from "@/features/public/components/invoice-verification-card";
+import { VerificationIntro } from "@/features/public/components/verification-intro";
 
 export const dynamic = "force-dynamic";
 
@@ -15,23 +17,17 @@ export async function generateMetadata({
   };
 }
 
-export default async function ValidasiPage({
-  params,
-}: PageProps<"/validasi/[token]">) {
+export default async function ValidasiPage({ params }: PageProps<"/validasi/[token]">) {
   const { token } = await params;
   const invoice = await findInvoiceVerificationServer(token);
   if (!invoice) notFound();
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-6 py-16">
-      <header className="space-y-2 text-center">
-        <h1 className="text-2xl font-semibold text-foreground">
-          Verifikasi Invoice
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Halaman ini menampilkan data invoice yang tersimpan di sistem kami.
-        </p>
-      </header>
+      <VerificationIntro
+        title="Verifikasi Invoice"
+        description={PUBLIC_COPY.verification.invoiceDescription}
+      />
 
       <InvoiceVerificationCard invoice={invoice} />
     </main>

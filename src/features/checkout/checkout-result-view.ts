@@ -5,25 +5,24 @@ export type CheckoutView = "paid" | "verifying" | "waiting" | "failed";
 
 /** A link out of the page, or an in-place gateway check. */
 export type PrimaryAction =
-  | { kind: "link"; href: string; label: string }
-  | { kind: "reconcile"; label: string };
+  { kind: "link"; href: string; label: string } | { kind: "reconcile"; label: string };
 
 export const CHECKOUT_VIEW_COPY: Record<CheckoutView, { title: string; body: string }> = {
   paid: {
     title: "Pembayaran berhasil",
-    body: "Pembayaran sudah diterima. Sesi tes aktif dan siap dibagikan.",
+    body: "Pembayaran sudah diterima. Langkah berikutnya ada di bawah.",
   },
   verifying: {
     title: "Pembayaran diterima — sedang diverifikasi",
-    body: "Pembayaran sudah tercatat di penyedia pembayaran. Sistem sedang memperbarui tagihan; halaman ini menyegarkan sendiri.",
+    body: "Pembayaran tercatat di penyedia. Sistem sedang memperbarui status; halaman ini menyegarkan sendiri.",
   },
   waiting: {
     title: "Menunggu pembayaran",
-    body: "Pembayaran belum masuk. Selesaikan pembayaran, lalu halaman ini akan diperbarui otomatis.",
+    body: "Selesaikan pembayaran sebelum batas waktu. Status diperbarui otomatis.",
   },
   failed: {
     title: "Pembayaran tidak berhasil",
-    body: "Pembayaran tidak selesai atau sudah kedaluwarsa. Silakan mulai lagi.",
+    body: "Pembayaran tidak selesai atau sudah kedaluwarsa. Mulai pesanan baru dari katalog.",
   },
 };
 

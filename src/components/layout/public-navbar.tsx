@@ -24,6 +24,7 @@ const NAV_LINKS = [
   { href: "/tes", label: "Tes" },
   { href: "/artikel", label: "Artikel" },
   { href: "/untuk-perusahaan", label: "Untuk Perusahaan" },
+  { href: "/bantuan", label: "Bantuan" },
 ] as const;
 
 /** Role → the console the navbar links to, with the label shown next to it. */

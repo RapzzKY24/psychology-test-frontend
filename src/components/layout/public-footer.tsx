@@ -7,6 +7,7 @@ const COLUMNS = [
     links: [
       { href: "/tes", label: "Tes Psikologi" },
       { href: "/artikel", label: "Artikel" },
+      { href: "/verifikasi", label: "Verifikasi Dokumen" },
       { href: "/untuk-perusahaan", label: "Untuk Perusahaan" },
     ],
   },
@@ -21,8 +22,10 @@ const COLUMNS = [
   {
     title: "Bantuan",
     links: [
-      { href: "/artikel", label: "Panduan & FAQ" },
-      { href: "/untuk-perusahaan", label: "Hubungi Kami" },
+      { href: "/bantuan", label: "Pusat Bantuan" },
+      { href: "/bantuan#faq", label: "Pertanyaan Umum" },
+      { href: "/bantuan#verifikasi", label: "Cara verifikasi" },
+      { href: "/bantuan#kontak", label: "Hubungi Kami" },
     ],
   },
 ] as const;

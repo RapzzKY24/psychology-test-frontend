@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { PUBLIC_COPY } from "@/features/public/copy";
 import { findReportVerificationServer } from "@/features/public/api";
 import { ReportVerificationCard } from "@/features/public/components/report-verification-card";
+import { VerificationIntro } from "@/features/public/components/verification-intro";
 
 export const dynamic = "force-dynamic";
 
@@ -20,12 +22,10 @@ export default async function VerifikasiLaporanPage({
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-6 py-16">
-      <header className="space-y-2 text-center">
-        <h1 className="text-2xl font-semibold text-foreground">Verifikasi Laporan</h1>
-        <p className="text-sm text-muted-foreground">
-          Halaman ini menampilkan data laporan yang tersimpan di sistem kami.
-        </p>
-      </header>
+      <VerificationIntro
+        title="Verifikasi Laporan"
+        description={PUBLIC_COPY.verification.reportDescription}
+      />
 
       {report ? (
         <ReportVerificationCard report={report} />

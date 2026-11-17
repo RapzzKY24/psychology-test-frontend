@@ -3,10 +3,10 @@ import { ArrowRight } from "lucide-react";
 import type { PublicArticleListItem } from "@/lib/api/types";
 import { ArticleCard } from "./article-card";
 
-/** White band: the latest published articles. */
+/** Gray band: the latest published articles. */
 export function LandingArticlesBand({ articles }: { articles: PublicArticleListItem[] }) {
   return (
-    <section className="bg-background">
+    <section className="bg-muted/30 border-y">
       <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-14 sm:px-6 sm:py-16">
         <section className="space-y-5">
           <div className="flex items-end justify-between gap-4">

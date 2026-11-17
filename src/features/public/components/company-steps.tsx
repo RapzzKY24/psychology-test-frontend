@@ -1,36 +1,25 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { PUBLIC_COPY } from "../copy";
+import { SectionHeading } from "./section-heading";
+import { StepTimeline } from "./step-timeline";
 
-const STEPS = [
-  { title: "Daftar instansi", body: "Isi data instansi dan akun akuntabilitas (PIC HR)." },
-  { title: "Tentukan kuota peserta", body: "Tentukan jumlah peserta dan durasi asesmen." },
-  { title: "Daftarkan peserta", body: "Masukkan data peserta; admin bisa mengirim undangan." },
-  { title: "Terima hasil", body: "Bagi hasil per orang atau kelompok, verifikasi psikolog." },
-];
-
-/** The four steps of the institution package, numbered in order. */
+/** The five steps of an institution batch, in order. */
 export function CompanySteps() {
+  const copy = PUBLIC_COPY.company;
+
   return (
     <section className="space-y-5">
-      <h2 className="text-2xl font-semibold tracking-tight">Alur Paket Instansi</h2>
-      <ol className="space-y-4">
-        {STEPS.map((step, index) => (
-          <li key={step.title} className="flex gap-4">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-              {index + 1}
-            </span>
-            <div>
-              <p className="font-medium">{step.title}</p>
-              <p className="text-sm text-muted-foreground">{step.body}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+      <SectionHeading
+        title={copy.stepsTitle}
+        description="Dari akun instansi sampai laporan tiap peserta."
+      />
+      <StepTimeline steps={copy.steps} columns={3} />
       <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+        href="/bantuan#alur-instansi"
+        className="text-primary inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
       >
-        Kembali ke beranda
+        Panduan lengkap instansi
         <ArrowRight className="size-4" aria-hidden />
       </Link>
     </section>

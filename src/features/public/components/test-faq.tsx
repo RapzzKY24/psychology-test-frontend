@@ -1,45 +1,26 @@
-import { ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { PUBLIC_COPY } from "../copy";
+import { TEST_FAQ_IDS, faqById } from "../help-content";
+import { FaqAccordion } from "./faq-accordion";
 
-const FAQ = [
-  {
-    q: "Berapa lama hasil keluar?",
-    a: "Hasil diproses otomatis dan diverifikasi psikolog. Anda akan diberi tahu begitu laporan siap.",
-  },
-  {
-    q: "Apakah hasilnya resmi?",
-    a: "Ya. Setiap laporan ditandatangani psikolog berlisensi dan dilengkapi QR untuk memverifikasi keasliannya.",
-  },
-  {
-    q: "Bisa dikerjakan lewat HP?",
-    a: "Ya, tes dirancang responsif dan dapat dikerjakan dari ponsel maupun komputer.",
-  },
-  {
-    q: "Bagaimana jika koneksi terputus?",
-    a: "Jawaban tersimpan sepanjang pengerjaan, sehingga Anda bisa melanjutkan dari tempat terakhir.",
-  },
-] as const;
+const FAQ = TEST_FAQ_IDS.map(faqById);
 
-/** Native <details> accordion — works without JS, chevron rotates when open. */
+/** The questions that actually decide whether someone buys or asks admin. */
 export function TestFaq() {
   return (
     <section aria-labelledby="faq" className="space-y-4">
       <h2 id="faq" className="text-lg font-semibold">
-        Pertanyaan Umum
+        {PUBLIC_COPY.testDetail.faqTitle}
       </h2>
-      <div className="bg-card divide-y overflow-hidden rounded-2xl border">
-        {FAQ.map((item) => (
-          <details key={item.q} className="group">
-            <summary className="hover:bg-muted/50 flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-medium transition-colors marker:content-none">
-              {item.q}
-              <ChevronDown
-                className="text-muted-foreground size-4 shrink-0 transition-transform group-open:rotate-180"
-                aria-hidden
-              />
-            </summary>
-            <p className="text-muted-foreground px-5 pb-4 text-sm leading-relaxed">{item.a}</p>
-          </details>
-        ))}
-      </div>
+      <FaqAccordion items={FAQ} />
+      <Link
+        href="/bantuan#faq"
+        className="text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline"
+      >
+        Lihat semua pertanyaan
+        <ArrowRight className="size-4" aria-hidden />
+      </Link>
     </section>
   );
 }

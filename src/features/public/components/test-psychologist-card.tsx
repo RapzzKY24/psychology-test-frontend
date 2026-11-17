@@ -16,7 +16,7 @@ export function TestPsychologistCard({ psychologists }: { psychologists: PublicP
           Psikolog Berlisensi
         </h2>
         <p className="text-muted-foreground text-sm">
-          Laporan Anda diperiksa dan ditandatangani oleh psikolog berikut.
+          Hasil Anda diperiksa dan disetujui oleh psikolog berikut.
         </p>
       </div>
 
@@ -31,10 +31,7 @@ export function TestPsychologistCard({ psychologists }: { psychologists: PublicP
             .join(" · ");
 
           return (
-            <li
-              key={psychologist.licenseNumber}
-              className="flex items-start gap-4 p-5"
-            >
+            <li key={psychologist.licenseNumber} className="flex items-start gap-4 p-5">
               <span className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-full">
                 <BadgeCheck className="size-5" aria-hidden />
               </span>

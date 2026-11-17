@@ -1,39 +1,30 @@
-import { Building2, ShieldCheck, Users } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { CreditCard, FileText, Monitor, ShieldCheck } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { PUBLIC_COPY } from "../copy";
+import { InfoCard } from "./info-card";
+import { SectionHeading } from "./section-heading";
 
-const PERKS = [
-  {
-    icon: Users,
-    title: "Pemetaan tim",
-    body: "Kepribadian, gaya kerja, dan minat tiap karyawan dalam satu sesi terjadwal.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Hasil terlulusi",
-    body: "Laporan psikolog resmi + verifikasi QR, cocok untuk kebutuhan HR & compliance.",
-  },
-  {
-    icon: Building2,
-    title: "Kuota peserta",
-    body: "Sediakan kuota peserta instansi, lalu daftarkan kapan saja.",
-  },
-];
+const ICONS: Record<string, LucideIcon> = {
+  dashboard: Monitor,
+  report: FileText,
+  invoice: CreditCard,
+  access: ShieldCheck,
+};
 
-/** What an institution gets, as three cards under the hero. */
+/** What an institution gets, as four cards under the hero. */
 export function CompanyPerks() {
+  const copy = PUBLIC_COPY.company;
+
   return (
-    <section className="grid gap-5 sm:grid-cols-3">
-      {PERKS.map((perk) => (
-        <Card key={perk.title} className="rounded-2xl">
-          <CardContent className="space-y-3 p-6">
-            <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <perk.icon className="size-5" aria-hidden />
-            </span>
-            <h2 className="font-semibold">{perk.title}</h2>
-            <p className="text-sm text-muted-foreground">{perk.body}</p>
-          </CardContent>
-        </Card>
-      ))}
+    <section className="space-y-5">
+      <SectionHeading title={copy.perksTitle} />
+      <div className="grid gap-5 sm:grid-cols-2">
+        {copy.perks.map((perk) => (
+          <InfoCard key={perk.key} icon={ICONS[perk.key] ?? Monitor} title={perk.title}>
+            {perk.body}
+          </InfoCard>
+        ))}
+      </div>
     </section>
   );
 }
