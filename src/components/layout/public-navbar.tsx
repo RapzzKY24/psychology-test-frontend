@@ -117,7 +117,7 @@ export function PublicNavbar() {
               <Link href="/masuk">Masuk</Link>
             </Button>
             <Button asChild className="rounded-full">
-              <Link href="/daftar">Daftar</Link>
+              <Link href="/daftar">Buat akun</Link>
             </Button>
           </div>
         )}
@@ -175,7 +175,7 @@ export function PublicNavbar() {
                 </Button>
                 <Button asChild className="flex-1 rounded-full">
                   <Link href="/daftar" onClick={() => setOpen(false)}>
-                    Daftar
+                    Buat akun
                   </Link>
                 </Button>
               </div>

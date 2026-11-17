@@ -3,7 +3,7 @@
 import type { LucideIcon } from "lucide-react";
 import { Controller } from "react-hook-form";
 import type { Control, FieldValues, Path } from "react-hook-form";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 export interface AuthTextSpec<T extends FieldValues> {
@@ -12,6 +12,8 @@ export interface AuthTextSpec<T extends FieldValues> {
   placeholder?: string;
   type?: string;
   autoComplete?: string;
+  /** Helper copy under the input, e.g. why the full name matters. */
+  hint?: string;
 }
 
 export function AuthTextField<T extends FieldValues>({
@@ -37,6 +39,7 @@ export function AuthTextField<T extends FieldValues>({
             aria-invalid={fieldState.invalid}
             className="h-11"
           />
+          {spec.hint ? <FieldDescription>{spec.hint}</FieldDescription> : null}
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </Field>
       )}
@@ -80,7 +83,9 @@ export function AuthSection({
         <h2 className="text-sm font-semibold">{title}</h2>
       </div>
       <p className="-mt-2 text-xs text-muted-foreground">{hint}</p>
-      <div className="grid gap-4 md:grid-cols-2">{children}</div>
+      <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))]">
+        {children}
+      </div>
     </section>
   );
 }

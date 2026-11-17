@@ -10,16 +10,16 @@ function renderCta(role: "PARTICIPANT" | "INSTANSI" | null) {
   const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
   return render(
     <QueryClientProvider client={client}>
-      <TestBuyCta testId="t1" testName="IST" role={role} />
+      <TestBuyCta testId="t1" testName="IST" testSlug="ist" role={role} />
     </QueryClientProvider>,
   );
 }
 
 describe("TestBuyCta", () => {
-  it("sends a signed-out visitor to sign in", () => {
+  it("sends a signed-out visitor to sign in and back to this test", () => {
     renderCta(null);
     const link = screen.getByRole("link", { name: "Mulai Tes" });
-    expect(link.getAttribute("href")).toBe("/masuk");
+    expect(link.getAttribute("href")).toBe("/masuk?next=%2Ftes%2Fist");
   });
 
   it("sends an institution to the batch checkout with the test preselected", () => {

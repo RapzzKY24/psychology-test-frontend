@@ -22,7 +22,9 @@ export function proxy(request: NextRequest) {
   if (!hasSessionCookie(request)) {
     const url = request.nextUrl.clone();
     url.pathname = "/masuk";
-    url.search = `?next=${encodeURIComponent(request.nextUrl.pathname)}`;
+    // `langsung=1` tells the auth page this is an expired session, not a first
+    // visit: show the form, not the two-question gateway.
+    url.search = `?next=${encodeURIComponent(request.nextUrl.pathname)}&langsung=1`;
     return NextResponse.redirect(url);
   }
   return NextResponse.next();

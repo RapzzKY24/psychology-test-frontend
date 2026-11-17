@@ -27,14 +27,18 @@ export function TestBuyPanel({ test, role }: BuyProps) {
           <p className="font-heading text-3xl font-semibold tracking-tight">
             {formatIdr(test.price)}
           </p>
-          <p className="text-muted-foreground mt-1 text-xs">
-            Biaya sudah termasuk laporan hasil.
-          </p>
+          <p className="text-muted-foreground mt-1 text-xs">Biaya sudah termasuk laporan hasil.</p>
         </div>
 
         <AgeGateCard role={role} />
 
-        <TestBuyCta testId={test.id} testName={test.name} role={role} className="w-full" />
+        <TestBuyCta
+          testId={test.id}
+          testName={test.name}
+          testSlug={test.slug}
+          role={role}
+          className="w-full"
+        />
 
         <ul className="space-y-2.5 border-t pt-4">
           {INCLUDES.map((item) => (
@@ -63,7 +67,13 @@ export function TestBuyBar({ test, role }: BuyProps) {
           <p className="text-muted-foreground text-xs">Biaya</p>
           <p className="text-lg font-semibold">{formatIdr(test.price)}</p>
         </div>
-        <TestBuyCta testId={test.id} testName={test.name} role={role} className="flex-shrink-0" />
+        <TestBuyCta
+          testId={test.id}
+          testName={test.name}
+          testSlug={test.slug}
+          role={role}
+          className="flex-shrink-0"
+        />
       </div>
     </div>
   );

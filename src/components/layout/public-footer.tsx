@@ -15,7 +15,7 @@ const COLUMNS = [
     links: [
       { href: "/untuk-perusahaan", label: "Paket Instansi" },
       { href: "/masuk", label: "Masuk" },
-      { href: "/daftar", label: "Daftar" },
+      { href: "/daftar", label: "Buat akun" },
     ],
   },
   {

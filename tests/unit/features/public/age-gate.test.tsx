@@ -24,7 +24,7 @@ function renderGate(band: AgeBand | null = CFIT2) {
   return render(
     <AgeGateProvider band={band}>
       <AgeGateCard role={null} />
-      <TestBuyCta testId="t1" testName="IST" role={null} />
+      <TestBuyCta testId="t1" testName="IST" testSlug="ist" role={null} />
     </AgeGateProvider>,
   );
 }
@@ -79,7 +79,7 @@ describe("AgeGateCard", () => {
     render(
       <AgeGateProvider band={CFIT2}>
         <AgeGateCard role="INSTANSI" />
-        <TestBuyCta testId="t1" testName="IST" role="INSTANSI" />
+        <TestBuyCta testId="t1" testName="IST" testSlug="ist" role="INSTANSI" />
       </AgeGateProvider>,
     );
     expect(screen.getByText(/Pastikan seluruh peserta/)).toBeTruthy();

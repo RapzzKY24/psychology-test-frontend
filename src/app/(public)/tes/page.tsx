@@ -64,12 +64,15 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
             <TestCard
               key={test.id}
               test={test}
-              buySlot={<TestBuyCta
-                testId={test.id}
-                testName={test.name}
-                role={role}
-                className="flex-1"
-              />}
+              buySlot={
+                <TestBuyCta
+                  testId={test.id}
+                  testName={test.name}
+                  testSlug={test.slug}
+                  role={role}
+                  className="flex-1"
+                />
+              }
             />
           ))}
         </div>

@@ -10,6 +10,8 @@ import { useAgeGate } from "./age-gate";
 interface TestBuyCtaProps {
   testId: string;
   testName: string;
+  /** Keeps the visitor on this test after signing in or creating an account. */
+  testSlug: string;
   /** null = signed-out visitor. */
   role: UserRole | null;
   className?: string;
@@ -22,7 +24,7 @@ interface TestBuyCtaProps {
  * until the gate card confirms the participant fits it — institutions buy for
  * a roster, so they pass through.
  */
-export function TestBuyCta({ testId, testName, role, className }: TestBuyCtaProps) {
+export function TestBuyCta({ testId, testName, testSlug, role, className }: TestBuyCtaProps) {
   const { band, status } = useAgeGate();
   const blocked = Boolean(band) && role !== "INSTANSI" && status !== "inside";
 
@@ -43,18 +45,12 @@ export function TestBuyCta({ testId, testName, role, className }: TestBuyCtaProp
   }
 
   if (role) {
-    return (
-      <PersonalCheckoutButton
-        testId={testId}
-        testName={testName}
-        className={className}
-      />
-    );
+    return <PersonalCheckoutButton testId={testId} testName={testName} className={className} />;
   }
 
   return (
     <Button asChild className={cn("rounded-full", className)}>
-      <Link href="/masuk">Mulai Tes</Link>
+      <Link href={`/masuk?next=${encodeURIComponent(`/tes/${testSlug}`)}`}>Mulai Tes</Link>
     </Button>
   );
 }
