@@ -7,53 +7,11 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
-
-/** One lajur of the grid, as the scorer stores it. */
-export interface TimedGridColumn {
-  column: number;
-  correct: number;
-  wrong: number;
-  skipped: number;
-  attempted: number;
-  gaps: number;
-}
-
-export interface TimedGridMetric {
-  label: string;
-  value: number;
-  band: string | null;
-  group: string;
-}
-
-/** `scores` of a TIMED_GRID result. */
-export interface TimedGridScores {
-  total: number;
-  gaps: number;
-  correct: number;
-  wrong: number;
-  skipped: number;
-  columns: TimedGridColumn[];
-  curve: number[];
-  metrics: Record<string, TimedGridMetric>;
-}
+import type { TimedGridScores } from "../lib/timed-grid-scores";
 
 const CHART_CONFIG = {
   correct: { label: "Jawaban benar", color: "var(--chart-1)" },
 } satisfies ChartConfig;
-
-/**
- * A result's `scores` are whatever the family wrote, so the page has to ask
- * before it draws. A curve of numbers and a per-lajur tally is the whole shape.
- */
-export function isTimedGridScores(scores: unknown): scores is TimedGridScores {
-  const value = scores as Partial<TimedGridScores> | undefined;
-  return (
-    Array.isArray(value?.curve) &&
-    Array.isArray(value?.columns) &&
-    typeof value?.metrics === "object" &&
-    value?.metrics !== null
-  );
-}
 
 /**
  * The work curve: correct answers per lajur, left to right in the order the

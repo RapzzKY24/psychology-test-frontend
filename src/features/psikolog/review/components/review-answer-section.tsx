@@ -17,7 +17,7 @@ import { PairDetailTable, type PairItem, type PairResponseRow } from "./pair-det
 import { RightWrongDetailTable } from "./right-wrong-detail-table";
 import { ScaleTallyDetailTable } from "./scale-tally-detail-table";
 import { TimedGridDetailTable } from "./timed-grid-detail-table";
-import type { TimedGridScores } from "./work-curve-chart";
+import type { TimedGridScores } from "../lib/timed-grid-scores";
 
 /** The table takes the item/response slices it renders, not the whole review. */
 interface RightWrongItem {

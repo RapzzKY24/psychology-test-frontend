@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { TimedGridScores } from "./work-curve-chart";
+import type { TimedGridScores } from "../lib/timed-grid-scores";
 
 /**
  * Per-lajur tally. The scorer already decided what is right, wrong and

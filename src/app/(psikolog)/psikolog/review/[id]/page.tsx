@@ -9,10 +9,8 @@ import {
   MultiSubtestProfileCard,
   isMultiSubtestScores,
 } from "@/features/psikolog/review/components/multi-subtest-profile-card";
-import {
-  WorkCurveChart,
-  isTimedGridScores,
-} from "@/features/psikolog/review/components/work-curve-chart";
+import { WorkCurveChart } from "@/features/psikolog/review/components/work-curve-chart";
+import { isTimedGridScores } from "@/features/psikolog/review/lib/timed-grid-scores";
 import { fetchReviewDetailServer } from "@/features/psikolog/review/api.server";
 import { isApiError } from "@/lib/api/client";
 import { formatIdDate } from "@/lib/format/format-date";
