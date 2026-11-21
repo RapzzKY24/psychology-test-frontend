@@ -36,26 +36,21 @@ describe("TestCard", () => {
     expect(screen.getByText("Gaya Kerja")).toBeTruthy();
     expect(screen.getByText("15 menit")).toBeTruthy();
     expect(screen.queryByText(/Rp\s?150\.000/)).toBeNull();
-    expect(screen.getByRole("link", { name: /Detail/ }).getAttribute("href")).toBe("/tes/disc");
+    expect(screen.getByRole("link", { name: /Lihat detail/ }).getAttribute("href")).toBe(
+      "/tes/disc",
+    );
   });
 
-  it("renders an injected buy action", () => {
+  it("renders an injected buy action next to the detail link", () => {
     render(<TestCard test={test} buySlot={<button type="button">Beli</button>} />);
     expect(screen.getByRole("button", { name: "Beli" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Lihat detail" })).toBeTruthy();
   });
 
-  it("shows the cover when the test has one", () => {
+  it("stays text-first even when the test has a cover", () => {
     render(<TestCard test={{ ...test, imageUrl: "/uploads/test-covers/disc.png" }} />);
 
-    const cover = screen.getByRole("img", { name: "Tes DISC" });
-    expect(cover.getAttribute("src")).toContain("test-covers");
-  });
-
-  it("replaces the empty media strip with the category band", () => {
-    render(<TestCard test={test} />);
-
-    expect(screen.queryByRole("img", { name: "Tes DISC" })).toBeNull();
-    expect(screen.getByTestId("category-band")).toBeTruthy();
+    expect(screen.queryByRole("img")).toBeNull();
   });
 });
 

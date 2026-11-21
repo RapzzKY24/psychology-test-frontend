@@ -77,7 +77,7 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
       <TestCategoryFilters category={category} />
 
       {tests.length > 0 ? (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2">
           {tests.map((test) => (
             <TestCard
               key={test.id}
@@ -88,7 +88,7 @@ export default async function TesCatalogPage({ searchParams }: PageProps<"/tes">
                   testName={test.name}
                   testSlug={test.slug}
                   role={role}
-                  className="flex-1"
+                  className="shrink-0 rounded-lg"
                 />
               }
             />
