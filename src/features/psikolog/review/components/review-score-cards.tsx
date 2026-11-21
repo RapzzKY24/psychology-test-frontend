@@ -31,7 +31,9 @@ export function ReviewScoreCards({
             Pola: <span className="font-mono font-medium">{patternCode}</span>
           </p>
           {hasScores ? (
-            <pre className="overflow-x-auto rounded-lg bg-muted/50 p-3 font-mono text-xs">
+            // A digit grid stores 80 lajur, so the raw record can run to
+            // hundreds of lines — it must not push the work curve off screen.
+            <pre className="max-h-64 overflow-auto rounded-lg bg-muted/50 p-3 font-mono text-xs">
               {JSON.stringify(scores, null, 2)}
             </pre>
           ) : (
@@ -51,7 +53,7 @@ export function ReviewScoreCards({
               <p>
                 Pola: <span className="font-mono font-medium">{correctedPatternCode}</span>
               </p>
-              <pre className="overflow-x-auto rounded-lg bg-muted/50 p-3 font-mono text-xs">
+              <pre className="max-h-64 overflow-auto rounded-lg bg-muted/50 p-3 font-mono text-xs">
                 {JSON.stringify(correctedScores, null, 2)}
               </pre>
               {correctionReason && <p className="text-muted-foreground">{correctionReason}</p>}
