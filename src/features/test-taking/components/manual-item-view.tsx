@@ -25,6 +25,8 @@ interface ManualItemViewProps {
   participantToken: string | null;
   disabled: boolean;
   onSaved: (imageUrl: string) => void;
+  /** True while a stroke is drawn but not uploaded — the runner asks before leaving. */
+  onDirtyChange: (dirty: boolean) => void;
 }
 
 /**
@@ -45,6 +47,7 @@ export function ManualItemView({
   participantToken,
   disabled,
   onSaved,
+  onDirtyChange,
 }: ManualItemViewProps) {
   const backgroundRef = useRef<HTMLCanvasElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -54,6 +57,12 @@ export function ManualItemView({
   const [empty, setEmpty] = useState(true);
   const [dirty, setDirty] = useState(false);
   const { upload, saving } = useUploadDrawing();
+
+  // The runner cannot see the canvas, so it learns here whether a stroke is
+  // still only local and has to confirm before moving to another box.
+  useEffect(() => {
+    onDirtyChange(dirty);
+  }, [dirty, onDirtyChange]);
 
   /** Repaint the lower layer with the printed mark only. */
   const paintMark = useCallback(() => {

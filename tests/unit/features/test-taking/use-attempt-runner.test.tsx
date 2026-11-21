@@ -196,6 +196,19 @@ function timedAttempt(remainingSeconds: number): AttemptRead {
   };
 }
 
+function timedGridAttempt(responses: AttemptRead["responses"] = []): AttemptRead {
+  const attempt = rightWrongAttempt();
+  return {
+    ...attempt,
+    scorerType: "TIMED_GRID",
+    responses,
+    items: [
+      { id: "item-1", order: 1, content: { column: 1, digits: [2, 7, 7] } },
+      { id: "item-2", order: 2, content: { column: 2, digits: [9, 1, 4] } },
+    ],
+  };
+}
+
 function manualAttempt(responses: AttemptRead["responses"] = []): AttemptRead {
   const attempt = rightWrongAttempt();
   return {
@@ -524,5 +537,77 @@ describe("useAttemptRunner", () => {
     await act(async () => result.current.goNext());
     await act(async () => result.current.goNext());
     expect(result.current.safeIndex).toBe(2);
+  });
+
+  it("skips an empty lajur without inventing an answer", async () => {
+    const { result } = renderRunner(timedGridAttempt());
+
+    await act(async () => result.current.skipTimedGridColumn());
+
+    expect(result.current.safeIndex).toBe(1);
+    expect(result.current.answered[0]).toBe(false);
+    expect(putResponse).not.toHaveBeenCalled();
+  });
+
+  it("keeps the digits typed before a lajur is skipped", async () => {
+    const { result } = renderRunner(timedGridAttempt());
+
+    await act(async () => result.current.answerTimedGrid([4, null]));
+    await act(async () => result.current.skipTimedGridColumn());
+
+    expect(result.current.safeIndex).toBe(1);
+    await waitFor(() =>
+      expect(putResponse).toHaveBeenCalledWith(
+        "attempt-1",
+        "item-1",
+        { answers: [4, null] },
+        undefined,
+      ),
+    );
+  });
+
+  it("finishes a timed grid while lajurs are still blank", async () => {
+    const { result } = renderRunner(timedGridAttempt());
+
+    await act(async () => result.current.finish());
+
+    await waitFor(() => expect(completeAttempt).toHaveBeenCalledWith("attempt-1", undefined));
+    expect(result.current.safeIndex).toBe(0);
+  });
+
+  it("asks before leaving a drawing that was not saved", async () => {
+    const { result } = renderRunner(manualAttempt());
+
+    await act(async () => result.current.setManualDirty(true));
+    await act(async () => result.current.goNext());
+
+    expect(result.current.pendingNavigation).toBe(true);
+    expect(result.current.safeIndex).toBe(0);
+
+    await act(async () => result.current.confirmNavigation());
+
+    expect(result.current.pendingNavigation).toBe(false);
+    expect(result.current.safeIndex).toBe(1);
+  });
+
+  it("stays on the drawing when the participant cancels", async () => {
+    const { result } = renderRunner(manualAttempt());
+
+    await act(async () => result.current.setManualDirty(true));
+    await act(async () => result.current.goTo(1));
+    await act(async () => result.current.cancelNavigation());
+
+    expect(result.current.pendingNavigation).toBe(false);
+    expect(result.current.safeIndex).toBe(0);
+  });
+
+  it("moves on freely once the drawing was saved", async () => {
+    const { result } = renderRunner(manualAttempt());
+
+    await act(async () => result.current.setManualDirty(false));
+    await act(async () => result.current.goNext());
+
+    expect(result.current.pendingNavigation).toBe(false);
+    expect(result.current.safeIndex).toBe(1);
   });
 });

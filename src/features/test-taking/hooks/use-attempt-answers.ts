@@ -216,12 +216,20 @@ export function useAttemptAnswers(
     }
   }, [complete, flushPendingText]);
 
-  const tryComplete = useCallback((): string | null => {
-    const missing = firstUnansweredId;
-    if (missing) return missing;
-    void submit();
-    return null;
-  }, [firstUnansweredId, submit]);
+  /**
+   * `allowUnanswered` lets a family whose blanks are legal (the timed grid)
+   * finish without walking the participant back to an item they deliberately
+   * skipped. The clock would submit the same attempt a moment later.
+   */
+  const tryComplete = useCallback(
+    (allowUnanswered = false): string | null => {
+      const missing = allowUnanswered ? null : firstUnansweredId;
+      if (missing) return missing;
+      void submit();
+      return null;
+    },
+    [firstUnansweredId, submit],
+  );
 
   const retryFailed = useCallback(async () => {
     if (submittingRef.current) return;

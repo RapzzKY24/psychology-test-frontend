@@ -78,6 +78,14 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   const [index, setIndex] = useState(0);
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
   const advanceTimer = useRef<number | null>(null);
+  /**
+   * A drawing only reaches the server when the participant presses Save, so a
+   * stroke that has not been saved yet would vanish on the next question.
+   * `pendingNavigation` holds the move that was interrupted until the runner
+   * either confirms or drops it.
+   */
+  const [manualDirty, setManualDirty] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<(() => void) | null>(null);
 
   // Three families draw the same "question + options" screen: right/wrong
   // items, tally statements and choice tallies. Only the scoring differs.
@@ -108,6 +116,40 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   const isLast = safeIndex === total - 1;
   const allAnswered = answers.answeredCount === total;
   const content = (item?.content ?? {}) as Record<string, unknown>;
+
+  /**
+   * Every way out of a drawing box goes through here. Only MANUAL can hold
+   * unsaved work, and only a stroke that was not saved yet is worth asking
+   * about — every other family has already sent its answer.
+   */
+  const guard = useCallback(
+    (action: () => void) => {
+      if (usesManualView && manualDirty) {
+        setPendingNavigation(() => action);
+        return;
+      }
+      action();
+    },
+    [manualDirty, usesManualView],
+  );
+
+  const confirmNavigation = useCallback(() => {
+    const action = pendingNavigation;
+    setPendingNavigation(null);
+    action?.();
+  }, [pendingNavigation]);
+
+  const cancelNavigation = useCallback(() => setPendingNavigation(null), []);
+
+  /**
+   * The only place the index moves. The box being left is gone with its
+   * canvas, so the next one always opens clean.
+   */
+  const moveTo = useCallback((next: number) => {
+    setManualDirty(false);
+    setPendingNavigation(null);
+    setIndex(next);
+  }, []);
 
   const answered = attempt.items.map((it) => isAnswered(answers.answers[it.id]));
 
@@ -234,31 +276,41 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
   );
 
   const goNext = useCallback(() => {
-    cancelAdvance();
-    setDuplicateWarning(null);
-    setIndex((current) => Math.min(current + 1, Math.max(total - 1, 0)));
-  }, [cancelAdvance, total]);
+    guard(() => {
+      cancelAdvance();
+      setDuplicateWarning(null);
+      moveTo(Math.min(safeIndex + 1, Math.max(total - 1, 0)));
+    });
+  }, [cancelAdvance, guard, moveTo, safeIndex, total]);
 
   const goPrev = useCallback(() => {
-    cancelAdvance();
-    setDuplicateWarning(null);
-    setIndex((current) => Math.max(current - 1, 0));
-  }, [cancelAdvance]);
+    guard(() => {
+      cancelAdvance();
+      setDuplicateWarning(null);
+      moveTo(Math.max(safeIndex - 1, 0));
+    });
+  }, [cancelAdvance, guard, moveTo, safeIndex]);
 
   const goTo = useCallback(
     (next: number) => {
-      cancelAdvance();
-      setIndex(next);
+      guard(() => {
+        cancelAdvance();
+        moveTo(next);
+      });
     },
-    [cancelAdvance],
+    [cancelAdvance, guard, moveTo],
   );
 
   const finish = useCallback(() => {
-    const missing = answers.tryComplete();
-    if (!missing) return;
-    const missingIndex = attempt.items.findIndex((it) => it.id === missing);
-    if (missingIndex !== -1) setIndex(missingIndex);
-  }, [answers, attempt.items]);
+    guard(() => {
+      // A timed grid scores its blanks, and a lajur the participant chose to
+      // skip must not bounce them back to it.
+      const missing = answers.tryComplete(usesTimedGridView);
+      if (!missing) return;
+      const missingIndex = attempt.items.findIndex((it) => it.id === missing);
+      if (missingIndex !== -1) moveTo(missingIndex);
+    });
+  }, [answers, attempt.items, guard, moveTo, usesTimedGridView]);
 
   /**
    * One lajur is one answer, saved on a pause. The view keeps the draft locally
@@ -273,8 +325,13 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     [answers, item],
   );
 
-  /** The last gap filled: push the lajur to the server and open the next one. */
-  const finishTimedGridColumn = useCallback(() => {
+  /**
+   * Leaving a lajur — by filling its last gap or by skipping it — pushes the
+   * digits already typed and opens the next one. A skipped lajur keeps its
+   * empty gaps and stays unanswered; the scorer counts those as wrong, exactly
+   * as it would for a lajur the buzzer cut off.
+   */
+  const leaveTimedGridColumn = useCallback(() => {
     answers.flushPendingText();
     if (!isLast) goNext();
   }, [answers, goNext, isLast]);
@@ -353,8 +410,13 @@ export function useAttemptRunner({ attempt, participantToken, scorerType }: UseA
     mark,
     typeRightWrong,
     answerTimedGrid,
-    finishTimedGridColumn,
+    finishTimedGridColumn: leaveTimedGridColumn,
+    skipTimedGridColumn: leaveTimedGridColumn,
     saveManualDrawing,
+    setManualDirty,
+    pendingNavigation: pendingNavigation !== null,
+    confirmNavigation,
+    cancelNavigation,
     goNext,
     goPrev,
     finish,

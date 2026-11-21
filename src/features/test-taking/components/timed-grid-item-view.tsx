@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { SkipForward } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface TimedGridItemViewProps {
@@ -14,6 +16,13 @@ interface TimedGridItemViewProps {
   onChange: (answers: (number | null)[]) => void;
   /** The last gap just got a digit — the runner moves on by itself. */
   onComplete: () => void;
+  /**
+   * Give up on this lajur and open the next one. A participant who cannot read
+   * a row should lose that row, not the rest of the test.
+   */
+  onSkip: () => void;
+  /** The last lajur has nothing to skip to; it ends with the clock. */
+  isLast: boolean;
 }
 
 /**
@@ -32,6 +41,8 @@ export function TimedGridItemView({
   disabled,
   onChange,
   onComplete,
+  onSkip,
+  isLast,
 }: TimedGridItemViewProps) {
   const gaps = Math.max(digits.length - 1, 0);
   const boxes = useRef<(HTMLInputElement | null)[]>([]);
@@ -135,10 +146,23 @@ export function TimedGridItemView({
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Lajur yang sudah selesai tidak bisa dibuka lagi. Jawaban tersimpan
-        otomatis.
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-xs text-muted-foreground">
+          Lajur yang sudah selesai tidak bisa dibuka lagi. Jawaban tersimpan
+          otomatis.
+        </p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onSkip}
+          disabled={disabled || isLast}
+          className="shrink-0"
+        >
+          <SkipForward className="size-4" aria-hidden />
+          Lewati lajur
+        </Button>
+      </div>
     </div>
   );
 }

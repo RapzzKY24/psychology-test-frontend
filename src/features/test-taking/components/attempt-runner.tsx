@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { AttemptCompleteScreen } from "./attempt-complete-screen";
 import { AttemptSaveAlert } from "./attempt-save-alert";
 import { DiscItemView } from "./disc-item-view";
@@ -42,7 +52,9 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
     activeIndex: runner.safeIndex,
     atStart: runner.safeIndex === 0,
     isLast: runner.isLast,
-    currentAnswered: runner.currentAnswered,
+    // The last lajur of a timed grid may be submitted while still empty: the
+    // clock would end the test anyway, and the scorer counts blanks as wrong.
+    currentAnswered: runner.currentAnswered || (runner.usesTimedGridView && runner.isLast),
     completing: runner.completing,
     onSelect: runner.goTo,
     onPrev: runner.goPrev,
@@ -88,6 +100,8 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
             disabled={runner.timeUp}
             onChange={runner.answerTimedGrid}
             onComplete={runner.finishTimedGridColumn}
+            onSkip={runner.skipTimedGridColumn}
+            isLast={runner.isLast}
           />
         ) : runner.usesManualView && runner.item ? (
           <ManualItemView
@@ -100,6 +114,7 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
             participantToken={participantToken}
             disabled={runner.timeUp}
             onSaved={runner.saveManualDrawing}
+            onDirtyChange={runner.setManualDirty}
           />
         ) : runner.usesMarkView ? (
           <MarkGroupItemView
@@ -185,6 +200,29 @@ export function AttemptRunner({ attempt, participantToken, homeHref }: AttemptRu
         remainingSeconds={runner.remainingSeconds}
         locked={runner.usesTimedGridView}
       />
+
+      <AlertDialog
+        open={runner.pendingNavigation}
+        onOpenChange={(open) => {
+          if (!open) runner.cancelNavigation();
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Gambar belum disimpan</AlertDialogTitle>
+            <AlertDialogDescription>
+              Goresan di kotak ini akan hilang kalau Anda pindah tanpa menekan
+              Simpan gambar. Kembali dan simpan dulu, atau tinggalkan gambar ini.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Kembali menggambar</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={runner.confirmNavigation}>
+              Tinggalkan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
