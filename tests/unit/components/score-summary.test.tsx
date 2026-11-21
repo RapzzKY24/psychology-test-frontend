@@ -310,6 +310,23 @@ describe("ScoreSummary", () => {
     expect(screen.queryByText("Akurasi")).toBeNull();
   });
 
+  it("does not draw a negative DISC factor as a short positive bar", () => {
+    const { container } = render(
+      <ScoreSummary scores={{ graph: { D: -4, I: 2, S: 0, C: 6 } }} />,
+    );
+
+    const widths = [...container.querySelectorAll<HTMLElement>("[style*='width']")].map(
+      (element) => element.style.width,
+    );
+
+    // -4 gets no fill; 0 keeps the 4% floor so the track still reads as a bar.
+    expect(widths[0]).toBe("0%");
+    expect(parseFloat(widths[1])).toBeCloseTo(33.33, 1);
+    expect(widths[2]).toBe("4%");
+    expect(widths[3]).toBe("100%");
+    expect(screen.getByText("-4")).toBeTruthy();
+  });
+
   it("does not divide by zero on an empty attempt", () => {
     render(<ScoreSummary scores={{ raw: 0, total: 0 }} />);
     expect(screen.getByText("0/0")).toBeTruthy();

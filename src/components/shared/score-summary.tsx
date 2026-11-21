@@ -577,7 +577,13 @@ export function ScoreSummary({ scores }: { scores: Record<string, unknown> }) {
           <div className="h-2 rounded-full bg-muted">
             <div
               className="h-2 rounded-full bg-primary"
-              style={{ width: `${Math.max((bar.value / maxValue) * 100, 4)}%` }}
+              // A DISC factor can be negative (most minus least). The 4% floor
+              // keeps a real zero visible, but it would draw a negative value
+              // as a short positive bar — an empty track and the signed number
+              // say it better.
+              style={{
+                width: `${bar.value >= 0 ? Math.max((bar.value / maxValue) * 100, 4) : 0}%`,
+              }}
             />
           </div>
         </div>
