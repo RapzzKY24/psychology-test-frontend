@@ -51,7 +51,15 @@ export function useAttemptAnswers(
     Object.fromEntries(attempt.responses.map((r) => [r.itemId, r.value])),
   );
   const [completed, setCompleted] = useState(false);
-  const [savingFailed, setSavingFailed] = useState(false);
+  /**
+   * Mirror of `failedItems` for the render pass. The set itself stays in a ref
+   * so the save queue can read it without a re-render, and the mirror is what
+   * the caller sees.
+   */
+  const [failed, setFailed] = useState<{ ids: string[]; retryable: boolean }>({
+    ids: [],
+    retryable: false,
+  });
   const [submitting, setSubmitting] = useState(false);
   const submittingRef = useRef(false);
 
@@ -72,10 +80,20 @@ export function useAttemptAnswers(
       new Set([...failedItems.current, ...unsyncedItems.current]),
     );
   }, [attempt.id]);
+  /** Refresh the render mirror after the failure set changed. */
+  const syncFailed = useCallback(() => {
+    const ids = [...failedItems.current];
+    setFailed({
+      ids,
+      // A failure loaded from storage has no value in memory, so it cannot be
+      // resent until the participant types or picks that answer again.
+      retryable: ids.length > 0 && ids.every((id) => latestValues.current.has(id)),
+    });
+  }, []);
   useEffect(() => {
     failedItems.current = loadFailedItems(attempt.id);
-    setSavingFailed(failedItems.current.size > 0);
-  }, [attempt.id]);
+    syncFailed();
+  }, [attempt.id, syncFailed]);
   /**
    * Items whose latest value has not been sent yet. A map, not a single slot:
    * a digit grid debounces one lajur while the participant may already have
@@ -97,7 +115,7 @@ export function useAttemptAnswers(
             failedItems.current.delete(itemId);
             unsyncedItems.current.delete(itemId);
             persistOutstanding();
-            setSavingFailed(failedItems.current.size > 0);
+            syncFailed();
           }
         })
         .catch((error: unknown) => {
@@ -105,12 +123,12 @@ export function useAttemptAnswers(
             failedItems.current.add(itemId);
             unsyncedItems.current.delete(itemId);
             persistOutstanding();
-            setSavingFailed(true);
+            syncFailed();
           }
           toast.error(isApiError(error) ? error.message : GENERIC_ERROR_MESSAGE);
         });
     },
-    [attempt.id, participantToken, persistOutstanding],
+    [attempt.id, participantToken, persistOutstanding, syncFailed],
   );
 
   const answer = useCallback(
@@ -251,9 +269,9 @@ export function useAttemptAnswers(
     firstUnansweredId,
     completed,
     completing: submitting || complete.isPending,
-    savingFailed,
-    failedItemIds: [...failedItems.current],
-    canRetryFailed: savingFailed && [...failedItems.current].every((id) => latestValues.current.has(id)),
+    savingFailed: failed.ids.length > 0,
+    failedItemIds: failed.ids,
+    canRetryFailed: failed.retryable,
     retryFailed,
     submit,
     tryComplete,
