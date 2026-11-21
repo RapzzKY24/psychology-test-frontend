@@ -43,6 +43,8 @@ export function AttemptRunnerIsland({ attemptId }: { attemptId: string }) {
     birthDate,
     gender,
     education,
+    // Wait for hydration: only then is the guest token readable.
+    mounted,
   );
 
   if (!mounted || query.isPending) {

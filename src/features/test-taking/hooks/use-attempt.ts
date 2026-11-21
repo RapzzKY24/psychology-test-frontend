@@ -20,11 +20,22 @@ export function useAttempt(
   birthDate: string | null = null,
   gender: Gender | null = null,
   education: Education | null = null,
+  /**
+   * A guest's token only exists in localStorage, which the server render and
+   * the hydration pass cannot read. Starting the fetch before that pass is over
+   * would call the signed-in route with no token, take a 401 and bounce the
+   * participant to /masuk — so the caller holds the query until it is mounted.
+   */
+  enabled = true,
 ) {
   return useQuery({
-    queryKey: [...qk.attempts.detail(attemptId), birthDate, gender, education],
+    queryKey: [...qk.attempts.detail(attemptId), participantToken, birthDate, gender, education],
     queryFn: () =>
       fetchAttempt(attemptId, participantToken ?? undefined, birthDate, gender, education),
+    enabled,
+    // `*_required` is an expected answer, not a failure: the island turns it
+    // into a gate screen. A global error toast on top of that reads as a bug.
+    meta: { silentError: true },
     // The runner is the source of truth while it is mounted — no refetch
     // that could clobber in-flight answers.
     refetchOnWindowFocus: false,
