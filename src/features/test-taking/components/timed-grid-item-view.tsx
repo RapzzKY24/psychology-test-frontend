@@ -87,13 +87,28 @@ export function TimedGridItemView({
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Lajur {column}
         </p>
-        <p className="text-xs text-muted-foreground">
-          {answers.filter((answer) => answer !== null).length} / {gaps} terisi
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-xs text-muted-foreground">
+            {answers.filter((answer) => answer !== null).length} / {gaps} terisi
+          </p>
+          {/* At the top, where it is reachable while the lajur is still empty:
+              the sidebar's "Lanjut" already covers a half-filled row. */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onSkip}
+            disabled={disabled || isLast}
+            className="shrink-0"
+          >
+            <SkipForward className="size-4" aria-hidden />
+            Lewati lajur
+          </Button>
+        </div>
       </div>
 
       <p className="text-sm text-muted-foreground">
@@ -146,23 +161,10 @@ export function TimedGridItemView({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-muted-foreground">
-          Lajur yang sudah selesai tidak bisa dibuka lagi. Jawaban tersimpan
-          otomatis.
-        </p>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onSkip}
-          disabled={disabled || isLast}
-          className="shrink-0"
-        >
-          <SkipForward className="size-4" aria-hidden />
-          Lewati lajur
-        </Button>
-      </div>
+      <p className="text-xs text-muted-foreground">
+        Lajur yang sudah selesai tidak bisa dibuka lagi. Jawaban tersimpan
+        otomatis.
+      </p>
     </div>
   );
 }

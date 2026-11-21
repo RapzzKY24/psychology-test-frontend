@@ -60,13 +60,16 @@ export function RunnerNavPanel({
         </p>
       </div>
       {locked ? null : (
-        <QuestionNavigator
-          total={total}
-          answered={answered}
-          activeIndex={activeIndex}
-          onSelect={onSelect}
-          orientation="vertical"
-        />
+        // A 180-item inventory would otherwise push the buttons off screen.
+        <div className="max-h-[42vh] overflow-y-auto overscroll-contain pr-1">
+          <QuestionNavigator
+            total={total}
+            answered={answered}
+            activeIndex={activeIndex}
+            onSelect={onSelect}
+            orientation="vertical"
+          />
+        </div>
       )}
       <Separator />
       <NavButtons
