@@ -64,7 +64,7 @@ describe("CheckoutResult", () => {
       { wrapper },
     );
 
-    expect(screen.getByText(/penyedia pembayaran/i)).toBeTruthy();
+    expect(screen.getByText(/Pembayaran tercatat di penyedia/i)).toBeTruthy();
     expect(screen.queryByText(/midtrans/i)).toBeNull();
   });
 

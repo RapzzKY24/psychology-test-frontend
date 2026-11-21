@@ -1,27 +1,47 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { TestCategoryFilters } from "@/features/public/components/test-category-filters";
 
-afterEach(cleanup);
+const push = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push }),
+}));
+
+afterEach(() => {
+  cleanup();
+  push.mockClear();
+});
 
 describe("TestCategoryFilters", () => {
-  it("links every category plus an all-tests option", () => {
+  it("offers every category plus an all-tests option", () => {
     render(<TestCategoryFilters />);
-    expect(screen.getByRole("link", { name: "Semua" }).getAttribute("href")).toBe("/tes");
-    expect(screen.getByRole("link", { name: "Kepribadian" }).getAttribute("href")).toBe(
-      "/tes?category=PERSONALITY",
-    );
-    expect(screen.getByRole("link", { name: "Gaya Kerja" }).getAttribute("href")).toBe(
-      "/tes?category=WORK_STYLE",
-    );
+    const select = screen.getByLabelText("Kategori tes") as HTMLSelectElement;
+
+    expect(Array.from(select.options).map((option) => option.textContent)).toEqual([
+      "Semua kategori",
+      "Kepribadian",
+      "Kognitif",
+      "Gaya Kerja",
+      "Minat",
+      "Projektif",
+    ]);
   });
 
-  it("marks the active category and links back to all tests", () => {
+  it("marks the active category", () => {
     render(<TestCategoryFilters category="COGNITIVE" />);
-    expect(screen.getByRole("link", { name: "Kognitif" }).getAttribute("aria-current")).toBe(
-      "true",
-    );
-    expect(screen.getByRole("link", { name: "Semua" }).getAttribute("aria-current")).toBeNull();
+    const select = screen.getByLabelText("Kategori tes") as HTMLSelectElement;
+
+    expect(select.value).toBe("COGNITIVE");
+  });
+
+  it("navigates to the chosen category", () => {
+    render(<TestCategoryFilters />);
+    fireEvent.change(screen.getByLabelText("Kategori tes"), {
+      target: { value: "COGNITIVE" },
+    });
+
+    expect(push).toHaveBeenCalledWith("/tes?category=COGNITIVE", { scroll: false });
   });
 });
