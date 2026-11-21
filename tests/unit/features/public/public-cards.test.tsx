@@ -47,10 +47,18 @@ describe("TestCard", () => {
     expect(screen.getByRole("link", { name: "Lihat detail" })).toBeTruthy();
   });
 
-  it("stays text-first even when the test has a cover", () => {
+  it("shows the cover in the thumbnail slot", () => {
     render(<TestCard test={{ ...test, imageUrl: "/uploads/test-covers/disc.png" }} />);
 
+    const cover = screen.getByRole("img", { name: "Tes DISC" });
+    expect(cover.getAttribute("src")).toContain("test-covers");
+  });
+
+  it("falls back to the category icon when there is no cover", () => {
+    render(<TestCard test={test} />);
+
     expect(screen.queryByRole("img")).toBeNull();
+    expect(screen.getByTestId("category-thumb")).toBeTruthy();
   });
 });
 
