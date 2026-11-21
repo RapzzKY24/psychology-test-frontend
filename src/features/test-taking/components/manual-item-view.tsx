@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import type { ManualMark } from "@/lib/api/types";
 import { MANUAL_MARK_LABELS } from "@/lib/manual-marks";
 import { useUploadDrawing } from "../hooks/use-upload-drawing";
+import { useUnsavedWarning } from "../hooks/use-unsaved-warning";
 import { paintStimulus } from "../lib/manual-marks";
 
 interface ManualItemViewProps {
@@ -63,6 +64,9 @@ export function ManualItemView({
   useEffect(() => {
     onDirtyChange(dirty);
   }, [dirty, onDirtyChange]);
+
+  // Closing the tab is the one exit the runner cannot intercept.
+  useUnsavedWarning(dirty);
 
   /** Repaint the lower layer with the printed mark only. */
   const paintMark = useCallback(() => {
