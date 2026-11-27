@@ -32,3 +32,18 @@ export function fetchPublishedTestsServer(): Promise<ApiSuccess<InstansiTestOpti
   // as the public catalog, price included.
   return apiFetchServer<InstansiTestOption[]>("/instansi/tests");
 }
+
+/**
+ * One test with the caller's deal price. Never cached: the response depends on
+ * who is signed in, so an ISR entry would leak one institution's price to
+ * another. The page is dynamic anyway (it reads the session).
+ */
+export function fetchInstansiTestDetailServer(
+  slug: string,
+): Promise<ApiSuccess<InstansiTestOption>> {
+  return apiFetchServer<InstansiTestOption>(
+    `/instansi/tests/${encodeURIComponent(slug)}`,
+    // revalidate: 0 = no-store. (`false` would cache indefinitely.)
+    { revalidate: 0 },
+  );
+}

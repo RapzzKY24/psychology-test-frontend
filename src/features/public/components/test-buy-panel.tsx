@@ -1,7 +1,8 @@
 import { Check, ShieldCheck } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatIdr } from "@/lib/format/format-idr";
-import type { PublicTest, UserRole } from "@/lib/api/types";
+import type { PublicTestWithDeal, UserRole } from "@/lib/api/types";
 import { AgeGateCard } from "./age-gate";
 import { TestBuyCta } from "./test-buy-cta";
 
@@ -12,7 +13,7 @@ const INCLUDES = [
 ] as const;
 
 interface BuyProps {
-  test: PublicTest;
+  test: PublicTestWithDeal;
   /** null = signed-out visitor. */
   role: UserRole | null;
 }
@@ -24,9 +25,21 @@ export function TestBuyPanel({ test, role }: BuyProps) {
       <CardContent className="space-y-5">
         <div>
           <p className="text-muted-foreground text-sm">Biaya asesmen</p>
-          <p className="font-heading text-3xl font-semibold tracking-tight">
-            {formatIdr(test.price)}
-          </p>
+          <div className="flex flex-wrap items-baseline gap-2">
+            <p className="font-heading text-3xl font-semibold tracking-tight">
+              {formatIdr(test.price)}
+            </p>
+            {test.hasDealPrice && test.basePrice != null && (
+              <span className="text-muted-foreground text-sm line-through">
+                {formatIdr(test.basePrice)}
+              </span>
+            )}
+          </div>
+          {test.hasDealPrice && (
+            <Badge variant="secondary" className="mt-1.5">
+              Harga Khusus
+            </Badge>
+          )}
           <p className="text-muted-foreground mt-1 text-xs">Biaya sudah termasuk laporan hasil.</p>
         </div>
 
@@ -65,7 +78,14 @@ export function TestBuyBar({ test, role }: BuyProps) {
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
         <div>
           <p className="text-muted-foreground text-xs">Biaya</p>
-          <p className="text-lg font-semibold">{formatIdr(test.price)}</p>
+          <div className="flex items-baseline gap-2">
+            <p className="text-lg font-semibold">{formatIdr(test.price)}</p>
+            {test.hasDealPrice && test.basePrice != null && (
+              <span className="text-muted-foreground text-xs line-through">
+                {formatIdr(test.basePrice)}
+              </span>
+            )}
+          </div>
         </div>
         <TestBuyCta
           testId={test.id}

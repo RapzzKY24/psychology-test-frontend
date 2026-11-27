@@ -11,6 +11,8 @@ function test(price: number, id = "t1"): InstansiTestOption {
     imageUrl: null,
     category: "PERSONALITY",
     price,
+    basePrice: price,
+    hasDealPrice: false,
     estimatedDurationMin: 30,
     ageBand: null,
   };

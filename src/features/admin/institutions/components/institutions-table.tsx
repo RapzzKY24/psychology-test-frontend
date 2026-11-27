@@ -1,3 +1,5 @@
+import { Tag } from "lucide-react";
+import Link from "next/link";
 import {
   Table,
   TableBody,
@@ -43,7 +45,7 @@ export function InstitutionsTable({ rows, meta, listKey }: InstitutionsTableProp
               <TableHead>Institusi</TableHead>
               <TableHead>Kontak</TableHead>
               <TableHead>Telepon</TableHead>
-              <TableHead className="w-16">Aksi</TableHead>
+              <TableHead className="w-44">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -59,7 +61,24 @@ export function InstitutionsTable({ rows, meta, listKey }: InstitutionsTableProp
                 </TableCell>
                 <TableCell className="tabular-nums">{row.phone || "—"}</TableCell>
                 <TableCell>
-                  {row._optimistic ? <SavingChip /> : <InstitutionFormDialog listKey={listKey} mode="edit" institution={row} />}
+                  {row._optimistic ? (
+                    <SavingChip />
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href={`/admin/institusi/${row.id}`}
+                        className="text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline"
+                      >
+                        <Tag className="size-3.5" aria-hidden />
+                        Harga Khusus
+                      </Link>
+                      <InstitutionFormDialog
+                        listKey={listKey}
+                        mode="edit"
+                        institution={row}
+                      />
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

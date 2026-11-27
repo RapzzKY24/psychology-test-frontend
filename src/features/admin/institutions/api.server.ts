@@ -20,3 +20,9 @@ export function fetchInstitutionsServer(
 ): Promise<ApiSuccess<Institution[]>> {
   return apiFetchServer<Institution[]>(`/admin/institutions${buildQuery(filters)}`);
 }
+
+export function fetchInstitutionServer(
+  id: string,
+): Promise<ApiSuccess<Institution>> {
+  return apiFetchServer<Institution>(`/admin/institutions/${id}`);
+}
