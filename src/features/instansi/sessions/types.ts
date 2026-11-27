@@ -1,7 +1,9 @@
-import type { PublicTest } from "@/lib/api/types";
+import type { DealPriceView, PublicTest } from "@/lib/api/types";
 
 /**
- * `GET /instansi/tests` returns the full public DTO (price included) for every
- * published test, so the checkout can read the price without a second call.
+ * `GET /instansi/tests` returns the public DTO for every published test with
+ * this institution's deal price already applied: `price` is what the
+ * institution pays, `basePrice` is the website price for the struck-through
+ * reference, and `hasDealPrice` drives the badge.
  */
-export type InstansiTestOption = PublicTest;
+export type InstansiTestOption = PublicTest & DealPriceView;

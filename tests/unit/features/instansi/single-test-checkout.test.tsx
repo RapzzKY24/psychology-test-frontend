@@ -18,6 +18,8 @@ const disc: InstansiTestOption = {
   imageUrl: null,
   category: "PERSONALITY",
   price: 75000,
+  basePrice: 75000,
+  hasDealPrice: false,
   estimatedDurationMin: 30,
   ageBand: null,
 };
@@ -74,6 +76,21 @@ describe("SingleTestCheckout", () => {
 
     expect(screen.getByRole("alert").textContent).toContain("Biaya tes ini belum ditetapkan");
     expect(screen.getByRole("button", { name: /Buat Sesi/ }).hasAttribute("disabled")).toBe(true);
+  });
+
+  it("shows the deal price with the website price struck through", () => {
+    const deal: InstansiTestOption = {
+      ...disc,
+      id: "t-deal",
+      price: 100000,
+      basePrice: 150000,
+      hasDealPrice: true,
+    };
+    render(<SingleTestCheckout testId="t-deal" initialTests={[deal]} />, { wrapper });
+
+    expect(screen.getByText("Harga Khusus")).toBeTruthy();
+    expect(screen.getAllByText((content) => content.includes("150.000")).length).toBeGreaterThan(0);
+    expect(screen.getAllByText((content) => content.includes("100.000")).length).toBeGreaterThan(0);
   });
 
   it("explains when the test is not sellable instead of showing an empty form", () => {

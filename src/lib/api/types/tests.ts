@@ -16,6 +16,18 @@ export interface PublicTest {
   ageBand: AgeBand | null;
 }
 
+/**
+ * Institution deal fields, attached when the caller is an INSTANSI.
+ * `price` is then the effective price and `basePrice` the website reference.
+ */
+export interface DealPriceView {
+  basePrice: number;
+  hasDealPrice: boolean;
+}
+
+/** A public test that may carry institution deal fields (absent for anonymous users). */
+export type PublicTestWithDeal = PublicTest & Partial<DealPriceView>;
+
 /** Admin test row (`GET /api/v1/admin/tests`) — the public shape plus builder fields. */
 export interface AdminTest extends Omit<PublicTest, "ageBand"> {
   status: TestStatus;

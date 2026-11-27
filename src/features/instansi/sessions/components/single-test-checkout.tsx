@@ -1,6 +1,7 @@
 "use client";
 
 import { Clock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
@@ -58,9 +59,19 @@ function SingleTestCheckoutForm({ test }: { test: InstansiTestOption }) {
         </CardHeader>
         <CardContent className="space-y-1">
           <p className="font-medium">{test.name}</p>
-          <p className="text-muted-foreground flex items-center gap-1 text-sm">
+          <p className="text-muted-foreground flex flex-wrap items-center gap-1 text-sm">
             <Clock className="size-3" aria-hidden />
-            {test.estimatedDurationMin} menit · {formatIdr(test.price)} / peserta
+            {test.estimatedDurationMin} menit ·
+            {test.hasDealPrice ? (
+              <>
+                <span className="line-through">{formatIdr(test.basePrice)}</span>
+                <span className="text-foreground font-medium">{formatIdr(test.price)}</span>
+                <Badge variant="secondary">Harga Khusus</Badge>
+              </>
+            ) : (
+              <span>{formatIdr(test.price)}</span>
+            )}
+            <span>/ peserta</span>
           </p>
         </CardContent>
       </Card>
