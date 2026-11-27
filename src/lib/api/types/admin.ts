@@ -44,6 +44,21 @@ export interface InstitutionInput {
   notes?: string;
 }
 
+/** Row of `GET /api/v1/admin/institutions/:id/test-prices`. */
+export interface InstitutionTestPriceRow {
+  testId: string;
+  name: string;
+  slug: string;
+  basePrice: number;
+  /** null = no deal, the institution pays `basePrice`. */
+  dealPrice: number | null;
+}
+
+/** Body of `PUT /api/v1/admin/institutions/:id/test-prices` (replace-all). */
+export interface SaveInstitutionTestPricesInput {
+  prices: Array<{ testId: string; price: number }>;
+}
+
 /** Row of `GET /api/v1/admin/invoices` (number auto: INV-YYYY-NNNN). */
 export interface Invoice {
   /** FE-only: set while an optimistic mutation is in flight (rendered grayed). */
