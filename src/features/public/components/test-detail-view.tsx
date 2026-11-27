@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import type { PublicPsychologist, PublicTest, UserRole } from "@/lib/api/types";
+import type {
+  PublicPsychologist,
+  PublicTestWithDeal,
+  UserRole,
+} from "@/lib/api/types";
 import { AgeGateCard, AgeGateProvider } from "./age-gate";
 import { TestBeforeStart } from "./test-before-start";
 import { TestBuyBar, TestBuyPanel } from "./test-buy-panel";
@@ -17,7 +21,7 @@ export function TestDetailView({
   role,
   psychologists,
 }: {
-  test: PublicTest;
+  test: PublicTestWithDeal;
   role: UserRole | null;
   psychologists: PublicPsychologist[];
 }) {
